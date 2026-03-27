@@ -7,8 +7,8 @@
 
 const APP_CONFIG_ = {
   templateName: 'Dashboard',
-  releaseName: 'Mapa de Cobre',
-  versionNumber: '1.1.1',
+  releaseName: 'Trilha de Castanha',
+  versionNumber: '1.0.0',
   spreadsheetId: '119enzesF7j5g7Cd1uBgjiu-YSlTKHpubfc_ZSv1M3Lk',
   spreadsheetUrl: 'https://docs.google.com/spreadsheets/d/119enzesF7j5g7Cd1uBgjiu-YSlTKHpubfc_ZSv1M3Lk/edit',
   spreadsheetFileName: 'Esquilo_Invest_Operacional.xlsx',

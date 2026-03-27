@@ -1,5 +1,28 @@
 # Release Notes
 
+Nota: entradas antigas preservam nomes e caminhos historicos da epoca em que foram registradas.
+
+## Release Note - Trilha de Castanha v1.0.0
+
+### Bootstrap estrutural
+
+Base reorganizada em camadas claras para Apps Script, frontend, dados, documentacao e planejamento.
+
+### Arquivos
+
+Foram ajustados:
+- `apps_script/*`
+- `frontend/html/Dashboard.html`
+- `data/*`
+- `docs/*`
+- `plans/*`
+
+### Observacoes
+
+Foram consolidados `docs/project_context.md`, `data/bigquery/table_schemas.md`, `data/mappings/operational_sheet_headers.md`, `plans/roadmap/evolution_tracks.md` e `plans/sprints/backlog.md`.
+As notas intermediarias de etapa foram removidas apos consolidacao do contexto.
+O release visivel da base foi realinhado para `Trilha de Castanha v1.0.0`.
+
 ## Release Note - Mapa de Cobre v1.1.4
 
 ### Estabilizacao da IA
