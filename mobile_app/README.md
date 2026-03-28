@@ -1,4 +1,4 @@
-# Pocket Ops
+# ESQUILO INVEST
 
 Base inicial do app Flutter do Esquilo Invest.
 

@@ -57,7 +57,7 @@ class CategoryDetailScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Bloco tatico da carteira',
+                            'Detalhe da categoria',
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: AppPalette.textMuted),
                           ),
@@ -79,7 +79,7 @@ class CategoryDetailScreen extends StatelessWidget {
                   children: <Widget>[
                     TacticalCard(
                       title: args.snapshot.totalLabel,
-                      subtitle: 'Participacao atual da macroclasse',
+                      subtitle: 'Participacao atual da categoria',
                       accent: color,
                       trailing: StatusChip(
                         label: args.snapshot.shareLabel,
@@ -215,7 +215,7 @@ class _HoldingCard extends StatelessWidget {
             [
               if (holding.institution.isNotEmpty) holding.institution,
               if (holding.supportLabel.isNotEmpty) holding.supportLabel,
-            ].join(' • '),
+            ].join(' | '),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppPalette.textMuted,
               height: 1.45,

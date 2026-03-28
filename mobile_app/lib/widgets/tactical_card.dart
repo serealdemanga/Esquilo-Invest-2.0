@@ -21,20 +21,24 @@ class TacticalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppPalette.border),
         gradient: LinearGradient(
-          colors: <Color>[accent.withValues(alpha: 0.10), AppPalette.panel],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          colors: <Color>[
+            accent.withValues(alpha: 0.08),
+            AppPalette.panel,
+            const Color(0xFF09111D),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
         boxShadow: const <BoxShadow>[
           BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 22,
-            offset: Offset(0, 16),
+            color: Color(0x22020617),
+            blurRadius: 18,
+            offset: Offset(0, 12),
           ),
         ],
       ),

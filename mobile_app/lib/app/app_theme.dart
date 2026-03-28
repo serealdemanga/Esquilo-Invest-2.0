@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 abstract final class AppPalette {
-  static const Color background = Color(0xFF061019);
-  static const Color panel = Color(0xFF10202C);
-  static const Color panelAlt = Color(0xFF132938);
-  static const Color border = Color(0xFF284557);
-  static const Color textPrimary = Color(0xFFF3F7FB);
-  static const Color textMuted = Color(0xFF9BAEBE);
-  static const Color amber = Color(0xFFFFB347);
-  static const Color cyan = Color(0xFF68D8FF);
-  static const Color green = Color(0xFF6DE6B3);
-  static const Color red = Color(0xFFFF8F8F);
+  static const Color background = Color(0xFF05070A);
+  static const Color panel = Color(0xFF0F172A);
+  static const Color panelAlt = Color(0xFF111C31);
+  static const Color border = Color(0x1FFFFFFF);
+  static const Color textPrimary = Color(0xFFE2E8F0);
+  static const Color textMuted = Color(0xFF94A3B8);
+  static const Color amber = Color(0xFFF59E0B);
+  static const Color cyan = Color(0xFF38BDF8);
+  static const Color green = Color(0xFF6EE7B7);
+  static const Color red = Color(0xFFFCA5A5);
 }
 
 class AppTheme {
@@ -43,13 +43,27 @@ class AppTheme {
         scrolledUnderElevation: 0,
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: const Color(0xFF08131D),
-        indicatorColor: AppPalette.amber.withValues(alpha: 0.14),
+        backgroundColor: const Color(0xFF081018),
+        indicatorColor: AppPalette.amber.withValues(alpha: 0.10),
         labelTextStyle: WidgetStatePropertyAll(
           GoogleFonts.rajdhani(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            letterSpacing: 0.8,
+            letterSpacing: 1.1,
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: AppPalette.amber,
+          foregroundColor: const Color(0xFFF8FAFC),
+          textStyle: GoogleFonts.rajdhani(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.9,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
@@ -69,7 +83,7 @@ class AppTheme {
       fontSize: size,
       fontWeight: weight,
       color: color,
-      letterSpacing: -0.3,
+      letterSpacing: 0.2,
     );
   }
 
@@ -82,7 +96,7 @@ class AppTheme {
       fontSize: size,
       fontWeight: weight,
       color: color,
-      letterSpacing: 1.1,
+      letterSpacing: 1.4,
     );
   }
 }

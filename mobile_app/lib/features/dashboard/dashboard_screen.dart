@@ -13,7 +13,9 @@ import 'category_detail_screen.dart';
 import 'dashboard_controller.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, this.service});
+
+  final AppScriptDashboardService? service;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -26,7 +28,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = DashboardController(AppScriptDashboardService());
+    _controller = DashboardController(
+      widget.service ?? AppScriptDashboardService(),
+    );
     _controller.loadDashboard();
   }
 
@@ -48,9 +52,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: <Color>[
-                  Color(0xFF03070B),
-                  Color(0xFF071018),
-                  Color(0xFF0A1722),
+                  Color(0xFF05070A),
+                  Color(0xFF09111A),
+                  Color(0xFF0D1622),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -85,12 +89,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               NavigationDestination(
                 icon: Icon(Icons.space_dashboard_outlined),
                 selectedIcon: Icon(Icons.space_dashboard_rounded),
-                label: 'Visao',
+                label: 'Visao geral',
               ),
               NavigationDestination(
                 icon: Icon(Icons.account_tree_outlined),
                 selectedIcon: Icon(Icons.account_tree_rounded),
-                label: 'Carteira',
+                label: 'Categorias',
               ),
               NavigationDestination(
                 icon: Icon(Icons.auto_awesome_outlined),
@@ -174,19 +178,35 @@ class _HeaderBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: AppPalette.panel.withValues(alpha: 0.94),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppPalette.border),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Container(
+              width: 48,
+              height: 48,
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppPalette.panelAlt,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppPalette.border),
+              ),
+              child: Image.asset(
+                'assets/brand/esquilo.png',
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Pocket Ops', style: AppTheme.hudStyle(size: 18)),
+                  Text('Esquilo Invest', style: AppTheme.hudStyle(size: 18)),
                   const SizedBox(height: 4),
                   Text(
-                    AppEnvironment.releaseLabel,
+                    'Base Operacional - v${AppEnvironment.version}',
                     style: AppTheme.tacticalLabel(size: 12),
                   ),
                   const SizedBox(height: 8),
@@ -259,8 +279,8 @@ class _HeroCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TacticalCard(
-      title: 'Painel de campo',
-      subtitle: payload.executiveStatusText,
+      title: 'Resumo executivo',
+      subtitle: 'Patrimonio consolidado e leitura principal da rodada.',
       accent: AppPalette.amber,
       trailing: StatusChip(
         label: '${payload.score.value}/100',
@@ -274,6 +294,14 @@ class _HeroCard extends StatelessWidget {
           Text(
             payload.performanceText,
             style: AppTheme.tacticalLabel(size: 14, color: AppPalette.cyan),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            payload.executiveStatusText,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppPalette.textPrimary,
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 14),
           Wrap(
@@ -306,8 +334,8 @@ class _AllocationSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TacticalCard(
-      title: 'Alocacao por macroclasse',
-      subtitle: 'Leitura principal da carteira no mobile',
+      title: 'Alocacao da carteira',
+      subtitle: 'Valor, peso e rentabilidade por macroclasse.',
       accent: AppPalette.cyan,
       child: Column(
         children: <Widget>[
@@ -359,7 +387,7 @@ class _CategoryRow extends StatelessWidget {
                 Text(snapshot.label, style: AppTheme.hudStyle(size: 13)),
                 const SizedBox(height: 4),
                 Text(
-                  '${snapshot.totalLabel} • ${snapshot.shareLabel}',
+                  '${snapshot.totalLabel} | ${snapshot.shareLabel}',
                   style: Theme.of(
                     context,
                   ).textTheme.bodySmall?.copyWith(color: AppPalette.textMuted),
@@ -387,7 +415,7 @@ class _RadarSection extends StatelessWidget {
     final entries = _buildRadarEntries(payload);
     return TacticalCard(
       title: 'Radar da carteira',
-      subtitle: 'O que merece leitura rapida agora',
+      subtitle: 'Leitura rapida do que pede atencao agora.',
       accent: AppPalette.amber,
       child: Column(
         children: entries
@@ -470,7 +498,7 @@ class _MissionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress = clampUnit(payload.score.value / 100);
     return TacticalCard(
-      title: 'Missao do mes',
+      title: 'Plano de acao',
       subtitle: payload.missionSupport,
       accent: AppPalette.cyan,
       trailing: StatusChip(
@@ -495,7 +523,7 @@ class _MissionSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Prontidao atual ${payload.score.value}/100',
+            'Score atual ${payload.score.value}/100',
             style: Theme.of(
               context,
             ).textTheme.bodySmall?.copyWith(color: AppPalette.textMuted),
@@ -583,8 +611,8 @@ class _PortfolioTab extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
       children: <Widget>[
         TacticalCard(
-          title: 'Blocos operacionais',
-          subtitle: 'Cada card abre um detalhe independente da categoria.',
+          title: 'Detalhe por categoria',
+          subtitle: 'Blocos do dashboard prontos para toque.',
           accent: AppPalette.amber,
           child: Column(
             children: payload.categorySnapshots
@@ -644,7 +672,7 @@ class _CategoryTile extends StatelessWidget {
                       Text(snapshot.label, style: AppTheme.hudStyle(size: 15)),
                       const SizedBox(height: 4),
                       Text(
-                        '$holdingCount itens • ${snapshot.totalLabel}',
+                        '$holdingCount itens | ${snapshot.totalLabel}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppPalette.textMuted,
                         ),
@@ -720,7 +748,7 @@ class _InsightsTab extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         children: <Widget>[
           TacticalCard(
-            title: 'Score operacional',
+            title: 'Score da carteira',
             subtitle: payload.score.explanation,
             accent: AppPalette.cyan,
             trailing: StatusChip(
@@ -750,7 +778,7 @@ class _InsightsTab extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           TacticalCard(
-            title: 'Proxima jogada',
+            title: 'Resumo executivo',
             subtitle: payload.messaging.primaryRecommendation.reason,
             accent: AppPalette.amber,
             trailing: StatusChip(
@@ -799,7 +827,7 @@ class _InsightsTab extends StatelessWidget {
           TacticalCard(
             title: 'Esquilo IA',
             subtitle: aiAnalysis == null
-                ? 'Consulta sob demanda usando o mesmo contexto do AppScript.'
+                ? 'Consulta sob demanda usando o mesmo contexto do dashboard.'
                 : 'Leitura remota atualizada para a rodada atual.',
             accent: const Color(0xFF9C8CFF),
             trailing: StatusChip(
@@ -966,7 +994,7 @@ class _LoadingState extends StatelessWidget {
         children: <Widget>[
           CircularProgressIndicator(),
           SizedBox(height: 14),
-          Text('Carregando operacao...'),
+          Text('Carregando dashboard...'),
         ],
       ),
     );

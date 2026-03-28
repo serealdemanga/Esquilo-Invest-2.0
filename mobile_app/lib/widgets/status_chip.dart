@@ -22,7 +22,7 @@ class StatusChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: palette.background,
         border: Border.all(color: palette.border),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
@@ -36,26 +36,26 @@ class StatusChip extends StatelessWidget {
       case StatusChipTone.info:
         return const _ChipPalette(
           foreground: AppPalette.cyan,
-          border: Color(0x5539BDF8),
-          background: Color(0x1A39BDF8),
+          border: Color(0x5538BDF8),
+          background: Color(0x1A38BDF8),
         );
       case StatusChipTone.warning:
         return const _ChipPalette(
           foreground: AppPalette.amber,
-          border: Color(0x55FFB347),
-          background: Color(0x1AFFB347),
+          border: Color(0x55F59E0B),
+          background: Color(0x1AF59E0B),
         );
       case StatusChipTone.danger:
         return const _ChipPalette(
           foreground: AppPalette.red,
-          border: Color(0x55FF8F8F),
-          background: Color(0x1AFF8F8F),
+          border: Color(0x55FCA5A5),
+          background: Color(0x1AFCA5A5),
         );
       case StatusChipTone.positive:
         return const _ChipPalette(
           foreground: AppPalette.green,
-          border: Color(0x556DE6B3),
-          background: Color(0x1A6DE6B3),
+          border: Color(0x556EE7B7),
+          background: Color(0x1A6EE7B7),
         );
       case StatusChipTone.neutral:
         return const _ChipPalette(

@@ -55,6 +55,8 @@ class AppScriptDashboardService {
         .get(uri)
         .timeout(const Duration(seconds: 20));
 
+    _throwIfHtmlResponse(response);
+
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw AppScriptApiException(
         'O AppScript respondeu com HTTP ${response.statusCode}.',
@@ -77,6 +79,34 @@ class AppScriptDashboardService {
     throw AppScriptApiException(
       _stringFrom(body['error'], fallback: 'Falha ao consultar o AppScript.'),
     );
+  }
+
+  void _throwIfHtmlResponse(http.Response response) {
+    final host = response.request?.url.host.toLowerCase() ?? '';
+    if (host.contains('accounts.google.com')) {
+      throw const AppScriptApiException(
+        'O Web App do AppScript foi publicado com acesso restrito e redirecionou para login Google. Reimplante o /exec com acesso compativel com o app mobile.',
+      );
+    }
+
+    if (response.statusCode == 401) {
+      throw const AppScriptApiException(
+        'O Web App do AppScript recusou a chamada com HTML de autenticacao. Revise o acesso do deploy e publique novamente o /exec.',
+      );
+    }
+
+    final contentType = response.headers['content-type']?.toLowerCase() ?? '';
+    final normalizedBody = response.body.trimLeft().toLowerCase();
+    final looksLikeHtml =
+        contentType.contains('text/html') ||
+        normalizedBody.startsWith('<!doctype html') ||
+        normalizedBody.startsWith('<html');
+
+    if (looksLikeHtml) {
+      throw const AppScriptApiException(
+        'O Web App do AppScript respondeu HTML em vez de JSON. Verifique a rota /exec e a configuracao de acesso do deploy.',
+      );
+    }
   }
 
   Uri _buildUri(String resource) {

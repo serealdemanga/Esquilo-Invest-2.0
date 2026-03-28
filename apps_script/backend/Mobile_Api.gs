@@ -19,9 +19,20 @@ function buildMobileApiResponse_(e) {
 
 function routeMobileApiRequest_(e) {
   try {
-    validateMobileApiToken_(e);
-
     const resource = normalizeMobileApiValue_(e?.parameter?.resource);
+    if (resource === 'health') {
+      return buildMobileApiSuccess_({
+        resource: resource,
+        data: {
+          releaseName: APP_CONFIG_.releaseName,
+          versionNumber: APP_CONFIG_.versionNumber,
+          updatedAt: new Date().toISOString()
+        }
+      });
+    }
+
+    validateMobileApiToken_(e, resource);
+
     if (resource === 'dashboard') {
       return buildMobileApiSuccess_({
         resource: resource,
@@ -44,31 +55,38 @@ function routeMobileApiRequest_(e) {
       });
     }
 
-    if (resource === 'health') {
-      return buildMobileApiSuccess_({
-        resource: resource,
-        data: {
-          releaseName: APP_CONFIG_.releaseName,
-          versionNumber: APP_CONFIG_.versionNumber,
-          updatedAt: new Date().toISOString()
-        }
-      });
-    }
-
     throw new Error('Recurso mobile nao suportado: ' + (resource || 'vazio') + '.');
   } catch (error) {
     return buildMobileApiError_(String(error && error.message ? error.message : error));
   }
 }
 
-function validateMobileApiToken_(e) {
+function validateMobileApiToken_(e, resource) {
+  if (!isProtectedMobileResource_(resource)) return;
+
   const configuredToken = getScriptProperty_(SCRIPT_PROPERTY_KEYS_.mobileAppApiToken);
   if (!configuredToken) return;
 
-  const receivedToken = String(e?.parameter?.token || '').trim();
+  const receivedToken = readMobileApiToken_(e);
   if (receivedToken && receivedToken === configuredToken) return;
 
-  throw new Error('Token mobile invalido.');
+  throw new Error('Token mobile invalido ou ausente.');
+}
+
+function isProtectedMobileResource_(resource) {
+  return ['dashboard', 'ai-analysis'].indexOf(normalizeMobileApiValue_(resource)) >= 0;
+}
+
+function readMobileApiToken_(e) {
+  const directToken = String(e?.parameter?.token || '').trim();
+  if (directToken) return directToken;
+
+  const tokenList = e?.parameters?.token || [];
+  if (tokenList.length > 0) {
+    return String(tokenList[0] || '').trim();
+  }
+
+  return '';
 }
 
 function buildMobileApiSuccess_(data) {

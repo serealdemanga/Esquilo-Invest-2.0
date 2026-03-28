@@ -507,7 +507,7 @@ class PortfolioHolding {
       supportLabel: [
         _stringFrom(json['avgPrice']),
         _stringFrom(json['qty']),
-      ].where((value) => value.isNotEmpty).join(' • '),
+      ].where((value) => value.isNotEmpty).join(' | '),
       detailUrl: _stringFrom(json['chartUrl']),
     );
   }
@@ -542,7 +542,7 @@ class PortfolioHolding {
       supportLabel: [
         _stringFrom(json['strategy']),
         _stringFrom(json['profileLabel']),
-      ].where((value) => value.isNotEmpty).join(' • '),
+      ].where((value) => value.isNotEmpty).join(' | '),
       detailUrl: _stringFrom(json['detailUrl']),
     );
   }
@@ -577,7 +577,7 @@ class PortfolioHolding {
       supportLabel: [
         _stringFrom(json['classification']),
         _stringFrom(json['institution']),
-      ].where((value) => value.isNotEmpty).join(' • '),
+      ].where((value) => value.isNotEmpty).join(' | '),
       detailUrl: _stringFrom(json['detailUrl']),
     );
   }

@@ -37,23 +37,30 @@ class AllocationRing extends StatelessWidget {
             height: size * 0.55,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF071119),
+              color: const Color(0xFF05070A),
               border: Border.all(color: AppPalette.border),
             ),
             padding: const EdgeInsets.all(12),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
-                  centerLabel,
-                  textAlign: TextAlign.center,
-                  style: AppTheme.hudStyle(size: 15),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    centerLabel,
+                    textAlign: TextAlign.center,
+                    style: AppTheme.hudStyle(size: 15),
+                  ),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  centerSupportLabel,
-                  textAlign: TextAlign.center,
-                  style: AppTheme.tacticalLabel(size: 11),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    centerSupportLabel,
+                    textAlign: TextAlign.center,
+                    style: AppTheme.tacticalLabel(size: 11),
+                  ),
                 ),
               ],
             ),
