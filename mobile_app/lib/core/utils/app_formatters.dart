@@ -27,3 +27,26 @@ String formatUpdatedAt(DateTime? value) {
   final month = local.month.toString().padLeft(2, '0');
   return '$day/$month $hour:$minute';
 }
+
+String formatPercentValue(
+  double value, {
+  bool signed = true,
+  int fractionDigits = 1,
+}) {
+  final normalized = (value * 100).toStringAsFixed(fractionDigits)
+      .replaceAll('.', ',');
+  if (!signed) return '$normalized%';
+  if (value > 0) return '+$normalized%';
+  if (value < 0) return '$normalized%';
+  return '0,0%';
+}
+
+String formatRatioLabel(double value, {int max = 100}) {
+  final safeValue = value.round().clamp(0, max);
+  return '$safeValue/$max';
+}
+
+String compactText(String value, {String fallback = 'Sem leitura'}) {
+  final trimmed = value.trim();
+  return trimmed.isEmpty ? fallback : trimmed;
+}

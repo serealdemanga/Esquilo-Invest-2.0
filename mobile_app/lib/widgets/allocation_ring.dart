@@ -4,7 +4,18 @@ import 'package:flutter/material.dart';
 
 import '../app/app_theme.dart';
 import '../core/utils/app_formatters.dart';
-import '../models/dashboard_payload.dart';
+
+class AllocationRingSegment {
+  const AllocationRingSegment({
+    required this.label,
+    required this.weight,
+    required this.color,
+  });
+
+  final String label;
+  final double weight;
+  final Color color;
+}
 
 class AllocationRing extends StatelessWidget {
   const AllocationRing({
@@ -12,10 +23,10 @@ class AllocationRing extends StatelessWidget {
     required this.segments,
     required this.centerLabel,
     required this.centerSupportLabel,
-    this.size = 168,
+    this.size = 220,
   });
 
-  final List<CategorySnapshot> segments;
+  final List<AllocationRingSegment> segments;
   final String centerLabel;
   final String centerSupportLabel;
   final double size;
@@ -33,52 +44,84 @@ class AllocationRing extends StatelessWidget {
             painter: _AllocationRingPainter(segments),
           ),
           Container(
-            width: size * 0.55,
-            height: size * 0.55,
+            width: size * 0.56,
+            height: size * 0.56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF05070A),
+              gradient: const LinearGradient(
+                colors: <Color>[AppPalette.background, AppPalette.panel],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               border: Border.all(color: AppPalette.border),
-            ),
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    centerLabel,
-                    textAlign: TextAlign.center,
-                    style: AppTheme.hudStyle(size: 15),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    centerSupportLabel,
-                    textAlign: TextAlign.center,
-                    style: AppTheme.tacticalLabel(size: 11),
-                  ),
+              boxShadow: const <BoxShadow>[
+                BoxShadow(
+                  color: AppPalette.shadow,
+                  blurRadius: 18,
+                  offset: Offset(0, 10),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          centerSupportLabel,
+                          textAlign: TextAlign.center,
+                          style: AppTheme.tacticalLabel(
+                            size: 11,
+                            color: AppPalette.textMuted,
+                            weight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          centerLabel,
+                          textAlign: TextAlign.center,
+                          style: AppTheme.hudStyle(
+                            size: 22,
+                            color: _ringCenterColor(segments),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
       ),
     );
   }
+
+  Color _ringCenterColor(List<AllocationRingSegment> items) {
+    if (items.isEmpty) return AppPalette.brand;
+    final sorted = <AllocationRingSegment>[...items]
+      ..sort((a, b) => b.weight.compareTo(a.weight));
+    return sorted.first.color;
+  }
 }
 
 class _AllocationRingPainter extends CustomPainter {
   _AllocationRingPainter(this.segments);
 
-  final List<CategorySnapshot> segments;
+  final List<AllocationRingSegment> segments;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final strokeWidth = size.width * 0.13;
+    final strokeWidth = size.width * 0.14;
     final rect = Rect.fromLTWH(
       strokeWidth / 2,
       strokeWidth / 2,
@@ -90,7 +133,7 @@ class _AllocationRingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round
-      ..color = AppPalette.border.withValues(alpha: 0.45);
+      ..color = AppPalette.panelSoft;
 
     canvas.drawArc(rect, 0, math.pi * 2, false, basePaint);
 
@@ -100,10 +143,11 @@ class _AllocationRingPainter extends CustomPainter {
 
     final totalShare = segments.fold<double>(
       0,
-      (total, segment) => total + clampUnit(segment.shareRaw),
+      (double total, AllocationRingSegment segment) =>
+          total + clampUnit(segment.weight),
     );
     final effectiveTotal = totalShare <= 0 ? 1 : totalShare;
-    const gap = 0.08;
+    const gap = 0.06;
     final availableSweep = math.max(
       0.0,
       (math.pi * 2) - (gap * segments.length),
@@ -111,14 +155,20 @@ class _AllocationRingPainter extends CustomPainter {
     var startAngle = -math.pi / 2;
 
     for (final segment in segments) {
-      final sweep =
-          availableSweep * (clampUnit(segment.shareRaw) / effectiveTotal);
+      final sweep = availableSweep * (clampUnit(segment.weight) / effectiveTotal);
+      final glowPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth + 4
+        ..strokeCap = StrokeCap.round
+        ..color = segment.color.withValues(alpha: 0.18)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
       final paint = Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round
-        ..color = colorFromHex(segment.colorHex);
+        ..color = segment.color;
 
+      canvas.drawArc(rect, startAngle, sweep, false, glowPaint);
       canvas.drawArc(rect, startAngle, sweep, false, paint);
       startAngle += sweep + gap;
     }

@@ -18,15 +18,19 @@ class StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = _resolveTone(tone);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: palette.background,
         border: Border.all(color: palette.border),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         label,
-        style: AppTheme.tacticalLabel(size: 11, color: palette.foreground),
+        style: AppTheme.tacticalLabel(
+          size: 11,
+          color: palette.foreground,
+          weight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -35,27 +39,27 @@ class StatusChip extends StatelessWidget {
     switch (tone) {
       case StatusChipTone.info:
         return const _ChipPalette(
-          foreground: AppPalette.cyan,
-          border: Color(0x5538BDF8),
-          background: Color(0x1A38BDF8),
+          foreground: AppPalette.cobalt,
+          border: Color(0x406A86FF),
+          background: Color(0x186A86FF),
         );
       case StatusChipTone.warning:
         return const _ChipPalette(
-          foreground: AppPalette.amber,
-          border: Color(0x55F59E0B),
-          background: Color(0x1AF59E0B),
+          foreground: AppPalette.gold,
+          border: Color(0x40F0B74A),
+          background: Color(0x18F0B74A),
         );
       case StatusChipTone.danger:
         return const _ChipPalette(
           foreground: AppPalette.red,
-          border: Color(0x55FCA5A5),
-          background: Color(0x1AFCA5A5),
+          border: Color(0x40FF6C62),
+          background: Color(0x18FF6C62),
         );
       case StatusChipTone.positive:
         return const _ChipPalette(
           foreground: AppPalette.green,
-          border: Color(0x556EE7B7),
-          background: Color(0x1A6EE7B7),
+          border: Color(0x404FD38C),
+          background: Color(0x184FD38C),
         );
       case StatusChipTone.neutral:
         return const _ChipPalette(

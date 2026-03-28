@@ -71,4 +71,34 @@ void main() {
     expect(payload.snapshotFor('acoes'), isNotNull);
     expect(payload.healthFor('fundos'), isNotNull);
   });
+
+  test('live payload exposes the full mobile command surface', () async {
+    final uri = Uri.parse(
+      _baseUrl,
+    ).replace(queryParameters: <String, String>{
+      'format': 'json',
+      'resource': 'dashboard',
+      'token': _token,
+    });
+
+    final response = await http
+        .get(uri)
+        .timeout(const Duration(seconds: 20));
+
+    expect(response.statusCode, 200);
+
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    final payload = DashboardPayload.fromJson(
+      Map<String, dynamic>.from(decoded['data'] as Map),
+    );
+
+    expect(payload.mobileHome.total.label, isNotEmpty);
+    expect(payload.mobileHome.variation.label, contains('%'));
+    expect(payload.mobileHome.score.valueLabel, contains('/100'));
+    expect(payload.intelligentAlerts.length, greaterThanOrEqualTo(1));
+    expect(payload.assetRanking.items.length, greaterThanOrEqualTo(1));
+    expect(payload.decisionHistory.length, greaterThanOrEqualTo(1));
+    expect(payload.dataProfiles.all.length, 3);
+    expect(payload.operations.canCreate, isTrue);
+  });
 }

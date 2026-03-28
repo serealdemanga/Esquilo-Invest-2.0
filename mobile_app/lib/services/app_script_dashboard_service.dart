@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../core/config/app_environment.dart';
+import '../models/backend_health.dart';
 import '../models/dashboard_payload.dart';
 
 class AppScriptApiException implements Exception {
@@ -27,6 +28,12 @@ class AppScriptDashboardService {
     final body = await _getResource('dashboard');
     final data = _mapFrom(body['data']);
     return DashboardPayload.fromJson(data);
+  }
+
+  Future<BackendHealth> fetchHealth() async {
+    final body = await _getResource('health');
+    final data = _mapFrom(body['data']);
+    return BackendHealth.fromJson(data);
   }
 
   Future<String> fetchAiAnalysis() async {

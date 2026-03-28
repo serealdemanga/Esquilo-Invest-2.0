@@ -2,6 +2,50 @@
 
 Nota: entradas antigas preservam nomes e caminhos historicos da epoca em que foram registradas.
 
+## [Laranja Orbital] v2.0.0
+
+### Rebuild completo do app mobile
+
+O app Flutter foi reconstruido para seguir a hierarquia do novo prototipo sem perder a identidade do Esquilo Invest: header com logo + nome, tema dark premium recalibrado para a cor da marca, home com circulo de composicao real da carteira e centro dedicado a rentabilidade total, navegacao inferior redesenhada e quatro frentes reais de uso (`Inicio`, `Carteira`, `Radar` e `Base`).
+
+### Cobertura real do backend
+
+O mobile passou a expor blocos que ja existiam no `dashboard` e nao apareciam na UI anterior, incluindo:
+- alertas inteligentes
+- ranking de ativos
+- historico de decisao
+- ordens sugeridas
+- perfis de dados
+- capacidades operacionais
+- resumo de previdencia
+- detalhe navegavel por categoria
+- detalhe navegavel por ativo com leitura inteligente e link externo
+
+### Observacoes
+
+O endpoint `ai-analysis` continua dependente da chave Gemini no App Script; por isso o app trata a indisponibilidade de forma honesta, sem quebrar o fluxo principal da carteira.
+O build Android permanece com nome de app `Esquilo Invest` e versao `2.0.0`, alinhado ao projeto atual.
+
+## Release Note - Pocket Ops v2.1.0
+
+### HOME premium reconstruida
+
+A HOME premium do app Flutter foi reconstruida para seguir a hierarquia do prototipo em um fluxo unico: topo compacto, bloco principal com total investido + gauge de risco + distribuicao, recomendacao dedicada, score resumido, insights em lista e navegacao inferior com aparencia premium.
+
+### Arquivos
+
+Foram ajustados:
+- `mobile_app/lib/app/app_theme.dart`
+- `mobile_app/lib/features/dashboard/dashboard_screen.dart`
+- `mobile_app/lib/features/dashboard/dashboard_home_premium_tab.dart`
+- `mobile_app/test/dashboard_ui_audit_test.dart`
+- `docs/release_notes/release_notes.md`
+
+### Observacoes
+
+Os dados continuam vindo da integracao existente, sem congelar valores estruturais na HOME.
+Os estados de carregamento, erro e falta de configuracao passaram a respeitar a mesma moldura visual da tela principal, sem expor mensagem tecnica ao usuario.
+
 ## Release Note - Pocket Ops v2.0.0
 
 ### MVP mobile Flutter

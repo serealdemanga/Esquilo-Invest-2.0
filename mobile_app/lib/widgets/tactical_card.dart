@@ -9,7 +9,7 @@ class TacticalCard extends StatelessWidget {
     required this.child,
     this.subtitle,
     this.trailing,
-    this.accent = AppPalette.amber,
+    this.accent = AppPalette.brand,
   });
 
   final String title;
@@ -23,21 +23,21 @@ class TacticalCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppPalette.border),
         gradient: LinearGradient(
           colors: <Color>[
-            accent.withValues(alpha: 0.08),
+            accent.withValues(alpha: 0.12),
             AppPalette.panel,
-            const Color(0xFF09111D),
+            AppPalette.backgroundAlt,
           ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
         boxShadow: const <BoxShadow>[
           BoxShadow(
-            color: Color(0x22020617),
-            blurRadius: 18,
+            color: AppPalette.shadow,
+            blurRadius: 24,
             offset: Offset(0, 12),
           ),
         ],
@@ -60,6 +60,7 @@ class TacticalCard extends StatelessWidget {
                         subtitle!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppPalette.textMuted,
+                          height: 1.35,
                         ),
                       ),
                     ],
