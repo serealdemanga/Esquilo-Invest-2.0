@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../models/backend_health.dart';
 import '../../models/dashboard_payload.dart';
+import '../../models/holding_operation_request.dart';
 import '../../services/app_script_dashboard_service.dart';
 
 class DashboardController extends ChangeNotifier {
@@ -78,6 +79,37 @@ class DashboardController extends ChangeNotifier {
       _isAiLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<String> createHolding(HoldingOperationRequest request) async {
+    final result = await _service.createHolding(request);
+    return result.message;
+  }
+
+  Future<String> updateHolding(HoldingOperationRequest request) async {
+    final result = await _service.updateHolding(request);
+    return result.message;
+  }
+
+  Future<String> changeHoldingStatus({
+    required String type,
+    required String code,
+    required String status,
+  }) async {
+    final result = await _service.updateHoldingStatus(
+      type: type,
+      code: code,
+      status: status,
+    );
+    return result.message;
+  }
+
+  Future<String> deleteHolding({
+    required String type,
+    required String code,
+  }) async {
+    final result = await _service.deleteHolding(type: type, code: code);
+    return result.message;
   }
 
   @override

@@ -590,16 +590,233 @@ function buildFallbackStrategyResponse_(context, validation) {
   ].join('\n');
 }
 
+function normalizePortfolioAIRequest_(requestOptions) {
+  const profile = String(
+    requestOptions && (requestOptions.profile || requestOptions.responseProfile) || ''
+  ).trim().toLowerCase();
+
+  return {
+    profile: profile === 'mobile-brief' ? 'mobile-brief' : 'default',
+    isMobileBrief: profile === 'mobile-brief'
+  };
+}
+
+function buildMobileBriefSystemPrompt_() {
+  return [
+    'Voce e a Esquilo IA no modo resumo curto do app mobile Esquilo Invest.',
+    'Responda em portugues do Brasil.',
+    'Fale para leigo, sem markdown, sem titulos, sem numeracao e sem bullets.',
+    'Use apenas o contexto recebido, sem inventar dados.',
+    'Formato obrigatório:',
+    '- exatamente 7 linhas',
+    '- linhas 1 a 4: avaliacao geral da carteira',
+    '- linhas 5 e 6: o que fazer agora',
+    '- linha 7: uma unica oportunidade em texto de acao',
+    'Cada linha deve ter uma frase curta e objetiva.'
+  ].join('\n');
+}
+
+function buildMobileBriefPrompt_(context) {
+  const summary = context.summary || {};
+  const metrics = context.metrics || {};
+  const score = context.score || {};
+  const profile = context.profile || {};
+  const messaging = context.messaging || {};
+  const executiveSummary = messaging.executiveSummary || {};
+  const primaryRecommendation = messaging.primaryRecommendation || {};
+  const portfolioDecision = context.portfolioDecision || {};
+  const marketIntel = context.marketIntel || {};
+  const assetIntel = context.assetIntel || {};
+  const topCategory = getTopStrategyCategory_(context);
+
+  return [
+    'Resumo curto da carteira para o app mobile.',
+    'Patrimonio: ' + (summary.total || 'Sem dados') + '.',
+    'Performance consolidada: ' + formatPct_(metrics.performance) + '.',
+    'Score: ' + (score.score ?? 'Sem dados') + ' | Status: ' + (score.status || 'Sem leitura') + '.',
+    'Perfil: ' + [profile.level || '', profile.squad || ''].filter(Boolean).join(' | ') + '.',
+    'Maior concentracao: ' + (topCategory.label || 'Carteira') + ' com ' + formatPct_(topCategory.share || 0) + '.',
+    'Resumo executivo: ' + (executiveSummary.statusText || 'Sem resumo executivo.') + '.',
+    'Decisao consolidada: ' + [
+      portfolioDecision.actionText || '',
+      portfolioDecision.focusCategoryLabel ? ('Foco ' + portfolioDecision.focusCategoryLabel) : '',
+      portfolioDecision.criticalPoint ? ('Ponto critico ' + portfolioDecision.criticalPoint) : ''
+    ].filter(Boolean).join(' | ') + '.',
+    'Recomendacao principal: ' + [
+      primaryRecommendation.title || '',
+      primaryRecommendation.reason || '',
+      primaryRecommendation.impact || ''
+    ].filter(Boolean).join(' | ') + '.',
+    'Risco principal: ' + (
+      extractStrategyLineTarget_(assetIntel.topRiskLine) ||
+      portfolioDecision.criticalPoint ||
+      'Sem risco dominante'
+    ) + '.',
+    'Oportunidade principal: ' + (
+      extractStrategyLineTarget_(assetIntel.topOpportunityLine) ||
+      primaryRecommendation.asset ||
+      'Sem oportunidade dominante'
+    ) + '.',
+    'Radar de mercado: ' + (
+      marketIntel.actionLines && marketIntel.actionLines.length
+        ? marketIntel.actionLines.join(' || ')
+        : marketIntel.coverageText || 'Sem leitura externa relevante.'
+    ) + '.',
+    'Tarefa: devolver exatamente 7 linhas curtas no formato do mobile.'
+  ].join('\n');
+}
+
+function getTopStrategyCategory_(context) {
+  const categories = context && context.categories || {};
+  const orderedCategories = [categories.actions, categories.funds, categories.previdencia]
+    .filter(Boolean)
+    .map(function (category) {
+      return {
+        label: category.label || 'Carteira',
+        share: Number(category.portfolioShare || 0),
+        status: category.status || '',
+        recommendation: category.recommendation || ''
+      };
+    })
+    .sort(function (left, right) {
+      return right.share - left.share;
+    });
+
+  return orderedCategories[0] || {
+    label: 'Carteira',
+    share: 0,
+    status: '',
+    recommendation: ''
+  };
+}
+
+function normalizeMobileBriefLine_(value) {
+  const text = String(value || '')
+    .replace(/^\d+\s*[\)\.\-:]\s*/, '')
+    .replace(/^[\s>*\-.:]+/, '')
+    .replace(/[*_`]+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!text) return '';
+  if (/[.!?]$/.test(text)) return text;
+  return text + '.';
+}
+
+function extractMobileBriefLines_(text) {
+  return String(text || '')
+    .replace(/\r/g, '\n')
+    .split('\n')
+    .map(function (line) { return normalizeMobileBriefLine_(line); })
+    .filter(Boolean);
+}
+
+function getMobileBriefValidationDiagnostics_(text) {
+  const lines = extractMobileBriefLines_(text);
+  const normalizedLines = lines.slice(0, 7);
+
+  if (normalizedLines.length < 7) {
+    return {
+      valid: false,
+      reason: 'insufficient-lines',
+      lineCount: normalizedLines.length,
+      lines: normalizedLines
+    };
+  }
+
+  const tooShort = normalizedLines.filter(function (line) {
+    return line.length < 18;
+  });
+  if (tooShort.length > 0) {
+    return {
+      valid: false,
+      reason: 'line-too-short',
+      lineCount: normalizedLines.length,
+      lines: normalizedLines
+    };
+  }
+
+  return {
+    valid: true,
+    reason: '',
+    lineCount: normalizedLines.length,
+    lines: normalizedLines
+  };
+}
+
+function buildMobileBriefResponseText_(lines) {
+  return (lines || [])
+    .slice(0, 7)
+    .map(function (line) { return normalizeMobileBriefLine_(line); })
+    .filter(Boolean)
+    .join('\n');
+}
+
+function buildMobileBriefFallbackResponse_(context, details) {
+  const summary = context && context.summary || {};
+  const metrics = context && context.metrics || {};
+  const score = context && context.score || {};
+  const messaging = context && context.messaging || {};
+  const executiveSummary = messaging.executiveSummary || {};
+  const primaryRecommendation = messaging.primaryRecommendation || {};
+  const portfolioDecision = context && context.portfolioDecision || {};
+  const marketIntel = context && context.marketIntel || {};
+  const assetIntel = context && context.assetIntel || {};
+  const alerts = context && context.alerts || [];
+  const topCategory = getTopStrategyCategory_(context);
+  const riskTarget = extractStrategyLineTarget_(assetIntel.topRiskLine) || portfolioDecision.criticalPoint || topCategory.label || 'carteira';
+  const opportunityTarget = extractStrategyLineTarget_(assetIntel.topOpportunityLine) || primaryRecommendation.asset || topCategory.label || 'carteira';
+
+  const lines = [
+    'Patrimonio em ' + (summary.total || 'Sem dados') + ' com performance consolidada de ' + formatPct_(metrics.performance) + '.',
+    (topCategory.label || 'Carteira') + ' concentra ' + formatPct_(topCategory.share || 0) + ' da carteira e segue como bloco principal da leitura.',
+    'Score atual em ' + (score.score ?? '0') + ' com status ' + (score.status || 'Em leitura') + '.',
+    compactStrategySentence_(
+      executiveSummary.statusText,
+      'A carteira segue sem urgencia critica na rodada atual'
+    ) + '.',
+    mapStrategyDecisionVerb_(portfolioDecision.actionText || primaryRecommendation.actionText) + ' ' + (
+      portfolioDecision.focusCategoryLabel ||
+      primaryRecommendation.asset ||
+      topCategory.label ||
+      'a carteira'
+    ) + ' com disciplina e sem ampliar risco desnecessario.',
+    'Revisar ' + riskTarget + ' porque ' + compactStrategySentence_(
+      alerts[0] && alerts[0].message,
+      primaryRecommendation.reason || 'ele concentra o principal ponto de atencao desta rodada'
+    ) + '.',
+    'Acao: observar ' + opportunityTarget + ' se ' + compactStrategySentence_(
+      marketIntel.actionLines && marketIntel.actionLines[0],
+      'o contexto continuar favoravel na proxima leitura'
+    ).toLowerCase() + '.'
+  ];
+
+  const response = buildMobileBriefResponseText_(lines);
+  logAIDebug_('portfolio-analysis-mobile-brief-fallback', {
+    reason: details && details.reason ? details.reason : 'unknown',
+    responsePreview: truncateAIDebugText_(response, 500)
+  });
+  return response;
+}
+
 /**
  * Gera a Esquilo IA geral da carteira usando Gemini como motor principal.
  * Mantem fallback seguro para OpenAI sem quebrar o contrato atual do frontend.
  */
-function getPortfolioAIAnalysis() {
+function getPortfolioAIAnalysis(requestOptions) {
+  const request = normalizePortfolioAIRequest_(requestOptions);
   const context = buildStrategyContext_();
-  const prompt = buildStrategyPrompt_(context);
+  const prompt = request.isMobileBrief
+    ? buildMobileBriefPrompt_(context)
+    : buildStrategyPrompt_(context);
   const invalidResponseError = 'Erro: resposta da IA fora do formato esperado.';
   const genericErrorMessage = 'Erro: falha ao obter analise geral da carteira.';
-  const systemPrompt = buildStrategySystemPrompt_();
+  const systemPrompt = request.isMobileBrief
+    ? buildMobileBriefSystemPrompt_()
+    : buildStrategySystemPrompt_();
+  const retryInstruction = request.isMobileBrief
+    ? '\nRetorne exatamente 7 linhas curtas, sem titulos, sem numeracao e sem markdown.'
+    : '\nResponda estritamente no formato obrigatório.';
 
   try {
     let geminiError = '';
@@ -624,12 +841,21 @@ function getPortfolioAIAnalysis() {
       });
       if (isAIProviderErrorText_(response)) {
         openAiError = response;
+        if (request.isMobileBrief) {
+          return buildMobileBriefFallbackResponse_(context, {
+            reason: 'providers-unavailable',
+            geminiError: geminiError,
+            openAiError: openAiError
+          });
+        }
         return pickBestAIErrorText_(geminiError, openAiError);
       }
     }
 
     let safeResponse = sanitizeAIResponse_(response);
-    let validation = getStrategyValidationDiagnostics_(safeResponse);
+    let validation = request.isMobileBrief
+      ? getMobileBriefValidationDiagnostics_(safeResponse)
+      : getStrategyValidationDiagnostics_(safeResponse);
     if (!validation.valid) {
       logAIDebug_('portfolio-analysis-validation-failed', {
         pass: 'primary',
@@ -639,7 +865,7 @@ function getPortfolioAIAnalysis() {
         invalidActionLines: validation.invalidActionLines,
         responsePreview: truncateAIDebugText_(safeResponse, 500)
       });
-      response = callGemini_(systemPrompt + '\nResponda estritamente no formato obrigatório.', prompt);
+      response = callGemini_(systemPrompt + retryInstruction, prompt);
       logAIDebug_('portfolio-analysis-gemini-retry-response', {
         responsePreview: truncateAIDebugText_(response, 500),
         isProviderError: isAIProviderErrorText_(response)
@@ -650,7 +876,7 @@ function getPortfolioAIAnalysis() {
           reason: 'gemini-retry-provider-error',
           responsePreview: truncateAIDebugText_(response, 300)
         });
-        response = callChatGPT_(systemPrompt + '\nResponda estritamente no formato obrigatório.', prompt);
+        response = callChatGPT_(systemPrompt + retryInstruction, prompt);
         logAIDebug_('portfolio-analysis-openai-retry-response', {
           responsePreview: truncateAIDebugText_(response, 500),
           isProviderError: isAIProviderErrorText_(response)
@@ -658,10 +884,19 @@ function getPortfolioAIAnalysis() {
       }
       if (isAIProviderErrorText_(response)) {
         openAiError = response;
+        if (request.isMobileBrief) {
+          return buildMobileBriefFallbackResponse_(context, {
+            reason: 'providers-unavailable-after-retry',
+            geminiError: geminiError,
+            openAiError: openAiError
+          });
+        }
         return pickBestAIErrorText_(geminiError, openAiError);
       }
       safeResponse = sanitizeAIResponse_(response);
-      validation = getStrategyValidationDiagnostics_(safeResponse);
+      validation = request.isMobileBrief
+        ? getMobileBriefValidationDiagnostics_(safeResponse)
+        : getStrategyValidationDiagnostics_(safeResponse);
     }
 
     if (!validation.valid) {
@@ -674,6 +909,10 @@ function getPortfolioAIAnalysis() {
         responsePreview: truncateAIDebugText_(safeResponse, 500)
       });
 
+      if (request.isMobileBrief) {
+        return buildMobileBriefFallbackResponse_(context, validation);
+      }
+
       const fallbackResponse = buildFallbackStrategyResponse_(context, validation);
       if (validateStrategyResponse_(fallbackResponse)) {
         return fallbackResponse;
@@ -685,12 +924,21 @@ function getPortfolioAIAnalysis() {
     logAIDebug_('portfolio-analysis-success', {
       responsePreview: truncateAIDebugText_(safeResponse, 500)
     });
+    if (request.isMobileBrief) {
+      return buildMobileBriefResponseText_(validation.lines);
+    }
     return safeResponse;
   } catch (error) {
     logAIDebug_('portfolio-analysis-exception', {
       message: error && error.message ? error.message : String(error),
       stackPreview: truncateAIDebugText_(error && error.stack ? error.stack : '', 500)
     });
+    if (request.isMobileBrief) {
+      return buildMobileBriefFallbackResponse_(context, {
+        reason: 'exception',
+        error: error && error.message ? error.message : String(error)
+      });
+    }
     return genericErrorMessage;
   }
 }

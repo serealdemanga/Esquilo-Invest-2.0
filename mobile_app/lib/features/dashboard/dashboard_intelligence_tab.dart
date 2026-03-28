@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_theme.dart';
 import '../../core/utils/app_formatters.dart';
 import '../../models/dashboard_payload.dart';
+import '../../widgets/passive_info_panel.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/tactical_card.dart';
 import 'dashboard_presentation.dart';
@@ -192,7 +193,8 @@ class DashboardIntelligenceTab extends StatelessWidget {
           const SizedBox(height: 14),
           TacticalCard(
             title: 'Esquilo IA',
-            subtitle: 'Leitura remota complementar do mesmo contexto da carteira.',
+            subtitle:
+                'Leitura remota complementar do mesmo contexto da carteira.',
             accent: AppPalette.brand,
             trailing: StatusChip(
               label: isAiLoading
@@ -213,14 +215,11 @@ class DashboardIntelligenceTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppPalette.panelSoft,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppPalette.border),
-                  ),
+                PassiveInfoPanel(
+                  accent: aiAnalysis == null
+                      ? AppPalette.gold
+                      : AppPalette.brand,
+                  radius: 20,
                   child: Text(
                     aiAnalysis ??
                         aiErrorMessage ??
@@ -228,16 +227,18 @@ class DashboardIntelligenceTab extends StatelessWidget {
                     style: aiAnalysis == null
                         ? AppTheme.mono(size: 12, color: AppPalette.textMuted)
                         : Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppPalette.textPrimary,
-                              height: 1.5,
-                            ),
+                            color: AppPalette.textPrimary,
+                            height: 1.5,
+                          ),
                   ),
                 ),
                 const SizedBox(height: 14),
                 FilledButton.tonalIcon(
                   onPressed: isAiLoading ? null : onLoadAi,
                   icon: const Icon(Icons.auto_awesome_rounded),
-                  label: Text(isAiLoading ? 'Consultando...' : 'Atualizar leitura'),
+                  label: Text(
+                    isAiLoading ? 'Consultando...' : 'Atualizar leitura',
+                  ),
                 ),
               ],
             ),
@@ -255,14 +256,10 @@ class _AlertTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppPalette.panelSoft,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppPalette.border),
-      ),
+    return PassiveInfoPanel(
+      accent: alert.type.toLowerCase().contains('oportun')
+          ? AppPalette.green
+          : AppPalette.gold,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -359,6 +356,11 @@ class _RankingTile extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(width: 12),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppPalette.textMuted,
+            ),
           ],
         ),
       ),
@@ -373,14 +375,10 @@ class _DecisionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppPalette.panelSoft,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppPalette.border),
-      ),
+    return PassiveInfoPanel(
+      accent: toneForText(item.status) == StatusChipTone.danger
+          ? AppPalette.red
+          : AppPalette.teal,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -398,9 +396,9 @@ class _DecisionTile extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '${compactText(item.asset)} | ${formatUpdatedAt(item.date)}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppPalette.textMuted,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppPalette.textMuted),
           ),
           if (item.context.isNotEmpty) ...<Widget>[
             const SizedBox(height: 8),

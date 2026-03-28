@@ -1,22 +1,34 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../app/app_router.dart';
 import '../../app/app_theme.dart';
-import '../../core/config/app_environment.dart';
 import '../../models/dashboard_payload.dart';
+import '../../models/holding_operation_request.dart';
 import '../../services/app_script_dashboard_service.dart';
+import '../dashboard/dashboard_ai_brief_sheet.dart';
 import '../dashboard/category_detail_screen.dart';
 import '../dashboard/dashboard_home_tab.dart';
 import '../dashboard/dashboard_intelligence_tab.dart';
+import '../dashboard/dashboard_operations_sheet.dart';
 import '../dashboard/dashboard_portfolio_tab.dart';
 import '../dashboard/dashboard_profile_tab.dart';
 import '../dashboard/dashboard_controller.dart';
+import '../dashboard/dashboard_shell.dart';
 import '../dashboard/holding_detail_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, this.service});
+  const DashboardScreen({
+    super.key,
+    this.service,
+    this.initialTabIndex = dashboardHomeTabIndex,
+    this.openAiOnStart = false,
+  });
 
   final AppScriptDashboardService? service;
+  final int initialTabIndex;
+  final bool openAiOnStart;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -24,11 +36,19 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   late final DashboardController _controller;
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+  late int _lastPrimaryIndex;
+  late bool _pendingAiOpen;
 
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.initialTabIndex;
+    _lastPrimaryIndex = widget.initialTabIndex.clamp(
+      dashboardHomeTabIndex,
+      dashboardPortfolioTabIndex,
+    );
+    _pendingAiOpen = widget.openAiOnStart;
     _controller = DashboardController(
       widget.service ?? AppScriptDashboardService(),
     );
@@ -47,19 +67,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
       animation: _controller,
       builder: (BuildContext context, Widget? child) {
         final payload = _controller.dashboard;
+        if (payload != null && _pendingAiOpen) {
+          _pendingAiOpen = false;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _openAiBrief(context, payload);
+          });
+        }
 
         return Scaffold(
           extendBody: true,
-          body: _ShellBackground(
+          body: DashboardShellBackground(
             child: SafeArea(
               bottom: false,
               child: Column(
                 children: <Widget>[
-                  _HeaderBar(
-                    isLoading: _controller.isLoading,
-                    onRefresh: _controller.loadDashboard,
+                  DashboardHeaderBar(
+                    subtitle: _selectedIndex == dashboardProfileTabIndex
+                        ? 'Base operacional'
+                        : 'Leitura inteligente da carteira',
+                    trailing: IconButton.filledTonal(
+                      onPressed: _openBaseView,
+                      tooltip: 'Abrir Base',
+                      icon: const Icon(Icons.person_rounded),
+                    ),
                   ),
-                  if (_controller.dashboardErrorMessage != null && payload != null)
+                  if (_controller.dashboardErrorMessage != null &&
+                      payload != null)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                       child: _InlineWarning(
@@ -88,17 +122,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 onRefresh: _controller.loadDashboard,
                                 onOpenCategory: (String key) =>
                                     _openCategory(context, payload, key),
-                                onOpenPortfolio: () => _setNavigationIndex(1),
-                                onOpenRadar: () => _setNavigationIndex(2),
-                              ),
-                              DashboardPortfolioTab(
-                                payload: payload,
-                                onRefresh: _controller.loadDashboard,
-                                onOpenCategory: (String key) =>
-                                    _openCategory(context, payload, key),
-                                onOpenHolding: (PortfolioHolding holding) =>
-                                    _openHolding(context, payload, holding),
-                                onOpenRadar: () => _setNavigationIndex(2),
+                                onOpenAi: () => _openAiBrief(context, payload),
+                                isAiLoading: _controller.isAiLoading,
                               ),
                               DashboardIntelligenceTab(
                                 payload: payload,
@@ -112,6 +137,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 onOpenTicker: (String ticker) =>
                                     _openTicker(context, payload, ticker),
                               ),
+                              DashboardPortfolioTab(
+                                payload: payload,
+                                onRefresh: _controller.loadDashboard,
+                                onOpenCategory: (String key) =>
+                                    _openCategory(context, payload, key),
+                                onOpenHolding: (PortfolioHolding holding) =>
+                                    _openHolding(context, payload, holding),
+                                onOpenTicker: (String ticker) =>
+                                    _openTicker(context, payload, ticker),
+                                onOpenCreate: () => _openCreateHolding(context),
+                              ),
                               DashboardProfileTab(
                                 payload: payload,
                                 backendHealth: _controller.backendHealth,
@@ -124,9 +160,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          bottomNavigationBar: _BottomDock(
-            selectedIndex: _selectedIndex,
-            onSelected: _setNavigationIndex,
+          bottomNavigationBar: DashboardBottomDock(
+            selectedIndex: _lastPrimaryIndex,
+            onSelected: _setPrimaryNavigationIndex,
+            onOpenAi: payload == null
+                ? () {}
+                : () => _openAiBrief(context, payload),
           ),
         );
       },
@@ -148,6 +187,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         health: payload.healthFor(categoryKey),
         holdings: payload.holdingsFor(categoryKey),
         ranking: payload.assetRanking,
+        canUpdate: payload.operations.canUpdate,
+        canChangeStatus: payload.operations.canChangeStatus,
+        canDelete: payload.operations.canDelete,
+        onUpdateHolding: _controller.updateHolding,
+        onChangeHoldingStatus: (PortfolioHolding holding, String status) =>
+            _controller.changeHoldingStatus(
+              type: holding.categoryKey,
+              code: holding.id,
+              status: status,
+            ),
+        onDeleteHolding: (PortfolioHolding holding) => _controller
+            .deleteHolding(type: holding.categoryKey, code: holding.id),
       ),
     );
   }
@@ -164,7 +215,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
         snapshot: payload.snapshotFor(holding.categoryKey),
         health: payload.healthFor(holding.categoryKey),
         ranking: payload.rankingForTicker(holding.id),
+        canUpdate: payload.operations.canUpdate,
+        canChangeStatus: payload.operations.canChangeStatus,
+        canDelete: payload.operations.canDelete,
+        onUpdateHolding: _controller.updateHolding,
+        onChangeStatus: (String status) => _controller.changeHoldingStatus(
+          type: holding.categoryKey,
+          code: holding.id,
+          status: status,
+        ),
+        onDelete: () => _controller.deleteHolding(
+          type: holding.categoryKey,
+          code: holding.id,
+        ),
       ),
+    );
+  }
+
+  Future<void> _openCreateHolding(BuildContext context) async {
+    final request = await showModalBottomSheet<HoldingOperationRequest>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return const HoldingFormSheet(mode: HoldingFormMode.create);
+      },
+    );
+
+    if (!context.mounted || request == null) {
+      return;
+    }
+
+    await _runPortfolioMutation(
+      context,
+      () => _controller.createHolding(request),
     );
   }
 
@@ -175,7 +259,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ) {
     final normalized = ticker.trim().toLowerCase();
     if (normalized.isEmpty) {
-      _setNavigationIndex(1);
+      _setPrimaryNavigationIndex(dashboardPortfolioTabIndex);
       return;
     }
 
@@ -188,189 +272,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
     }
 
-    _setNavigationIndex(1);
+    _setPrimaryNavigationIndex(dashboardPortfolioTabIndex);
   }
 
-  void _setNavigationIndex(int index) {
+  void _setPrimaryNavigationIndex(int index) {
     setState(() {
       _selectedIndex = index;
+      _lastPrimaryIndex = index;
     });
   }
-}
 
-class _HeaderBar extends StatelessWidget {
-  const _HeaderBar({required this.isLoading, required this.onRefresh});
+  void _openBaseView() {
+    setState(() {
+      _selectedIndex = dashboardProfileTabIndex;
+    });
+  }
 
-  final bool isLoading;
-  final Future<void> Function() onRefresh;
+  Future<void> _openAiBrief(
+    BuildContext context,
+    DashboardPayload payload,
+  ) async {
+    unawaited(_controller.refreshAiAnalysis());
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-      child: Row(
-        children: <Widget>[
-          Container(
-            width: 44,
-            height: 44,
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: AppPalette.panelSoft,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppPalette.border),
-            ),
-            child: Image.asset('assets/brand/esquilo.png', fit: BoxFit.contain),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text.rich(
-                  TextSpan(
-                    children: <InlineSpan>[
-                      TextSpan(
-                        text: 'Esquilo ',
-                        style: AppTheme.hudStyle(size: 16),
-                      ),
-                      TextSpan(
-                        text: 'Invest',
-                        style: AppTheme.hudStyle(
-                          size: 16,
-                          weight: FontWeight.w400,
-                          color: AppPalette.textPrimary.withValues(alpha: 0.88),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Base operacional  .  v${AppEnvironment.version}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppPalette.textMuted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton.filledTonal(
-            onPressed: isLoading ? null : onRefresh,
-            icon: isLoading
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.refresh_rounded),
-          ),
-        ],
-      ),
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return AnimatedBuilder(
+          animation: _controller,
+          builder: (BuildContext context, Widget? child) {
+            return DashboardAiBriefSheet(
+              payload: payload,
+              aiAnalysis: _controller.aiAnalysis,
+              aiErrorMessage: _controller.aiErrorMessage,
+              isAiLoading: _controller.isAiLoading,
+              onRetry: _controller.refreshAiAnalysis,
+            );
+          },
+        );
+      },
     );
   }
-}
 
-class _BottomDock extends StatelessWidget {
-  const _BottomDock({required this.selectedIndex, required this.onSelected});
-
-  final int selectedIndex;
-  final void Function(int index) onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppPalette.panel.withValues(alpha: 0.98),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: AppPalette.border),
-            boxShadow: const <BoxShadow>[
-              BoxShadow(
-                color: AppPalette.shadow,
-                blurRadius: 30,
-                offset: Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Row(
-            children: <Widget>[
-              _DockItem(
-                label: 'Inicio',
-                icon: Icons.home_rounded,
-                selected: selectedIndex == 0,
-                onTap: () => onSelected(0),
-              ),
-              _DockItem(
-                label: 'Carteira',
-                icon: Icons.account_balance_wallet_rounded,
-                selected: selectedIndex == 1,
-                onTap: () => onSelected(1),
-              ),
-              _DockItem(
-                label: 'Radar',
-                icon: Icons.auto_graph_rounded,
-                selected: selectedIndex == 2,
-                onTap: () => onSelected(2),
-              ),
-              _DockItem(
-                label: 'Base',
-                icon: Icons.tune_rounded,
-                selected: selectedIndex == 3,
-                onTap: () => onSelected(3),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DockItem extends StatelessWidget {
-  const _DockItem({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = selected ? AppPalette.brand : AppPalette.textMuted;
-
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(icon, color: color),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: AppTheme.tacticalLabel(
-                  size: 12,
-                  color: color,
-                  weight: selected ? FontWeight.w700 : FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  Future<void> _runPortfolioMutation(
+    BuildContext context,
+    Future<String> Function() action,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final message = await action();
+      await _controller.loadDashboard();
+      if (!mounted) return;
+      setState(() {
+        _selectedIndex = dashboardPortfolioTabIndex;
+        _lastPrimaryIndex = dashboardPortfolioTabIndex;
+      });
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+    } on AppScriptApiException catch (error) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Falha ao executar a operacao.')),
+      );
+    }
   }
 }
 
@@ -411,7 +378,9 @@ class _DashboardStateView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Icon(
-                  isLoading ? Icons.sync_rounded : Icons.wifi_tethering_error_rounded,
+                  isLoading
+                      ? Icons.sync_rounded
+                      : Icons.wifi_tethering_error_rounded,
                   color: AppPalette.brand,
                   size: 32,
                 ),
@@ -466,69 +435,9 @@ class _InlineWarning extends StatelessWidget {
       ),
       child: Text(
         message,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: AppPalette.textPrimary,
-        ),
-      ),
-    );
-  }
-}
-
-class _ShellBackground extends StatelessWidget {
-  const _ShellBackground({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: <Color>[AppPalette.background, AppPalette.backgroundAlt],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Stack(
-        children: <Widget>[
-          Positioned(
-            top: -40,
-            left: -30,
-            child: Container(
-              width: 180,
-              height: 180,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: Color(0x22FF6A1F),
-                    blurRadius: 90,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: 120,
-            right: -40,
-            child: Container(
-              width: 160,
-              height: 160,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: Color(0x186A86FF),
-                    blurRadius: 90,
-                    spreadRadius: 18,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          child,
-        ],
+        style: Theme.of(
+          context,
+        ).textTheme.bodySmall?.copyWith(color: AppPalette.textPrimary),
       ),
     );
   }

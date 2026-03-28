@@ -4,9 +4,11 @@ import '../../app/app_router.dart';
 import '../../app/app_theme.dart';
 import '../../core/utils/app_formatters.dart';
 import '../../models/dashboard_payload.dart';
+import '../../models/holding_operation_request.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/tactical_card.dart';
 import 'dashboard_presentation.dart';
+import 'dashboard_shell.dart';
 import 'holding_detail_screen.dart';
 
 class CategoryDetailArgs {
@@ -15,12 +17,26 @@ class CategoryDetailArgs {
     required this.health,
     required this.holdings,
     required this.ranking,
+    required this.canUpdate,
+    required this.canChangeStatus,
+    required this.canDelete,
+    required this.onUpdateHolding,
+    required this.onChangeHoldingStatus,
+    required this.onDeleteHolding,
   });
 
   final CategorySnapshot snapshot;
   final CategoryHealth? health;
   final List<PortfolioHolding> holdings;
   final AssetRanking ranking;
+  final bool canUpdate;
+  final bool canChangeStatus;
+  final bool canDelete;
+  final Future<String> Function(HoldingOperationRequest request)
+  onUpdateHolding;
+  final Future<String> Function(PortfolioHolding holding, String status)
+  onChangeHoldingStatus;
+  final Future<String> Function(PortfolioHolding holding) onDeleteHolding;
 }
 
 class CategoryDetailScreen extends StatelessWidget {
@@ -33,121 +49,153 @@ class CategoryDetailScreen extends StatelessWidget {
     final accent = categoryAccent(args.snapshot.key);
 
     return Scaffold(
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: <Color>[AppPalette.background, AppPalette.backgroundAlt],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+      body: DashboardShellBackground(
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          bottom: false,
+          child: Column(
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  IconButton.filledTonal(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.arrow_back_rounded),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          args.snapshot.label,
-                          style: AppTheme.hudStyle(size: 18),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Composicao e posicoes do bloco',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppPalette.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  StatusChip(
-                    label: args.health?.status ?? args.snapshot.status,
-                    tone: toneForText(args.health?.status ?? args.snapshot.status),
-                  ),
-                ],
+              DashboardHeaderBar(
+                subtitle: args.snapshot.label,
+                onBack: () => Navigator.of(context).pop(),
               ),
-              const SizedBox(height: 18),
-              TacticalCard(
-                title: args.snapshot.totalLabel,
-                subtitle: 'Participacao atual: ${args.snapshot.shareLabel}',
-                accent: accent,
-                trailing: StatusChip(
-                  label: args.snapshot.performanceLabel,
-                  tone: toneForText(args.snapshot.performanceLabel),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
                   children: <Widget>[
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                    Row(
                       children: <Widget>[
-                        StatusChip(
-                          label: args.health?.risk ?? 'Sem leitura',
-                          tone: toneForText(args.health?.risk ?? ''),
-                        ),
-                        StatusChip(
-                          label: args.health?.recommendation ??
-                              args.snapshot.recommendation,
-                          tone: toneForText(
-                            args.health?.recommendation ??
-                                args.snapshot.recommendation,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                args.snapshot.label,
+                                style: AppTheme.hudStyle(size: 18),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Composicao e posicoes do bloco',
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppPalette.textMuted),
+                              ),
+                            ],
                           ),
                         ),
                         StatusChip(
-                          label: '${args.holdings.length} itens',
-                          tone: StatusChipTone.neutral,
+                          label: args.health?.status ?? args.snapshot.status,
+                          tone: toneForText(
+                            args.health?.status ?? args.snapshot.status,
+                          ),
                         ),
                       ],
                     ),
-                    if ((args.health?.primaryMessage ?? '').isNotEmpty) ...<Widget>[
-                      const SizedBox(height: 14),
-                      Text(
-                        args.health!.primaryMessage,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppPalette.textMuted,
-                          height: 1.45,
+                    const SizedBox(height: 18),
+                    TacticalCard(
+                      title: args.snapshot.totalLabel,
+                      subtitle:
+                          'Participacao atual: ${args.snapshot.shareLabel}',
+                      accent: accent,
+                      trailing: StatusChip(
+                        label: args.snapshot.performanceLabel,
+                        tone: toneForText(args.snapshot.performanceLabel),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: <Widget>[
+                              StatusChip(
+                                label: args.health?.risk ?? 'Sem leitura',
+                                tone: toneForText(args.health?.risk ?? ''),
+                              ),
+                              StatusChip(
+                                label:
+                                    args.health?.recommendation ??
+                                    args.snapshot.recommendation,
+                                tone: toneForText(
+                                  args.health?.recommendation ??
+                                      args.snapshot.recommendation,
+                                ),
+                              ),
+                              StatusChip(
+                                label: '${args.holdings.length} itens',
+                                tone: StatusChipTone.neutral,
+                              ),
+                            ],
+                          ),
+                          if ((args.health?.primaryMessage ?? '')
+                              .isNotEmpty) ...<Widget>[
+                            const SizedBox(height: 14),
+                            Text(
+                              args.health!.primaryMessage,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: AppPalette.textMuted,
+                                    height: 1.45,
+                                  ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    if (args.holdings.isEmpty)
+                      const _EmptyHoldingsState()
+                    else
+                      ...args.holdings.map(
+                        (PortfolioHolding holding) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _HoldingCard(
+                            holding: holding,
+                            ranking: args.ranking.itemByTicker(holding.id),
+                            onTap: () => Navigator.of(context).pushNamed(
+                              AppRouter.holdingDetailRoute,
+                              arguments: HoldingDetailArgs(
+                                holding: holding,
+                                snapshot: args.snapshot,
+                                health: args.health,
+                                ranking: args.ranking.itemByTicker(holding.id),
+                                canUpdate: args.canUpdate,
+                                canChangeStatus: args.canChangeStatus,
+                                canDelete: args.canDelete,
+                                onUpdateHolding: args.onUpdateHolding,
+                                onChangeStatus: (String status) =>
+                                    args.onChangeHoldingStatus(holding, status),
+                                onDelete: () => args.onDeleteHolding(holding),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ],
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
-              if (args.holdings.isEmpty)
-                const _EmptyHoldingsState()
-              else
-                ...args.holdings.map(
-                  (PortfolioHolding holding) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _HoldingCard(
-                      holding: holding,
-                      ranking: args.ranking.itemByTicker(holding.id),
-                      onTap: () => Navigator.of(context).pushNamed(
-                        AppRouter.holdingDetailRoute,
-                        arguments: HoldingDetailArgs(
-                          holding: holding,
-                          snapshot: args.snapshot,
-                          health: args.health,
-                          ranking: args.ranking.itemByTicker(holding.id),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: DashboardBottomDock(
+        selectedIndex: dashboardPortfolioTabIndex,
+        onSelected: (int index) => _goToDashboard(context, index),
+        onOpenAi: () =>
+            _goToDashboard(context, dashboardHomeTabIndex, openAiOnStart: true),
+      ),
+    );
+  }
+
+  void _goToDashboard(
+    BuildContext context,
+    int tabIndex, {
+    bool openAiOnStart = false,
+  }) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRouter.dashboardRoute,
+      (Route<dynamic> route) => false,
+      arguments: DashboardRouteArgs(
+        initialTabIndex: tabIndex,
+        openAiOnStart: openAiOnStart,
       ),
     );
   }
@@ -191,10 +239,7 @@ class _HoldingCard extends StatelessWidget {
                     color: accent.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
-                    categoryIcon(holding.categoryKey),
-                    color: accent,
-                  ),
+                  child: Icon(categoryIcon(holding.categoryKey), color: accent),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -260,7 +305,8 @@ class _HoldingCard extends StatelessWidget {
                   formatPercentValue(holding.performanceRaw),
                   style: AppTheme.tacticalLabel(
                     size: 14,
-                    color: toneForText(holding.performanceLabel) ==
+                    color:
+                        toneForText(holding.performanceLabel) ==
                             StatusChipTone.danger
                         ? AppPalette.red
                         : accent,
@@ -287,9 +333,9 @@ class _EmptyHoldingsState extends StatelessWidget {
       accent: AppPalette.gold,
       child: Text(
         'Nenhum ativo desta categoria esta disponivel na leitura atual.',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: AppPalette.textMuted,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: AppPalette.textMuted),
       ),
     );
   }
