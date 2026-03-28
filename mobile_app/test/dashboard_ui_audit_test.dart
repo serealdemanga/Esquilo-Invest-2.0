@@ -80,7 +80,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Base operacional'), findsAtLeastNWidgets(1));
-    expect(find.text('Esquilo Invest v2.1.0'), findsOneWidget);
+    expect(find.text('Esquilo Invest v2.1.1'), findsOneWidget);
     expect(find.text('Esquilo Invest v2.0.1'), findsOneWidget);
 
     await tester.tap(find.text('Carteira'));

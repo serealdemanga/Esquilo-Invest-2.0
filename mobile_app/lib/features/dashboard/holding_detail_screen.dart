@@ -5,6 +5,7 @@ import '../../app/app_router.dart';
 import '../../app/app_theme.dart';
 import '../../core/utils/app_formatters.dart';
 import '../../models/dashboard_payload.dart';
+import '../../widgets/passive_info_panel.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/tactical_card.dart';
 import 'dashboard_presentation.dart';
@@ -40,10 +41,9 @@ class HoldingDetailScreen extends StatelessWidget {
           child: Column(
             children: <Widget>[
               DashboardHeaderBar(
-                subtitle:
-                    args.holding.subtitle.isEmpty
-                        ? categoryLabel(args.holding.categoryKey)
-                        : args.holding.subtitle,
+                subtitle: args.holding.subtitle.isEmpty
+                    ? categoryLabel(args.holding.categoryKey)
+                    : args.holding.subtitle,
                 onBack: () => Navigator.of(context).pop(),
               ),
               Expanded(
@@ -84,10 +84,9 @@ class HoldingDetailScreen extends StatelessWidget {
                           'Posicao atual no bloco ${categoryLabel(args.holding.categoryKey)}',
                       accent: accent,
                       trailing: StatusChip(
-                        label:
-                            args.holding.shareLabel.isEmpty
-                                ? args.holding.categoryShareLabel
-                                : args.holding.shareLabel,
+                        label: args.holding.shareLabel.isEmpty
+                            ? args.holding.categoryShareLabel
+                            : args.holding.shareLabel,
                         tone: StatusChipTone.info,
                       ),
                       child: Column(
@@ -135,12 +134,11 @@ class HoldingDetailScreen extends StatelessWidget {
                               ),
                               _MetricItem(
                                 label: 'Stop',
-                                value:
-                                    args.holding.stopRaw <= 0
-                                        ? 'Nao informado'
-                                        : args.holding.stopRaw
-                                            .toStringAsFixed(2)
-                                            .replaceAll('.', ','),
+                                value: args.holding.stopRaw <= 0
+                                    ? 'Nao informado'
+                                    : args.holding.stopRaw
+                                          .toStringAsFixed(2)
+                                          .replaceAll('.', ','),
                               ),
                             ],
                           ),
@@ -180,10 +178,13 @@ class HoldingDetailScreen extends StatelessWidget {
                                 args.holding.smartRecommendation.title,
                                 fallback: 'Sem titulo adicional',
                               ),
-                              body: <String>[
-                                args.holding.smartRecommendation.reason,
-                                args.holding.smartRecommendation.impact,
-                              ].where((line) => line.trim().isNotEmpty).join('\n'),
+                              body:
+                                  <String>[
+                                        args.holding.smartRecommendation.reason,
+                                        args.holding.smartRecommendation.impact,
+                                      ]
+                                      .where((line) => line.trim().isNotEmpty)
+                                      .join('\n'),
                             ),
                           if (args.ranking != null) ...<Widget>[
                             const SizedBox(height: 12),
@@ -246,9 +247,8 @@ class HoldingDetailScreen extends StatelessWidget {
                                 ),
                               ),
                             ],
-                          ] else if (args.holding.assetScore.score > 0) ...<
-                            Widget
-                          >[
+                          ] else if (args.holding.assetScore.score >
+                              0) ...<Widget>[
                             const SizedBox(height: 12),
                             _MetricGrid(
                               items: <_MetricItem>[
@@ -301,9 +301,8 @@ class HoldingDetailScreen extends StatelessWidget {
                                 ),
                             ],
                           ),
-                          if ((args.health?.primaryMessage ?? '').isNotEmpty) ...<
-                            Widget
-                          >[
+                          if ((args.health?.primaryMessage ?? '')
+                              .isNotEmpty) ...<Widget>[
                             const SizedBox(height: 14),
                             Text(
                               args.health!.primaryMessage,
@@ -338,12 +337,8 @@ class HoldingDetailScreen extends StatelessWidget {
       bottomNavigationBar: DashboardBottomDock(
         selectedIndex: dashboardPortfolioTabIndex,
         onSelected: (int index) => _goToDashboard(context, index),
-        onOpenAi:
-            () => _goToDashboard(
-              context,
-              dashboardHomeTabIndex,
-              openAiOnStart: true,
-            ),
+        onOpenAi: () =>
+            _goToDashboard(context, dashboardHomeTabIndex, openAiOnStart: true),
       ),
     );
   }
@@ -386,41 +381,37 @@ class _MetricGrid extends StatelessWidget {
     return Wrap(
       spacing: 10,
       runSpacing: 10,
-      children:
-          items
-              .map(
-                (_MetricItem item) => SizedBox(
-                  width: 150,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppPalette.panelSoft,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: AppPalette.border),
+      children: items
+          .map(
+            (_MetricItem item) => SizedBox(
+              width: 150,
+              child: PassiveInfoPanel(
+                accent: AppPalette.cobalt,
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      item.label,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppPalette.textMuted,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          item.label,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppPalette.textMuted),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          item.value,
-                          style: AppTheme.tacticalLabel(
-                            size: 14,
-                            color: AppPalette.textPrimary,
-                            weight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 6),
+                    Text(
+                      item.value,
+                      style: AppTheme.tacticalLabel(
+                        size: 14,
+                        color: AppPalette.textPrimary,
+                        weight: FontWeight.w700,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              )
-              .toList(),
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -433,14 +424,9 @@ class _InsightBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppPalette.panelSoft,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppPalette.border),
-      ),
+    return PassiveInfoPanel(
+      accent: AppPalette.teal,
+      radius: 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

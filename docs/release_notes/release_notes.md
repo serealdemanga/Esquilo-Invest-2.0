@@ -4,7 +4,7 @@ Nota: entradas antigas preservam nomes e caminhos historicos da epoca em que for
 
 ## [Laranja Orbital]
 
-Frontend: v2.1.0
+Frontend: v2.1.1
 Backend: v2.0.1
 
 ### Correcao da navegacao principal
@@ -22,6 +22,10 @@ Os dados que antes estavam no `Radar IA` foram redistribuidos dentro de `Carteir
 ### Contrato backend para o resumo mobile
 
 O endpoint `ai-analysis` passou a aceitar o perfil `mobile-brief`, com prompt rigido para devolver 4 linhas de avaliacao, 2 de acao e 1 oportunidade. Quando Gemini e OpenAI nao estiverem disponiveis, o proprio App Script agora devolve uma resposta deterministica nesse formato, evitando erro bruto no app enquanto o deploy published ainda nao for atualizado.
+
+### Affordance visual corrigida
+
+Blocos informativos que nao executam acao deixaram de usar a mesma linguagem visual dos cards navegaveis. Status ganharam leitura mais passiva, paines estaticos passaram a ter acabamento proprio e os itens realmente clicaveis ficaram mais explicitos nas telas de Dashboard, Carteira, Base e detalhe de ativo.
 
 ## [Laranja Orbital] v2.0.0
 

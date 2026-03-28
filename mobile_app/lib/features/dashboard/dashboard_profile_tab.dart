@@ -5,6 +5,7 @@ import '../../core/config/app_environment.dart';
 import '../../core/utils/app_formatters.dart';
 import '../../models/backend_health.dart';
 import '../../models/dashboard_payload.dart';
+import '../../widgets/passive_info_panel.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/tactical_card.dart';
 import 'dashboard_presentation.dart';
@@ -89,16 +90,9 @@ class DashboardProfileTab extends StatelessWidget {
                 if (payload.sourceWarning.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
-                    child: Container(
-                      width: double.infinity,
+                    child: PassiveInfoPanel(
+                      accent: AppPalette.gold,
                       padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppPalette.gold.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: AppPalette.gold.withValues(alpha: 0.30),
-                        ),
-                      ),
                       child: Text(
                         payload.sourceWarning,
                         style: AppTheme.mono(size: 12),
@@ -150,14 +144,8 @@ class DashboardProfileTab extends StatelessWidget {
                   .map(
                     (SourceDescriptor item) => Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: AppPalette.panelSoft,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: AppPalette.border),
-                        ),
+                      child: PassiveInfoPanel(
+                        accent: AppPalette.teal,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[

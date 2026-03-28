@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_theme.dart';
 import '../../core/utils/app_formatters.dart';
 import '../../models/dashboard_payload.dart';
+import '../../widgets/passive_info_panel.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/tactical_card.dart';
 import 'dashboard_presentation.dart';
@@ -421,6 +422,11 @@ class _HoldingPreviewTile extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(width: 12),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppPalette.textMuted,
+            ),
           ],
         ),
       ),
@@ -443,13 +449,8 @@ class _OrderTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accent.withValues(alpha: 0.24)),
-      ),
+    return PassiveInfoPanel(
+      accent: accent,
       child: Row(
         children: <Widget>[
           Icon(Icons.swap_vert_circle_rounded, color: accent),
@@ -489,14 +490,10 @@ class _AlertTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppPalette.panelSoft,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppPalette.border),
-      ),
+    return PassiveInfoPanel(
+      accent: alert.type.toLowerCase().contains('oportun')
+          ? AppPalette.green
+          : AppPalette.gold,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -593,6 +590,11 @@ class _RankingTile extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(width: 12),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppPalette.textMuted,
+            ),
           ],
         ),
       ),
@@ -607,14 +609,10 @@ class _DecisionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppPalette.panelSoft,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppPalette.border),
-      ),
+    return PassiveInfoPanel(
+      accent: toneForText(item.status) == StatusChipTone.danger
+          ? AppPalette.red
+          : AppPalette.teal,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
