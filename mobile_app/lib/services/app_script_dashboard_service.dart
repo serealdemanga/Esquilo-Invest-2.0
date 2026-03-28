@@ -6,6 +6,23 @@ import 'package:http/http.dart' as http;
 import '../core/config/app_environment.dart';
 import '../models/backend_health.dart';
 import '../models/dashboard_payload.dart';
+import '../models/holding_operation_request.dart';
+
+String _stringFromStatic(Object? value, {String fallback = ''}) {
+  if (value is String && value.trim().isNotEmpty) {
+    return value.trim();
+  }
+  if (value is num || value is bool) {
+    return value.toString();
+  }
+  return fallback;
+}
+
+int _intFromStatic(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(_stringFromStatic(value)) ?? 0;
+}
 
 class AppScriptApiException implements Exception {
   const AppScriptApiException(this.message);
@@ -14,6 +31,35 @@ class AppScriptApiException implements Exception {
 
   @override
   String toString() => message;
+}
+
+class OperationalMutationResult {
+  const OperationalMutationResult({
+    required this.message,
+    required this.action,
+    required this.table,
+    required this.keyValue,
+    required this.affectedRows,
+  });
+
+  factory OperationalMutationResult.fromJson(Map<String, dynamic> json) {
+    return OperationalMutationResult(
+      message: _stringFromStatic(
+        json['message'],
+        fallback: 'Operacao concluida com sucesso.',
+      ),
+      action: _stringFromStatic(json['operation'], fallback: 'update'),
+      table: _stringFromStatic(json['table']),
+      keyValue: _stringFromStatic(json['keyValue']),
+      affectedRows: _intFromStatic(json['affectedRows']),
+    );
+  }
+
+  final String message;
+  final String action;
+  final String table;
+  final String keyValue;
+  final int affectedRows;
 }
 
 class AppScriptDashboardService {
@@ -53,6 +99,55 @@ class AppScriptDashboardService {
       return analysis.trim();
     }
     throw const AppScriptApiException('A resposta da Esquilo IA veio vazia.');
+  }
+
+  Future<OperationalMutationResult> createHolding(
+    HoldingOperationRequest request,
+  ) async {
+    final body = await _postResource('operations', <String, String>{
+      'action': 'create',
+      'type': request.normalizedType,
+      ...request.toCreatePayload(),
+    });
+    return OperationalMutationResult.fromJson(_mapFrom(body['data']));
+  }
+
+  Future<OperationalMutationResult> updateHolding(
+    HoldingOperationRequest request,
+  ) async {
+    final body = await _postResource('operations', <String, String>{
+      'action': 'update',
+      'type': request.normalizedType,
+      'code': request.code.trim(),
+      ...request.toUpdatePayload(),
+    });
+    return OperationalMutationResult.fromJson(_mapFrom(body['data']));
+  }
+
+  Future<OperationalMutationResult> updateHoldingStatus({
+    required String type,
+    required String code,
+    required String status,
+  }) async {
+    final body = await _postResource('operations', <String, String>{
+      'action': 'status',
+      'type': HoldingOperationRequest.crudTypeFromCategory(type),
+      'code': code.trim(),
+      'status': status.trim(),
+    });
+    return OperationalMutationResult.fromJson(_mapFrom(body['data']));
+  }
+
+  Future<OperationalMutationResult> deleteHolding({
+    required String type,
+    required String code,
+  }) async {
+    final body = await _postResource('operations', <String, String>{
+      'action': 'delete',
+      'type': HoldingOperationRequest.crudTypeFromCategory(type),
+      'code': code.trim(),
+    });
+    return OperationalMutationResult.fromJson(_mapFrom(body['data']));
   }
 
   void dispose() {
@@ -100,6 +195,46 @@ class AppScriptDashboardService {
     );
   }
 
+  Future<Map<String, dynamic>> _postResource(
+    String resource,
+    Map<String, String> formFields,
+  ) async {
+    if (!isConfigured) {
+      throw const AppScriptApiException(
+        'Defina APP_SCRIPT_BASE_URL para conectar o AppScript.',
+      );
+    }
+
+    final uri = _buildUri(resource, const <String, String>{});
+    final response = await _client
+        .post(uri, body: formFields)
+        .timeout(const Duration(seconds: 20));
+
+    _throwIfHtmlResponse(response);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw AppScriptApiException(
+        'O AppScript respondeu com HTTP ${response.statusCode}.',
+      );
+    }
+
+    final decoded = jsonDecode(response.body);
+    if (decoded is! Map) {
+      throw const AppScriptApiException(
+        'O AppScript nao retornou um envelope JSON valido.',
+      );
+    }
+
+    final body = decoded.map((key, value) => MapEntry(key.toString(), value));
+    if (body['ok'] == true) {
+      return body;
+    }
+
+    throw AppScriptApiException(
+      _stringFrom(body['error'], fallback: 'Falha ao executar a operacao.'),
+    );
+  }
+
   void _throwIfHtmlResponse(http.Response response) {
     final host = response.request?.url.host.toLowerCase() ?? '';
     if (host.contains('accounts.google.com')) {
@@ -144,7 +279,8 @@ class AppScriptDashboardService {
     return baseUri.replace(queryParameters: query);
   }
 
-  String get _resolvedBaseUrl => _baseUrlOverride ?? AppEnvironment.appScriptBaseUrl;
+  String get _resolvedBaseUrl =>
+      _baseUrlOverride ?? AppEnvironment.appScriptBaseUrl;
 
   String get _resolvedApiToken =>
       _apiTokenOverride ?? AppEnvironment.appScriptApiToken;

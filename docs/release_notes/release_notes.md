@@ -4,8 +4,8 @@ Nota: entradas antigas preservam nomes e caminhos historicos da epoca em que for
 
 ## [Laranja Orbital]
 
-Frontend: v2.1.1
-Backend: v2.0.1
+Frontend: v2.2.0
+Backend: v2.1.0
 
 ### Correcao da navegacao principal
 
@@ -26,6 +26,10 @@ O endpoint `ai-analysis` passou a aceitar o perfil `mobile-brief`, com prompt ri
 ### Affordance visual corrigida
 
 Blocos informativos que nao executam acao deixaram de usar a mesma linguagem visual dos cards navegaveis. Status ganharam leitura mais passiva, paines estaticos passaram a ter acabamento proprio e os itens realmente clicaveis ficaram mais explicitos nas telas de Dashboard, Carteira, Base e detalhe de ativo.
+
+### CRUD operacional no mobile
+
+O app passou a expor criacao, atualizacao, exclusao e troca de status diretamente na camada mobile, reaproveitando o CRUD controlado do backend sem executar ordem financeira real. A Base operacional continua declarando as capacidades disponiveis, mas agora a aba Carteira e o detalhe do ativo conseguem acionar esse contrato de ponta a ponta.
 
 ## [Laranja Orbital] v2.0.0
 

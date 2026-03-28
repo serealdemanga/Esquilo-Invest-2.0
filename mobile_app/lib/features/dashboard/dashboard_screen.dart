@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import '../../app/app_router.dart';
 import '../../app/app_theme.dart';
 import '../../models/dashboard_payload.dart';
+import '../../models/holding_operation_request.dart';
 import '../../services/app_script_dashboard_service.dart';
 import '../dashboard/dashboard_ai_brief_sheet.dart';
 import '../dashboard/category_detail_screen.dart';
 import '../dashboard/dashboard_home_tab.dart';
 import '../dashboard/dashboard_intelligence_tab.dart';
+import '../dashboard/dashboard_operations_sheet.dart';
 import '../dashboard/dashboard_portfolio_tab.dart';
 import '../dashboard/dashboard_profile_tab.dart';
 import '../dashboard/dashboard_controller.dart';
@@ -81,10 +83,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 children: <Widget>[
                   DashboardHeaderBar(
-                    subtitle:
-                        _selectedIndex == dashboardProfileTabIndex
-                            ? 'Base operacional'
-                            : 'Leitura inteligente da carteira',
+                    subtitle: _selectedIndex == dashboardProfileTabIndex
+                        ? 'Base operacional'
+                        : 'Leitura inteligente da carteira',
                     trailing: IconButton.filledTonal(
                       onPressed: _openBaseView,
                       tooltip: 'Abrir Base',
@@ -145,6 +146,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     _openHolding(context, payload, holding),
                                 onOpenTicker: (String ticker) =>
                                     _openTicker(context, payload, ticker),
+                                onOpenCreate: () => _openCreateHolding(context),
                               ),
                               DashboardProfileTab(
                                 payload: payload,
@@ -161,8 +163,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           bottomNavigationBar: DashboardBottomDock(
             selectedIndex: _lastPrimaryIndex,
             onSelected: _setPrimaryNavigationIndex,
-            onOpenAi:
-                payload == null ? () {} : () => _openAiBrief(context, payload),
+            onOpenAi: payload == null
+                ? () {}
+                : () => _openAiBrief(context, payload),
           ),
         );
       },
@@ -184,6 +187,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         health: payload.healthFor(categoryKey),
         holdings: payload.holdingsFor(categoryKey),
         ranking: payload.assetRanking,
+        canUpdate: payload.operations.canUpdate,
+        canChangeStatus: payload.operations.canChangeStatus,
+        canDelete: payload.operations.canDelete,
+        onUpdateHolding: _controller.updateHolding,
+        onChangeHoldingStatus: (PortfolioHolding holding, String status) =>
+            _controller.changeHoldingStatus(
+              type: holding.categoryKey,
+              code: holding.id,
+              status: status,
+            ),
+        onDeleteHolding: (PortfolioHolding holding) => _controller
+            .deleteHolding(type: holding.categoryKey, code: holding.id),
       ),
     );
   }
@@ -200,7 +215,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
         snapshot: payload.snapshotFor(holding.categoryKey),
         health: payload.healthFor(holding.categoryKey),
         ranking: payload.rankingForTicker(holding.id),
+        canUpdate: payload.operations.canUpdate,
+        canChangeStatus: payload.operations.canChangeStatus,
+        canDelete: payload.operations.canDelete,
+        onUpdateHolding: _controller.updateHolding,
+        onChangeStatus: (String status) => _controller.changeHoldingStatus(
+          type: holding.categoryKey,
+          code: holding.id,
+          status: status,
+        ),
+        onDelete: () => _controller.deleteHolding(
+          type: holding.categoryKey,
+          code: holding.id,
+        ),
       ),
+    );
+  }
+
+  Future<void> _openCreateHolding(BuildContext context) async {
+    final request = await showModalBottomSheet<HoldingOperationRequest>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return const HoldingFormSheet(mode: HoldingFormMode.create);
+      },
+    );
+
+    if (!context.mounted || request == null) {
+      return;
+    }
+
+    await _runPortfolioMutation(
+      context,
+      () => _controller.createHolding(request),
     );
   }
 
@@ -265,6 +313,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       },
     );
+  }
+
+  Future<void> _runPortfolioMutation(
+    BuildContext context,
+    Future<String> Function() action,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final message = await action();
+      await _controller.loadDashboard();
+      if (!mounted) return;
+      setState(() {
+        _selectedIndex = dashboardPortfolioTabIndex;
+        _lastPrimaryIndex = dashboardPortfolioTabIndex;
+      });
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+    } on AppScriptApiException catch (error) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Falha ao executar a operacao.')),
+      );
+    }
   }
 }
 

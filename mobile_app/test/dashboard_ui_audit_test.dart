@@ -80,13 +80,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Base operacional'), findsAtLeastNWidgets(1));
-    expect(find.text('Esquilo Invest v2.1.1'), findsOneWidget);
-    expect(find.text('Esquilo Invest v2.0.1'), findsOneWidget);
+    expect(find.text('Esquilo Invest v2.2.0'), findsOneWidget);
+    expect(find.text('Esquilo Invest v2.1.0'), findsOneWidget);
 
     await tester.tap(find.text('Carteira'));
     await tester.pumpAndSettle();
 
     expect(find.text('Carteira completa'), findsOneWidget);
+    expect(find.byTooltip('Novo item'), findsOneWidget);
     expect(find.text('Acoes'), findsOneWidget);
 
     await tester.tap(find.text('Acoes').first);
@@ -97,10 +98,16 @@ void main() {
     expect(find.text('Dashboard'), findsOneWidget);
     expect(find.text('Esquilo IA'), findsOneWidget);
 
-    await tester.tap(find.text('PETR4'));
+    await tester.tap(find.byIcon(Icons.chevron_right_rounded).last);
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Leitura inteligente'), 180);
     await tester.pumpAndSettle();
 
     expect(find.text('Leitura inteligente'), findsOneWidget);
+    expect(find.text('Operacoes de base'), findsOneWidget);
+    expect(find.text('Mudar status'), findsOneWidget);
+    expect(find.text('Excluir'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
@@ -131,7 +138,7 @@ class _FakeDashboardService extends AppScriptDashboardService {
   @override
   Future<BackendHealth> fetchHealth() async => const BackendHealth(
     releaseName: 'Esquilo Invest',
-    versionNumber: '2.0.1',
+    versionNumber: '2.1.0',
     updatedAt: null,
   );
 

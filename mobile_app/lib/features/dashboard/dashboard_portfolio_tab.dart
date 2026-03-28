@@ -16,6 +16,7 @@ class DashboardPortfolioTab extends StatelessWidget {
     required this.onOpenCategory,
     required this.onOpenHolding,
     required this.onOpenTicker,
+    required this.onOpenCreate,
   });
 
   final DashboardPayload payload;
@@ -23,6 +24,7 @@ class DashboardPortfolioTab extends StatelessWidget {
   final void Function(String categoryKey) onOpenCategory;
   final void Function(PortfolioHolding holding) onOpenHolding;
   final void Function(String ticker) onOpenTicker;
+  final VoidCallback onOpenCreate;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,13 @@ class DashboardPortfolioTab extends StatelessWidget {
             title: 'Carteira completa',
             subtitle: 'Leitura consolidada por blocos e posicoes.',
             accent: AppPalette.brand,
+            trailing: payload.operations.canCreate
+                ? IconButton.filledTonal(
+                    onPressed: onOpenCreate,
+                    tooltip: 'Novo item',
+                    icon: const Icon(Icons.add_rounded),
+                  )
+                : null,
             child: Column(
               children: payload.categorySnapshots
                   .map(

@@ -65,6 +65,14 @@ function routeMobileApiRequest_(e) {
       });
     }
 
+    if (resource === 'operations') {
+      ensureMobileMutationRequest_(e);
+      return buildMobileApiSuccess_({
+        resource: resource,
+        data: executeMobileCrudOperation_(e)
+      });
+    }
+
     throw new Error('Recurso mobile nao suportado: ' + (resource || 'vazio') + '.');
   } catch (error) {
     return buildMobileApiError_(String(error && error.message ? error.message : error));
@@ -84,7 +92,7 @@ function validateMobileApiToken_(e, resource) {
 }
 
 function isProtectedMobileResource_(resource) {
-  return ['dashboard', 'ai-analysis'].indexOf(normalizeMobileApiValue_(resource)) >= 0;
+  return ['dashboard', 'ai-analysis', 'operations'].indexOf(normalizeMobileApiValue_(resource)) >= 0;
 }
 
 function readMobileApiToken_(e) {
@@ -136,6 +144,85 @@ function resolveMobileAiProfile_(e) {
   }
 
   return 'mobile-brief';
+}
+
+function ensureMobileMutationRequest_(e) {
+  if (!(e && e.postData)) {
+    throw new Error('Operacoes mobile exigem POST.');
+  }
+}
+
+function executeMobileCrudOperation_(e) {
+  const action = normalizeMobileApiValue_(e && e.parameter && e.parameter.action);
+  const type = normalizeMobileApiValue_(e && e.parameter && e.parameter.type);
+  const code = String(
+    e && e.parameter && (
+      e.parameter.code ||
+      e.parameter.key ||
+      e.parameter.id
+    ) || ''
+  ).trim();
+
+  if (!type) {
+    throw new Error('Tipo operacional obrigatorio.');
+  }
+
+  switch (action) {
+    case 'create':
+      return Object.assign({}, adicionarAtivo(type, extractMobileCrudPayload_(e)), {
+        action: action,
+        type: type,
+        updatedAt: new Date().toISOString()
+      });
+    case 'update':
+      return Object.assign({}, atualizarAtivo(type, code, extractMobileCrudPayload_(e)), {
+        action: action,
+        type: type,
+        updatedAt: new Date().toISOString()
+      });
+    case 'status':
+      return Object.assign({}, updateStatusAtivo(type, code, String(
+        e && e.parameter && e.parameter.status || ''
+      ).trim()), {
+        action: action,
+        type: type,
+        updatedAt: new Date().toISOString()
+      });
+    case 'delete':
+      return Object.assign({}, removerAtivo(type, code), {
+        action: action,
+        type: type,
+        updatedAt: new Date().toISOString()
+      });
+    default:
+      throw new Error('Acao mobile nao suportada: ' + (action || 'vazia') + '.');
+  }
+}
+
+function extractMobileCrudPayload_(e) {
+  const params = e && e.parameter || {};
+  const reservedKeys = {
+    action: true,
+    code: true,
+    format: true,
+    id: true,
+    key: true,
+    profile: true,
+    resource: true,
+    token: true,
+    type: true
+  };
+
+  return Object.keys(params).reduce(function (payload, rawKey) {
+    const normalizedKey = normalizeMobileApiValue_(rawKey);
+    if (reservedKeys[normalizedKey]) return payload;
+
+    const value = String(params[rawKey] || '').trim();
+    if (!value) return payload;
+
+    payload[rawKey] = value;
+    return payload;
+  }, {});
 }
 
 function buildMobileHomeSnapshot_(dashboardData) {

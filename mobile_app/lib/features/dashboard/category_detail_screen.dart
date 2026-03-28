@@ -4,6 +4,7 @@ import '../../app/app_router.dart';
 import '../../app/app_theme.dart';
 import '../../core/utils/app_formatters.dart';
 import '../../models/dashboard_payload.dart';
+import '../../models/holding_operation_request.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/tactical_card.dart';
 import 'dashboard_presentation.dart';
@@ -16,12 +17,26 @@ class CategoryDetailArgs {
     required this.health,
     required this.holdings,
     required this.ranking,
+    required this.canUpdate,
+    required this.canChangeStatus,
+    required this.canDelete,
+    required this.onUpdateHolding,
+    required this.onChangeHoldingStatus,
+    required this.onDeleteHolding,
   });
 
   final CategorySnapshot snapshot;
   final CategoryHealth? health;
   final List<PortfolioHolding> holdings;
   final AssetRanking ranking;
+  final bool canUpdate;
+  final bool canChangeStatus;
+  final bool canDelete;
+  final Future<String> Function(HoldingOperationRequest request)
+  onUpdateHolding;
+  final Future<String> Function(PortfolioHolding holding, String status)
+  onChangeHoldingStatus;
+  final Future<String> Function(PortfolioHolding holding) onDeleteHolding;
 }
 
 class CategoryDetailScreen extends StatelessWidget {
@@ -77,7 +92,8 @@ class CategoryDetailScreen extends StatelessWidget {
                     const SizedBox(height: 18),
                     TacticalCard(
                       title: args.snapshot.totalLabel,
-                      subtitle: 'Participacao atual: ${args.snapshot.shareLabel}',
+                      subtitle:
+                          'Participacao atual: ${args.snapshot.shareLabel}',
                       accent: accent,
                       trailing: StatusChip(
                         label: args.snapshot.performanceLabel,
@@ -109,9 +125,8 @@ class CategoryDetailScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          if ((args.health?.primaryMessage ?? '').isNotEmpty) ...<
-                            Widget
-                          >[
+                          if ((args.health?.primaryMessage ?? '')
+                              .isNotEmpty) ...<Widget>[
                             const SizedBox(height: 14),
                             Text(
                               args.health!.primaryMessage,
@@ -142,6 +157,13 @@ class CategoryDetailScreen extends StatelessWidget {
                                 snapshot: args.snapshot,
                                 health: args.health,
                                 ranking: args.ranking.itemByTicker(holding.id),
+                                canUpdate: args.canUpdate,
+                                canChangeStatus: args.canChangeStatus,
+                                canDelete: args.canDelete,
+                                onUpdateHolding: args.onUpdateHolding,
+                                onChangeStatus: (String status) =>
+                                    args.onChangeHoldingStatus(holding, status),
+                                onDelete: () => args.onDeleteHolding(holding),
                               ),
                             ),
                           ),
@@ -157,12 +179,8 @@ class CategoryDetailScreen extends StatelessWidget {
       bottomNavigationBar: DashboardBottomDock(
         selectedIndex: dashboardPortfolioTabIndex,
         onSelected: (int index) => _goToDashboard(context, index),
-        onOpenAi:
-            () => _goToDashboard(
-              context,
-              dashboardHomeTabIndex,
-              openAiOnStart: true,
-            ),
+        onOpenAi: () =>
+            _goToDashboard(context, dashboardHomeTabIndex, openAiOnStart: true),
       ),
     );
   }
@@ -221,10 +239,7 @@ class _HoldingCard extends StatelessWidget {
                     color: accent.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
-                    categoryIcon(holding.categoryKey),
-                    color: accent,
-                  ),
+                  child: Icon(categoryIcon(holding.categoryKey), color: accent),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -292,9 +307,9 @@ class _HoldingCard extends StatelessWidget {
                     size: 14,
                     color:
                         toneForText(holding.performanceLabel) ==
-                                StatusChipTone.danger
-                            ? AppPalette.red
-                            : accent,
+                            StatusChipTone.danger
+                        ? AppPalette.red
+                        : accent,
                     weight: FontWeight.w700,
                   ),
                 ),
@@ -318,9 +333,9 @@ class _EmptyHoldingsState extends StatelessWidget {
       accent: AppPalette.gold,
       child: Text(
         'Nenhum ativo desta categoria esta disponivel na leitura atual.',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: AppPalette.textMuted,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: AppPalette.textMuted),
       ),
     );
   }
