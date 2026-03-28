@@ -2,6 +2,27 @@
 
 Nota: entradas antigas preservam nomes e caminhos historicos da epoca em que foram registradas.
 
+## Release Note - Pocket Ops v2.0.0
+
+### MVP mobile Flutter
+
+Foi criada a base inicial do app mobile em `mobile_app/`, com arquitetura Flutter simples, home tatico-mobile, navegacao para detalhe por categoria, painel de insights e camada HTTP para consumir o AppScript sem duplicar a regra de negocio do dashboard atual.
+
+### Arquivos
+
+Foram ajustados:
+- `mobile_app/*`
+- `apps_script/backend/Backend_Core.gs`
+- `apps_script/backend/Mobile_Api.gs`
+- `apps_script/utils/Config.gs`
+- `docs/release_notes/release_notes.md`
+- `README.md`
+
+### Observacoes
+
+O AppScript continua servindo o `Dashboard.html` por padrao e passa a entregar JSON apenas quando o app Flutter envia `format=json`.
+O iPhone fica estruturalmente preparado no projeto Flutter, mas a execucao local real ainda depende de Mac com Xcode e assinatura Apple.
+
 ## Release Note - Pocket Recon v1.6.0
 
 ### MVP mobile da carteira

@@ -12,6 +12,7 @@ O sistema:
 - calcula metricas, score, perfil, ranking, alertas e plano de acao
 - permite CRUD controlado no backend para manipulacao dos registros
 - usa IA para resumo executivo, analise da carteira, recomendacoes e plano de acao
+- agora expoe um endpoint JSON minimo para o app Flutter em `mobile_app/`
 - preserva a planilha operacional como contingencia e base auxiliar
 
 O sistema nao executa ordens em corretora. Toda recomendacao continua apenas analitica.
@@ -20,7 +21,9 @@ O sistema nao executa ordens em corretora. Toda recomendacao continua apenas ana
 
 Camadas principais:
 - `frontend/html/Dashboard.html`: arquivo unico do frontend, concentrando HTML, CSS e JavaScript do dashboard em blocos internos organizados
+- `mobile_app/lib/`: shell Flutter, telas mobile, widgets, modelos e service layer HTTP
 - `apps_script/backend/Backend_Core.gs`: entrada do web app, escolha da fonte principal e montagem do payload
+- `apps_script/backend/Mobile_Api.gs`: roteamento JSON para o app mobile sem quebrar o HTML legado
 - `apps_script/backend/Operational_CRUD.gs`: facade publica para CRUD controlado no backend
 - `apps_script/services/BigQueryService.gs`: leitura e escrita centralizada no BigQuery
 - `apps_script/services/Sheet_Readers.gs`: normalizacao compatível com o contrato historico do dashboard
@@ -47,6 +50,13 @@ Fluxo principal do dashboard:
 11. `Backend_Core.gs` devolve um payload unico para o frontend renderizar, incluindo `dataSource`, `sourceWarning` e capacidades operacionais.
 12. Sob demanda, o frontend chama `getPortfolioAIAnalysis()`.
 13. `AI_Service.gs` reutiliza o mesmo contexto consolidado do dashboard, chama Gemini, usa OpenAI como fallback e valida o formato final.
+
+Fluxo principal do app mobile:
+1. O Flutter inicia em `mobile_app/lib/main.dart`.
+2. O app monta `MaterialApp`, tema e roteamento simples para home, carteira e detalhe por categoria.
+3. `AppScriptDashboardService` chama o mesmo deploy do Apps Script com `format=json`.
+4. `Mobile_Api.gs` valida token opcional, resolve o recurso e reaproveita `getDashboardData()` ou `getPortfolioAIAnalysis()`.
+5. O app transforma o payload em modelos Dart e renderiza os cards mobile por bloco independente.
 
 Fluxo de CRUD controlado:
 1. O backend expoe `updateStatusAtivo()`, `removerAtivo()`, `adicionarAtivo()` e `atualizarAtivo()`.
@@ -110,6 +120,12 @@ Nesta fase, o frontend passou a operar com os seguintes principios:
 |-- frontend
 |   `-- html
 |       `-- Dashboard.html
+|-- mobile_app
+|   |-- android
+|   |-- ios
+|   |-- lib
+|   |-- docs
+|   `-- pubspec.yaml
 |-- plans
 |   |-- roadmap
 |   |   `-- evolution_tracks.md

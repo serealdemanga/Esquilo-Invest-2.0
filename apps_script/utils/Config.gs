@@ -7,8 +7,8 @@
 
 const APP_CONFIG_ = {
   templateName: 'Dashboard',
-  releaseName: 'Pocket Recon',
-  versionNumber: '1.6.0',
+  releaseName: 'Pocket Ops',
+  versionNumber: '2.0.0',
   spreadsheetId: '119enzesF7j5g7Cd1uBgjiu-YSlTKHpubfc_ZSv1M3Lk',
   spreadsheetUrl: 'https://docs.google.com/spreadsheets/d/119enzesF7j5g7Cd1uBgjiu-YSlTKHpubfc_ZSv1M3Lk/edit',
   spreadsheetFileName: 'Esquilo_Invest_Operacional.xlsx',
@@ -61,7 +61,8 @@ const APP_CONFIG_ = {
     geminiApiKey: 'GEMINI_API_KEY',
     openAiApiKey: 'OPENAI_API_KEY',
     openAiModel: 'OPENAI_MODEL',
-    externalMarketDataEnabled: 'EXTERNAL_MARKET_DATA_ENABLED'
+    externalMarketDataEnabled: 'EXTERNAL_MARKET_DATA_ENABLED',
+    mobileAppApiToken: 'MOBILE_APP_API_TOKEN'
   }
 };
 

@@ -4,7 +4,11 @@
  * BigQuery opera como fonte principal, com fallback seguro para a planilha.
  */
 
-function doGet() {
+function doGet(e) {
+  if (isMobileApiRequest_(e)) {
+    return buildMobileApiResponse_(e);
+  }
+
   return HtmlService.createTemplateFromFile(APP_CONFIG_.templateName)
     .evaluate()
     .setTitle('Esquilo Invest - Base Operacional')
@@ -180,7 +184,8 @@ function buildDashboardPayload_(dashboardContext) {
       financialExecutionEnabled: false
     },
     categories: categories,
-    portfolioDecision: insights.decisionEngine ? insights.decisionEngine.portfolioDecision : {}
+    portfolioDecision: insights.decisionEngine ? insights.decisionEngine.portfolioDecision : {},
+    updatedAt: new Date().toISOString()
   };
 }
 
