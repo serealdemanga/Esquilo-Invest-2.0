@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/serealdemanga/esquilo-invest/refs/heads/main/icons/esquilo.png">
     <meta name="apple-mobile-web-app-title" content="Esquilo Invest">
     <meta name="theme-color" content="#05070a">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script><script>
+window.google = { script: { run: { withSuccessHandler(handler) { this._success = handler; return this; }, withFailureHandler(handler) { this._failure = handler; return this; }, getDashboardData() { this._success && this._success({ summary: { total: 'R$ 128.430,00', totalRaw: 128430, totalInvestidoRaw: 120000, totalPerformanceRaw: 0.07025, acoes: 'R$ 52.300,00', acoesRaw: 52300, fundos: 'R$ 43.600,00', fundosRaw: 43600, previdencia: 'R$ 32.530,00', previdenciaRaw: 32530 }, score: { score: 74, status: 'Saudável', explanation: 'Capital: 15/25 | Categorias: 25/25 | Instituições: 15/25 | Saúde: 19/25', breakdown: { capitalPoints: 15, categoryPoints: 25, institutionPoints: 15, healthPoints: 19 } }, messaging: { executiveSummary: { statusText: 'Sua operacao segue em zona estavel.' }, primaryRecommendation: { title: 'REDISTRIBUIR CARTEIRA', reason: 'Fundos estao concentrados acima do ideal.' } }, actionPlan: { acao_principal: 'Redistribuir carteira', prioridade: 'Curta', justificativa: 'O peso de um unico fundo ainda domina o bloco passivo.' }, portfolioDecision: { actionText: 'Redistribuir carteira', focusCategoryLabel: 'Fundos', urgency: 'Curta' }, categories: { actions: { status: 'Seguro', risk: 'Controlado', recommendation: 'Manter' }, funds: { status: 'Atenção', risk: 'Médio', recommendation: 'Redistribuir', primaryIssue: { asset: 'XP Macro Plus', message: 'XP Macro Plus com peso alto nos fundos.' } }, previdencia: { status: 'Seguro', risk: 'Controlado', recommendation: 'Manter' } }, categorySnapshots: [ { key: 'acoes', label: 'Ações', totalRaw: 52300, totalLabel: 'R$ 52.300,00', shareRaw: 0.4072, shareLabel: '40,72%', performanceRaw: 0.12, performanceLabel: '+12,00%', color: '#34d399' }, { key: 'fundos', label: 'Fundos', totalRaw: 43600, totalLabel: 'R$ 43.600,00', shareRaw: 0.3395, shareLabel: '33,95%', performanceRaw: 0.045, performanceLabel: '+4,50%', color: '#c084fc' }, { key: 'previdencia', label: 'Previdência', totalRaw: 32530, totalLabel: 'R$ 32.530,00', shareRaw: 0.2533, shareLabel: '25,33%', performanceRaw: 0.031, performanceLabel: '+3,10%', color: '#60a5fa' } ], orders: { buy: { value: 'R$ 1.500,00' } }, actions: [ { ticker: 'ITSA4', name: 'Itaúsa', institution: 'Itaú', positionValue: 'R$ 18.500,00', rendimentoPct: '+8,40%', currentPrice: 'R$ 9,30', avgPrice: 'R$ 8,58', qty: '1.989', recommendation: 'Manter', rent: 0.084, chartUrl: 'https://www.b3.com.br', portfolioShareRaw: 0.144 } ], investments: [ { name: 'XP Macro Plus', institution: 'XP', classification: 'Multimercado', strategy: 'Macro', benchmark: 'CDI', valorAtual: 'R$ 24.600,00', valorAtualRaw: 24600, portfolioShareLabel: '19,15%', portfolioShareRaw: 0.1915, performanceLabel: '+2,60%', performanceRaw: 0.026, rentPct: '+2,60%', rentRaw: 0.026, recommendation: 'Redistribuir', institutionIcon: 'https://logo.clearbit.com/xpi.com.br' } ], previdencias: [ { name: 'Plano Futuro 2035', institution: 'Itaú', classification: 'PGBL', profileLabel: 'Moderado', valorAtual: 'R$ 18.430,00', valorAtualRaw: 18430, portfolioShareLabel: '14,35%', portfolioShareRaw: 0.1435, performanceLabel: '+3,40%', performanceRaw: 0.034, rentPct: '+3,40%', rentRaw: 0.034, recommendation: 'Manter', institutionIcon: 'https://logo.clearbit.com/itau.com.br' } ] }); return this; }, getPortfolioAIAnalysis() { this._success && this._success('Leitura remota simulada.'); return this; }, getDashboardActionsSnapshot() { this._success && this._success({ actions: [], summary: { acoes: 'R$ 52.300,00', acoesRaw: 52300, totalRaw: 128430 }, orders: {}, categories: { actions: { status: 'Seguro' } }, assetRanking: {}, updatedAt: new Date().toISOString() }); return this; } } } };
+</script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,11 +34,11 @@
         .btn-action:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
         .ai-glow { border: 1px solid rgba(139, 92, 246, 0.3); box-shadow: 0 0 15px rgba(139, 92, 246, 0.1); }
 
-        /* Exibe ou oculta valores sensÃ­veis sem alterar os dados em memÃ³ria. */
+        /* Exibe ou oculta valores sensíveis sem alterar os dados em memória. */
         .hide-value { transition: filter 0.3s ease; }
         .ghost-active .hide-value { filter: blur(8px); pointer-events: none; user-select: none; }
 
-        /* Controla os cards expansÃ­veis usados como pastas do dashboard. */
+        /* Controla os cards expansíveis usados como pastas do dashboard. */
         .folder-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; }
         .folder-active .folder-content { max-height: 1400px; padding-top: 0; }
         .folder-active .folder-arrow { transform: rotate(180deg); }
@@ -2714,15 +2716,15 @@ const appConfig = {
 
         function sanitizeInstitutionLabel(name) {
             const rawValue = String(name || '')
-                .replace(/[ï¿½]+/g, '')
-                .replace(/[Ã‚]+/g, '')
+                .replace(/[?]+/g, '')
+                .replace(/[Â]+/g, '')
                 .replace(/\s+/g, ' ')
                 .trim();
             const normalized = normalizeInteractionKey(rawValue);
             if (!normalized) return '';
             if (normalized.indexOf('xp') >= 0) return 'XP';
-            if (normalized.indexOf('ion') >= 0) return 'Ion ItaÃº';
-            if (normalized.indexOf('itau') >= 0) return 'ItaÃº';
+            if (normalized.indexOf('ion') >= 0) return 'Ion Itaú';
+            if (normalized.indexOf('itau') >= 0) return 'Itaú';
             if (normalized.indexOf('rico') >= 0) return 'Rico';
             if (normalized.indexOf('inter') >= 0) return 'Inter';
             if (normalized.indexOf('nubank') >= 0 || normalized.indexOf('nuinvest') >= 0 || normalized === 'nu') return 'Nubank';
@@ -2734,7 +2736,7 @@ const appConfig = {
             const cleaned = sanitizeInstitutionLabel(name) || String(name || '').trim();
             if (!cleaned) return 'SD';
 
-            const parts = cleaned.replace(/[^A-Za-zÃ€-Ã¿0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+            const parts = cleaned.replace(/[^A-Za-zÀ-ÿ0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
             if (!parts.length) return 'SD';
 
             const first = parts[0].charAt(0);
@@ -2898,11 +2900,11 @@ const appConfig = {
             const items = [
                 {
                     key: 'acoes',
-                    label: 'AÃ§Ãµes',
+                    label: 'Ações',
                     totalRaw: Number(summary?.acoesRaw),
                     totalLabel: summary?.acoes || '',
                     performanceRaw: summary?.acoesPerformanceRaw,
-                    performanceLabel: formatSignedPercentValue(summary?.acoesPerformanceRaw) || 'â€”',
+                    performanceLabel: formatSignedPercentValue(summary?.acoesPerformanceRaw) || '—',
                     color: '#34d399',
                     status: data?.categories?.actions?.status || '',
                     recommendation: data?.categories?.actions?.recommendation || ''
@@ -2913,18 +2915,18 @@ const appConfig = {
                     totalRaw: Number(summary?.fundosRaw),
                     totalLabel: summary?.fundos || '',
                     performanceRaw: summary?.fundosPerformanceRaw,
-                    performanceLabel: formatSignedPercentValue(summary?.fundosPerformanceRaw) || 'â€”',
+                    performanceLabel: formatSignedPercentValue(summary?.fundosPerformanceRaw) || '—',
                     color: '#c084fc',
                     status: data?.categories?.funds?.status || '',
                     recommendation: data?.categories?.funds?.recommendation || ''
                 },
                 {
                     key: 'previdencia',
-                    label: 'PrevidÃªncia',
+                    label: 'Previdência',
                     totalRaw: Number(summary?.previdenciaRaw),
                     totalLabel: summary?.previdencia || '',
                     performanceRaw: summary?.previdenciaPerformanceRaw,
-                    performanceLabel: formatSignedPercentValue(summary?.previdenciaPerformanceRaw) || 'â€”',
+                    performanceLabel: formatSignedPercentValue(summary?.previdenciaPerformanceRaw) || '—',
                     color: '#60a5fa',
                     status: data?.categories?.previdencia?.status || '',
                     recommendation: data?.categories?.previdencia?.recommendation || ''
@@ -2965,8 +2967,8 @@ const appConfig = {
                         share: Number(item?.shareRaw || 0),
                         shareLabel: item?.shareLabel || formatPercentValue(item?.shareRaw || 0),
                         performanceRaw: item?.performanceRaw,
-                        performanceLabel: item?.performanceLabel || 'â€”',
-                        supportLabel: statusParts.length ? statusParts.join(' Â· ') : 'Leitura consolidada',
+                        performanceLabel: item?.performanceLabel || '—',
+                        supportLabel: statusParts.length ? statusParts.join(' · ') : 'Leitura consolidada',
                         trend: item?.trend || getPerformanceTone(item?.performanceRaw),
                         color: item?.color || '#94a3b8'
                     };
@@ -3077,9 +3079,9 @@ const appConfig = {
 
             return {
                 resultRaw: resultRaw,
-                resultLabel: hasResult ? formatCurrencyValue(resultRaw) : 'â€”',
+                resultLabel: hasResult ? formatCurrencyValue(resultRaw) : '—',
                 resultPctRaw: performanceRaw,
-                resultPctLabel: hasResult ? formatSignedPercentValue(performanceRaw) : 'â€”'
+                resultPctLabel: hasResult ? formatSignedPercentValue(performanceRaw) : '—'
             };
         }
 
@@ -3103,9 +3105,9 @@ const appConfig = {
 
         function getInsightPriorityWeight(category) {
             if (!category) return 99;
-            if (category.status === 'CrÃ­tico') return 0;
-            if (category.status === 'AtenÃ§Ã£o') return 1;
-            if (category.status === 'InstÃ¡vel') return 2;
+            if (category.status === 'Crítico') return 0;
+            if (category.status === 'Atenção') return 1;
+            if (category.status === 'Instável') return 2;
             return 3;
         }
 
@@ -3144,7 +3146,7 @@ const appConfig = {
                 {
                     label: 'Maior posicao',
                     value: heaviestItem
-                        ? (heaviestItem.label + ' Â· ' + formatPercentValue(heaviestItem.shareRaw || 0))
+                        ? (heaviestItem.label + ' · ' + formatPercentValue(heaviestItem.shareRaw || 0))
                         : 'Sem concentracao relevante',
                     support: heaviestItem
                         ? (heaviestItem.type + ' com mais peso individual na carteira.')
@@ -3159,19 +3161,19 @@ const appConfig = {
                 },
                 {
                     label: 'Melhor desempenho',
-                    value: bestItem ? (bestItem.label + ' Â· ' + formatSignedPercentValue(bestItem.performanceRaw || 0)) : 'Sem leitura suficiente',
+                    value: bestItem ? (bestItem.label + ' · ' + formatSignedPercentValue(bestItem.performanceRaw || 0)) : 'Sem leitura suficiente',
                     support: bestItem ? 'Ativo que mais puxa o resultado para cima agora.' : 'Os dados ainda nao permitem ranquear a melhor tracao.',
                     tone: bestItem && Number(bestItem.performanceRaw || 0) > 0 ? 'positive' : 'neutral'
                 },
                 {
                     label: 'Ponto de pressao',
-                    value: worstItem ? (worstItem.label + ' Â· ' + formatSignedPercentValue(worstItem.performanceRaw || 0)) : 'Sem pressao mapeada',
+                    value: worstItem ? (worstItem.label + ' · ' + formatSignedPercentValue(worstItem.performanceRaw || 0)) : 'Sem pressao mapeada',
                     support: worstItem ? 'Item que mais pressiona a rentabilidade no momento.' : 'Nenhum item com leitura ruim suficiente para aparecer aqui.',
                     tone: worstItem && Number(worstItem.performanceRaw || 0) < 0 ? 'negative' : 'neutral'
                 },
                 {
                     label: 'Diversificacao',
-                    value: uniqueInstitutions + ' instituicoes Â· ' + categoryItems.length + ' classes',
+                    value: uniqueInstitutions + ' instituicoes · ' + categoryItems.length + ' classes',
                     support: uniqueInstitutions >= 3 && categoryItems.length >= 3
                         ? 'Distribuicao mais resiliente para um investidor iniciante.'
                         : 'Carteira ainda pode ganhar mais equilibrio entre blocos e plataformas.',
@@ -3230,7 +3232,7 @@ const appConfig = {
                     ? ('Reforco sugerido: ' + String(buyOrder.value))
                     : 'Meta de aporte ainda nao configurada',
                 reserveLabel: reserve.detected
-                    ? (reserve.totalLabel + ' Â· ' + reserve.shareLabel + ' da carteira')
+                    ? (reserve.totalLabel + ' · ' + reserve.shareLabel + ' da carteira')
                     : 'Reserva separada ainda nao foi identificada nos dados atuais'
             };
         }
@@ -3284,15 +3286,15 @@ const appConfig = {
                         + '              <p class="type-body-strong text-sm text-slate-50">' + escapeHtml(item.label || 'Classe') + '</p>'
                         + '              <p class="type-body-xs text-slate-500">' + escapeHtml(item.supportLabel || 'Sem leitura complementar') + '</p>'
                         + '          </div>'
-                        + '          <span class="mobile-allocation-row__value hide-value">' + escapeHtml(item.displayValue || 'â€”') + '</span>'
+                        + '          <span class="mobile-allocation-row__value hide-value">' + escapeHtml(item.displayValue || '—') + '</span>'
                         + '      </div>'
                         + '      <div class="mobile-allocation-row__stats">'
                         + '          <span class="mobile-allocation-row__tag">' + escapeHtml(roleLabel) + '</span>'
                         + '          <span class="type-body-xs text-slate-400">' + escapeHtml(riskLabel) + '</span>'
                         + '      </div>'
                         + '      <div class="mobile-allocation-row__stats">'
-                        + '          <span class="mobile-allocation-row__share">' + escapeHtml(item.shareLabel || 'â€”') + ' da carteira</span>'
-                        + '          <span class="type-value-sm mobile-allocation-row__rent mobile-allocation-row__rent--' + escapeHtml(performanceTone) + '">' + escapeHtml(item.performanceLabel || 'â€”') + '</span>'
+                        + '          <span class="mobile-allocation-row__share">' + escapeHtml(item.shareLabel || '—') + ' da carteira</span>'
+                        + '          <span class="type-value-sm mobile-allocation-row__rent mobile-allocation-row__rent--' + escapeHtml(performanceTone) + '">' + escapeHtml(item.performanceLabel || '—') + '</span>'
                         + '      </div>'
                         + '  </div>'
                         + '</div>';
@@ -3335,12 +3337,12 @@ const appConfig = {
                 + '      <div>'
                 + '          <p class="type-kicker text-amber-200/72">Painel de bolso</p>'
                 + '          <p class="type-body-xs text-slate-500">Visao rapida para decidir sem afogar a tela.</p>'
-                + '          <p class="mobile-hero-value hide-value mt-3">' + escapeHtml(displayValue(summary?.total, 'â€”')) + '</p>'
+                + '          <p class="mobile-hero-value hide-value mt-3">' + escapeHtml(displayValue(summary?.total, '—')) + '</p>'
                 + '          <p class="type-body-xs mt-2 text-slate-400">Patrimonio total da operacao</p>'
                 + '      </div>'
                 + '      <div class="mobile-score-badge">'
                 + '          <span class="mobile-score-badge__label">Score</span>'
-                + '          <span class="mobile-score-badge__value">' + escapeHtml(displayValue(score?.score, 'â€”')) + '</span>'
+                + '          <span class="mobile-score-badge__value">' + escapeHtml(displayValue(score?.score, '—')) + '</span>'
                 + '          <span class="mobile-score-badge__status">' + escapeHtml(displayValue(score?.status, 'Em leitura')) + '</span>'
                 + '      </div>'
                 + '  </div>'
@@ -3409,7 +3411,7 @@ const appConfig = {
                         + '<div class="mobile-radar-row">'
                         + '  <div class="mobile-radar-row__top">'
                         + '      <span class="type-body-label text-slate-500">' + escapeHtml(item.label || 'Radar') + '</span>'
-                        + '      <span class="type-value-sm mobile-insight-tone--' + escapeHtml(item.tone || 'neutral') + '">' + escapeHtml(displayValue(item.value, 'â€”')) + '</span>'
+                        + '      <span class="type-value-sm mobile-insight-tone--' + escapeHtml(item.tone || 'neutral') + '">' + escapeHtml(displayValue(item.value, '—')) + '</span>'
                         + '  </div>'
                         + '  <p class="type-body-xs mt-2 text-slate-400">' + escapeHtml(displayValue(item.support, 'Sem detalhe complementar.')) + '</p>'
                         + '</div>';
@@ -3508,17 +3510,17 @@ const appConfig = {
                 + '          <p class="type-body-xs text-slate-500">Papel no loadout</p>'
                 + '          <p class="type-body-strong text-sm text-slate-100">' + escapeHtml(roleLabel) + '</p>'
                 + '      </div>'
-                + '      <p class="hide-value type-value-sm text-slate-100">' + escapeHtml(displayValue(summaryItem?.displayValue, 'â€”')) + '</p>'
+                + '      <p class="hide-value type-value-sm text-slate-100">' + escapeHtml(displayValue(summaryItem?.displayValue, '—')) + '</p>'
                 + '  </div>'
                 + '  <div class="mobile-hero-metrics">'
                 + '      <div class="mobile-stat-card">'
                 + '          <span class="mobile-stat-card__label">% carteira</span>'
-                + '          <span class="mobile-stat-card__value">' + escapeHtml(displayValue(summaryItem?.shareLabel, 'â€”')) + '</span>'
+                + '          <span class="mobile-stat-card__value">' + escapeHtml(displayValue(summaryItem?.shareLabel, '—')) + '</span>'
                 + '          <span class="mobile-stat-card__support">' + escapeHtml(displayValue(category?.risk, 'Risco em leitura')) + '</span>'
                 + '      </div>'
                 + '      <div class="mobile-stat-card">'
                 + '          <span class="mobile-stat-card__label">Rentabilidade</span>'
-                + '          <span class="mobile-stat-card__value">' + escapeHtml(displayValue(summaryItem?.performanceLabel, 'â€”')) + '</span>'
+                + '          <span class="mobile-stat-card__value">' + escapeHtml(displayValue(summaryItem?.performanceLabel, '—')) + '</span>'
                 + '          <span class="mobile-stat-card__support">' + escapeHtml(displayValue(category?.recommendation, 'Manter')) + '</span>'
                 + '      </div>'
                 + '  </div>'
@@ -3545,9 +3547,9 @@ const appConfig = {
                 + '          <span class="px-2 py-1 ' + recommendationClass + ' rounded-none type-action">' + escapeHtml(displayValue(action?.recommendation, 'Manter')) + '</span>'
                 + '      </div>'
                 + '      <div class="mobile-inline-card__metrics">'
-                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Posicao</span><span class="mobile-stat-card__value hide-value">' + escapeHtml(displayValue(action?.positionValue, 'â€”')) + '</span></div>'
-                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Rent.</span><span class="mobile-stat-card__value hide-value ' + (Number(action?.rent || 0) < 0 ? 'text-red-400' : 'text-emerald-300') + '">' + escapeHtml(displayValue(action?.rendimentoPct, 'â€”')) + '</span></div>'
-                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Preco atual</span><span class="mobile-stat-card__value hide-value">' + escapeHtml(displayValue(action?.currentPrice, 'â€”')) + '</span></div>'
+                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Posicao</span><span class="mobile-stat-card__value hide-value">' + escapeHtml(displayValue(action?.positionValue, '—')) + '</span></div>'
+                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Rent.</span><span class="mobile-stat-card__value hide-value ' + (Number(action?.rent || 0) < 0 ? 'text-red-400' : 'text-emerald-300') + '">' + escapeHtml(displayValue(action?.rendimentoPct, '—')) + '</span></div>'
+                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Preco atual</span><span class="mobile-stat-card__value hide-value">' + escapeHtml(displayValue(action?.currentPrice, '—')) + '</span></div>'
                 + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Detalhe</span><span class="mobile-stat-card__value">' + (isExpanded ? 'Fechar' : 'Abrir') + '</span></div>'
                 + '      </div>'
                 + '  </div>'
@@ -3591,10 +3593,10 @@ const appConfig = {
                 +          buildPassiveRecommendationMarkup(item)
                 + '      </div>'
                 + '      <div class="mobile-inline-card__metrics">'
-                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Saldo</span><span class="mobile-stat-card__value hide-value">' + escapeHtml(displayValue(item?.valorAtual, 'â€”')) + '</span></div>'
-                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">% carteira</span><span class="mobile-stat-card__value">' + escapeHtml(displayValue(item?.portfolioShareLabel, 'â€”')) + '</span></div>'
+                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Saldo</span><span class="mobile-stat-card__value hide-value">' + escapeHtml(displayValue(item?.valorAtual, '—')) + '</span></div>'
+                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">% carteira</span><span class="mobile-stat-card__value">' + escapeHtml(displayValue(item?.portfolioShareLabel, '—')) + '</span></div>'
                 + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Rent.</span><span class="mobile-stat-card__value hide-value ' + getPassivePerformanceClass(item) + '">' + escapeHtml(getPassivePerformanceLabel(item)) + '</span></div>'
-                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Instituicao</span><span class="mobile-stat-card__value">' + escapeHtml(displayValue(sanitizeInstitutionLabel(item?.institution) || item?.institution, 'â€”')) + '</span></div>'
+                + '          <div class="mobile-inline-card__metric"><span class="mobile-stat-card__label">Instituicao</span><span class="mobile-stat-card__value">' + escapeHtml(displayValue(sanitizeInstitutionLabel(item?.institution) || item?.institution, '—')) + '</span></div>'
                 + '      </div>'
                 + '  </div>'
                 + (isExpanded
@@ -3651,7 +3653,7 @@ const appConfig = {
                 + '      <p class="type-heading text-lg text-white">Como a carteira ganhou esse rank</p>'
                 + '  </div>'
                 + '  <div class="text-right">'
-                + '      <p class="type-value-sm text-white">' + escapeHtml(displayValue(score?.score, 'â€”')) + '/100</p>'
+                + '      <p class="type-value-sm text-white">' + escapeHtml(displayValue(score?.score, '—')) + '/100</p>'
                 + '      <p class="type-body-xs text-slate-500">' + escapeHtml(displayValue(score?.status, 'Em leitura')) + '</p>'
                 + '  </div>'
                 + '</div>'
@@ -3704,7 +3706,7 @@ const appConfig = {
                         + '<div class="mobile-insight-row">'
                         + '  <div class="mobile-insight-row__top">'
                         + '      <span class="type-body-label text-slate-500">' + escapeHtml(displayValue(item?.label, 'Insight')) + '</span>'
-                        + '      <span class="type-value-sm mobile-insight-tone--' + escapeHtml(item?.tone || 'neutral') + '">' + escapeHtml(displayValue(item?.value, 'â€”')) + '</span>'
+                        + '      <span class="type-value-sm mobile-insight-tone--' + escapeHtml(item?.tone || 'neutral') + '">' + escapeHtml(displayValue(item?.value, '—')) + '</span>'
                         + '  </div>'
                         + '  <p class="type-body-xs mt-2 text-slate-400">' + escapeHtml(displayValue(item?.support, 'Sem leitura adicional.')) + '</p>'
                         + '</div>';
@@ -3817,7 +3819,7 @@ const appConfig = {
 
             if (breakdown) {
                 if (!Array.isArray(dataset.items) || !dataset.items.length) {
-                    breakdown.innerHTML = '<div class="portfolio-allocation-breakdown-item"><span class="portfolio-allocation-breakdown-item__swatch bg-slate-600"></span><div class="portfolio-allocation-breakdown-item__meta"><p class="portfolio-allocation-breakdown-item__label">Dados indisponiveis</p><p class="portfolio-allocation-breakdown-item__support">A composicao sera exibida aqui quando houver valores suficientes.</p></div><div class="portfolio-allocation-breakdown-item__stats"><span class="portfolio-allocation-breakdown-item__value">â€”</span><span class="portfolio-allocation-breakdown-item__performance portfolio-allocation-breakdown-item__performance--neutral">Rent. â€”</span></div><span class="portfolio-allocation-breakdown-item__share">--</span></div>';
+                    breakdown.innerHTML = '<div class="portfolio-allocation-breakdown-item"><span class="portfolio-allocation-breakdown-item__swatch bg-slate-600"></span><div class="portfolio-allocation-breakdown-item__meta"><p class="portfolio-allocation-breakdown-item__label">Dados indisponiveis</p><p class="portfolio-allocation-breakdown-item__support">A composicao sera exibida aqui quando houver valores suficientes.</p></div><div class="portfolio-allocation-breakdown-item__stats"><span class="portfolio-allocation-breakdown-item__value">—</span><span class="portfolio-allocation-breakdown-item__performance portfolio-allocation-breakdown-item__performance--neutral">Rent. —</span></div><span class="portfolio-allocation-breakdown-item__share">--</span></div>';
                     return;
                 }
 
@@ -3832,7 +3834,7 @@ const appConfig = {
                         + '  </div>'
                         + '  <div class="portfolio-allocation-breakdown-item__stats">'
                         + '    <span class="portfolio-allocation-breakdown-item__value hide-value">' + escapeHtml(item.displayValue || formatCurrencyValue(item.rawValue)) + '</span>'
-                        + '    <span class="portfolio-allocation-breakdown-item__performance portfolio-allocation-breakdown-item__performance--' + escapeHtml(performanceTone) + '">Rent. ' + escapeHtml(item.performanceLabel || 'â€”') + '</span>'
+                        + '    <span class="portfolio-allocation-breakdown-item__performance portfolio-allocation-breakdown-item__performance--' + escapeHtml(performanceTone) + '">Rent. ' + escapeHtml(item.performanceLabel || '—') + '</span>'
                         + '  </div>'
                         + '  <span class="portfolio-allocation-breakdown-item__share">' + escapeHtml(item.shareLabel || '--') + '</span>'
                         + '</div>';
@@ -4070,7 +4072,7 @@ const appConfig = {
             if (!isEmptyValue(score?.score)) scoreParts.push('Score ' + score.score);
             if (!isEmptyValue(summary.scoreStatusText)) scoreParts.push(String(summary.scoreStatusText));
             if (scoreParts.length) {
-                lines.push(scoreParts.join(' Â· '));
+                lines.push(scoreParts.join(' · '));
             }
 
             return lines.slice(0, 3);
@@ -4099,9 +4101,9 @@ const appConfig = {
 
         function buildPortfolioInsightItems(data) {
             const groups = [
-                { type: 'AÃ§Ã£o', items: Array.isArray(data?.actions) ? data.actions : [], getLabel: function (item) { return item?.ticker || item?.name || 'AÃ§Ã£o'; }, getPerformance: function (item) { return item?.rent; } },
+                { type: 'Ação', items: Array.isArray(data?.actions) ? data.actions : [], getLabel: function (item) { return item?.ticker || item?.name || 'Ação'; }, getPerformance: function (item) { return item?.rent; } },
                 { type: 'Fundo', items: Array.isArray(data?.investments) ? data.investments : [], getLabel: function (item) { return item?.name || 'Fundo'; }, getPerformance: function (item) { return item?.performanceRaw ?? item?.rentRaw; } },
-                { type: 'PrevidÃªncia', items: Array.isArray(data?.previdencias) ? data.previdencias : [], getLabel: function (item) { return item?.name || 'Plano'; }, getPerformance: function (item) { return item?.performanceRaw ?? item?.rentRaw; } }
+                { type: 'Previdência', items: Array.isArray(data?.previdencias) ? data.previdencias : [], getLabel: function (item) { return item?.name || 'Plano'; }, getPerformance: function (item) { return item?.performanceRaw ?? item?.rentRaw; } }
             ];
 
             return groups.reduce(function (items, group) {
@@ -4146,7 +4148,7 @@ const appConfig = {
             }
 
             if (heaviestItem && heaviestItem.shareRaw >= 0.12) {
-                lines.push('ConcentraÃ§Ã£o em destaque: ' + heaviestItem.type + ' ' + heaviestItem.label + ' responde por ' + formatPercentValue(heaviestItem.shareRaw) + '.');
+                lines.push('Concentração em destaque: ' + heaviestItem.type + ' ' + heaviestItem.label + ' responde por ' + formatPercentValue(heaviestItem.shareRaw) + '.');
             }
 
             if (worstItem && Number.isFinite(worstItem.performanceRaw)) {
@@ -4156,7 +4158,7 @@ const appConfig = {
             if (!isEmptyValue(actionPlan?.acao_principal)) {
                 lines.push('Plano sugerido: ' + String(actionPlan.acao_principal) + '.');
             } else if (!isEmptyValue(primaryRecommendation?.title)) {
-                lines.push('Leitura prioritÃ¡ria: ' + String(primaryRecommendation.title) + '.');
+                lines.push('Leitura prioritária: ' + String(primaryRecommendation.title) + '.');
             }
 
             if (!isEmptyValue(actionPlan?.justificativa)) {
@@ -4384,7 +4386,7 @@ function renderHeader(summary, score, profile, executiveSummary) {
         }
 
         /**
-         * Renderiza a faixa tÃ¡tica logo abaixo do header.
+         * Renderiza a faixa tática logo abaixo do header.
          * Consolida prioridade, justificativa e impacto sem competir com o conteudo principal.
          */
         function renderInsightStrip(data) {
@@ -4686,7 +4688,7 @@ function renderHeader(summary, score, profile, executiveSummary) {
         }
 
         function getPassivePerformanceLabel(item) {
-            return displayValue(item?.performanceLabel || item?.rentPct, 'â€”');
+            return displayValue(item?.performanceLabel || item?.rentPct, '—');
         }
 
         function getPassivePerformanceClass(item) {
@@ -4763,10 +4765,10 @@ function renderHeader(summary, score, profile, executiveSummary) {
                     + '      <div class="passive-table-row__label">' + titleMarkup + '</div>'
                     + '  </div>'
                     + '</td>'
-                    + '<td class="type-body text-sm text-slate-300">' + escapeHtml(displayValue(sanitizeInstitutionLabel(item.institution) || item.institution, 'â€”')) + '</td>'
-                    + '<td class="type-body-xs text-slate-300">' + escapeHtml(displayValue(item.classification || item.strategy, 'â€”')) + '</td>'
-                    + '<td class="hide-value type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.valorAtual, 'â€”')) + '</td>'
-                    + '<td class="type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.portfolioShareLabel, 'â€”')) + '</td>'
+                    + '<td class="type-body text-sm text-slate-300">' + escapeHtml(displayValue(sanitizeInstitutionLabel(item.institution) || item.institution, '—')) + '</td>'
+                    + '<td class="type-body-xs text-slate-300">' + escapeHtml(displayValue(item.classification || item.strategy, '—')) + '</td>'
+                    + '<td class="hide-value type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.valorAtual, '—')) + '</td>'
+                    + '<td class="type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.portfolioShareLabel, '—')) + '</td>'
                     + '<td class="hide-value type-value-sm text-xs ' + getPassivePerformanceClass(item) + '">' + escapeHtml(getPassivePerformanceLabel(item)) + '</td>'
                     + '<td>' + buildPassiveRecommendationMarkup(item) + '</td>';
 
@@ -4841,9 +4843,9 @@ function renderHeader(summary, score, profile, executiveSummary) {
                     + '      <div class="passive-table-row__label">' + titleMarkup + '</div>'
                     + '  </div>'
                     + '</td>'
-                    + '<td class="type-body text-sm text-slate-300">' + escapeHtml(displayValue(sanitizeInstitutionLabel(item.institution) || item.institution, 'â€”')) + '</td>'
-                    + '<td class="hide-value type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.valorAtual, 'â€”')) + '</td>'
-                    + '<td class="type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.portfolioShareLabel, 'â€”')) + '</td>'
+                    + '<td class="type-body text-sm text-slate-300">' + escapeHtml(displayValue(sanitizeInstitutionLabel(item.institution) || item.institution, '—')) + '</td>'
+                    + '<td class="hide-value type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.valorAtual, '—')) + '</td>'
+                    + '<td class="type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.portfolioShareLabel, '—')) + '</td>'
                     + '<td class="hide-value type-value-sm text-xs ' + getPassivePerformanceClass(item) + '">' + escapeHtml(getPassivePerformanceLabel(item)) + '</td>'
                     + '<td>' + buildPassiveRecommendationMarkup(item) + '</td>';
 
@@ -5290,4 +5292,5 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 </script>
 </body>
 </html>
+
 

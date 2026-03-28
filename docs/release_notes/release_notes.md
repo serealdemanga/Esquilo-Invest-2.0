@@ -2,6 +2,25 @@
 
 Nota: entradas antigas preservam nomes e caminhos historicos da epoca em que foram registradas.
 
+## Release Note - Pocket Recon v1.6.0
+
+### MVP mobile da carteira
+
+O dashboard passou a ter uma experiencia mobile propria no mesmo `Dashboard.html`, com header fixo, hero de patrimonio e score, alocacao por macroclasse, radar da carteira, missao do mes, navegacao curta em tres camadas e painel funcional do Esquilo IA sem duplicar backend nem retrabalhar o desktop.
+
+### Arquivos
+
+Foram ajustados:
+- `apps_script/utils/Config.gs`
+- `frontend/html/Dashboard.html`
+- `docs/release_notes/release_notes.md`
+- `README.md`
+
+### Observacoes
+
+O mobile reaproveita o payload atual do dashboard e usa leitura honesta quando ainda nao existe meta de aporte ou reserva explicita na base.
+O desktop foi preservado para telas grandes, enquanto a camada mobile assume a navegacao e a hierarquia visual apenas em breakpoints menores.
+
 ## Release Note - Trilha de Castanha v1.5.0
 
 ### Leitura operacional da carteira

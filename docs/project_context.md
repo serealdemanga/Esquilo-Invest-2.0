@@ -67,6 +67,7 @@ Nesta fase, o frontend passou a operar com os seguintes principios:
 - o frontend usa `getDashboardActionsSnapshot()` para atualizar apenas a leitura de acoes sem reload global, preservando scroll, filtros e estados expandidos
 - fundos de investimento e previdencia agora usam tabelas comparativas com detalhamento inline
 - o CTA da Esquilo IA usa leitura local baseada em regras quando a resposta remota nao estiver disponivel
+- o mesmo `Dashboard.html` agora entrega uma camada mobile propria abaixo do header, com home enxuta, radar, missao do mes, detalhe por categoria e trilha curta de insights sem duplicar a logica do desktop
 
 ## 4. Estrutura de pastas atual
 

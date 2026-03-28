@@ -9,6 +9,7 @@ Estado atual da base:
 - o frontend voltou a operar em um unico `Dashboard.html`, mantendo compatibilidade total com Apps Script classico.
 - o topo do dashboard agora consolida a carteira por macroclasse e os blocos de fundos e previdencia usam tabelas comparativas.
 - as cotacoes de acoes atualizam sem reload global, preservando scroll, filtros e blocos expandidos.
+- o dashboard agora tem uma camada mobile propria no mesmo `Dashboard.html`, com home enxuta, radar, missao do mes, detalhe por categoria e painel de insights sem duplicar backend.
 
 Estrutura atual:
 - `apps_script/` concentra o runtime Google Apps Script.
