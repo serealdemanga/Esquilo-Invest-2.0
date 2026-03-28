@@ -47,7 +47,10 @@ function routeMobileApiRequest_(e) {
     }
 
     if (resource === 'ai-analysis') {
-      const analysis = getPortfolioAIAnalysis();
+      const analysisProfile = resolveMobileAiProfile_(e);
+      const analysis = getPortfolioAIAnalysis({
+        profile: analysisProfile
+      });
       if (/^Erro:/i.test(String(analysis || ''))) {
         throw new Error(String(analysis));
       }
@@ -56,6 +59,7 @@ function routeMobileApiRequest_(e) {
         resource: resource,
         data: {
           analysis: analysis,
+          profile: analysisProfile,
           updatedAt: new Date().toISOString()
         }
       });
@@ -120,6 +124,18 @@ function normalizeMobileApiValue_(value) {
   return String(value || '')
     .trim()
     .toLowerCase();
+}
+
+function resolveMobileAiProfile_(e) {
+  const directProfile = normalizeMobileApiValue_(e && e.parameter && e.parameter.profile);
+  if (directProfile) return directProfile;
+
+  const profileList = e && e.parameters && e.parameters.profile || [];
+  if (profileList.length > 0) {
+    return normalizeMobileApiValue_(profileList[0]);
+  }
+
+  return 'mobile-brief';
 }
 
 function buildMobileHomeSnapshot_(dashboardData) {

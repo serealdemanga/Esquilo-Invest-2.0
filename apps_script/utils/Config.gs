@@ -8,7 +8,7 @@
 const APP_CONFIG_ = {
   templateName: 'Dashboard',
   releaseName: 'Esquilo Invest',
-  versionNumber: '2.0.0',
+  versionNumber: '2.0.1',
   spreadsheetId: '119enzesF7j5g7Cd1uBgjiu-YSlTKHpubfc_ZSv1M3Lk',
   spreadsheetUrl: 'https://docs.google.com/spreadsheets/d/119enzesF7j5g7Cd1uBgjiu-YSlTKHpubfc_ZSv1M3Lk/edit',
   spreadsheetFileName: 'Esquilo_Invest_Operacional.xlsx',

@@ -8,11 +8,11 @@ Color categoryAccent(String key) => AppPalette.categoryColor(key);
 IconData categoryIcon(String key) {
   switch (key) {
     case 'acoes':
-      return Icons.show_chart_rounded;
+      return Icons.query_stats_rounded;
     case 'fundos':
-      return Icons.account_balance_wallet_rounded;
+      return Icons.account_balance_rounded;
     case 'previdencia':
-      return Icons.verified_user_rounded;
+      return Icons.shield_outlined;
     default:
       return Icons.hub_rounded;
   }

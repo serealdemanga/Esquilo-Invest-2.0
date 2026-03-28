@@ -2,6 +2,27 @@
 
 Nota: entradas antigas preservam nomes e caminhos historicos da epoca em que foram registradas.
 
+## [Laranja Orbital]
+
+Frontend: v2.1.0
+Backend: v2.0.1
+
+### Correcao da navegacao principal
+
+O header deixou de exibir versao e perdeu o botao de atualizar, que foi substituido por um icone de usuario levando para a Base operacional. A navegacao inferior ficou mais enxuta, removendo `Radar` e `Base`, enquanto a versao do app passou a aparecer separada da versao do backend dentro da propria Base.
+
+### Home mais limpa e funcional
+
+O bloco central do donut foi simplificado para mostrar apenas a composicao real da carteira e a rentabilidade total no centro. O bloco `Categorias` deixou de existir como card, os atalhos ficaram soltos e alinhados na tela, `Portfolio Scan` foi corrigido e a antiga `Diretriz tatico_ia` foi substituida por um acionador discreto da IA.
+
+### Cobertura real sem Radar IA
+
+Os dados que antes estavam no `Radar IA` foram redistribuidos dentro de `Carteira`, preservando alertas, ranking de ativos e historico de decisao sem manter uma aba separada. A consulta da IA ficou sob demanda e ganhou fallback local objetivo quando o backend falha.
+
+### Contrato backend para o resumo mobile
+
+O endpoint `ai-analysis` passou a aceitar o perfil `mobile-brief`, com prompt rigido para devolver 4 linhas de avaliacao, 2 de acao e 1 oportunidade. Quando Gemini e OpenAI nao estiverem disponiveis, o proprio App Script agora devolve uma resposta deterministica nesse formato, evitando erro bruto no app enquanto o deploy published ainda nao for atualizado.
+
 ## [Laranja Orbital] v2.0.0
 
 ### Rebuild completo do app mobile

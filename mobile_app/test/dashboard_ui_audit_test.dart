@@ -41,7 +41,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Patrimonio liquido'), findsOneWidget);
-    expect(find.text('Categorias'), findsOneWidget);
+    expect(find.text('Categorias'), findsNothing);
+    expect(find.text('Radar IA'), findsNothing);
+    expect(find.text('Diretriz tatico_ia'), findsNothing);
+    expect(find.textContaining('Base operacional  .  v'), findsNothing);
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Dashboard'), findsOneWidget);
+    expect(find.text('Carteira'), findsOneWidget);
+    expect(find.text('Esquilo IA'), findsOneWidget);
 
     final logoImage = tester.widget<Image>(find.byType(Image).first);
     expect(logoImage.image, isA<AssetImage>());
@@ -50,12 +57,31 @@ void main() {
       'assets/brand/esquilo.png',
     );
 
-    await tester.scrollUntilVisible(find.text('Portfolio scan'), 220);
+    await tester.tap(find.text('Esquilo IA'));
     await tester.pumpAndSettle();
-    expect(find.text('Portfolio scan'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Diretriz tatico_ia'), 160);
+
+    expect(find.text('Esquilo IA'), findsAtLeastNWidgets(1));
+    expect(find.text('Avaliacao Geral'), findsOneWidget);
+
+    Navigator.of(tester.element(find.text('Avaliacao Geral'))).pop();
     await tester.pumpAndSettle();
-    expect(find.text('Diretriz tatico_ia'), findsOneWidget);
+
+    await tester.scrollUntilVisible(find.text('Portfolio Scan'), 220);
+    await tester.pumpAndSettle();
+    expect(find.text('Portfolio Scan'), findsOneWidget);
+
+    await tester.tap(find.text('Dashboard'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Plano da rodada'), findsOneWidget);
+    expect(find.text('Alertas inteligentes'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.person_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Base operacional'), findsAtLeastNWidgets(1));
+    expect(find.text('Esquilo Invest v2.1.0'), findsOneWidget);
+    expect(find.text('Esquilo Invest v2.0.1'), findsOneWidget);
 
     await tester.tap(find.text('Carteira'));
     await tester.pumpAndSettle();
@@ -68,6 +94,8 @@ void main() {
 
     expect(find.text('Composicao e posicoes do bloco'), findsOneWidget);
     expect(find.text('PETR4'), findsOneWidget);
+    expect(find.text('Dashboard'), findsOneWidget);
+    expect(find.text('Esquilo IA'), findsOneWidget);
 
     await tester.tap(find.text('PETR4'));
     await tester.pumpAndSettle();
@@ -80,13 +108,9 @@ void main() {
     await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Radar'));
+    await tester.scrollUntilVisible(find.text('Ranking de ativos'), 220);
     await tester.pumpAndSettle();
-
-    expect(find.text('Plano da rodada'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Esquilo IA'), 220);
-    await tester.pumpAndSettle();
-    expect(find.text('Esquilo IA'), findsOneWidget);
+    expect(find.text('Ranking de ativos'), findsOneWidget);
   });
 }
 
@@ -107,7 +131,7 @@ class _FakeDashboardService extends AppScriptDashboardService {
   @override
   Future<BackendHealth> fetchHealth() async => const BackendHealth(
     releaseName: 'Esquilo Invest',
-    versionNumber: '2.0.0',
+    versionNumber: '2.0.1',
     updatedAt: null,
   );
 
@@ -174,7 +198,10 @@ DashboardPayload _fixturePayload() {
       'prioridade': 'Baixa',
       'justificativa': 'Carteira aderente ao perfil e sem pressao critica.',
       'impacto': 'Mantem a consistencia do portifolio.',
-      'alternativas': <String>['Seguir monitoramento', 'Rever concentracao mensal'],
+      'alternativas': <String>[
+        'Seguir monitoramento',
+        'Rever concentracao mensal',
+      ],
       'context': <String, dynamic>{
         'urgency': 'Baixa',
         'focusCategory': 'Acoes',
@@ -239,9 +266,16 @@ DashboardPayload _fixturePayload() {
         'trend': 'up',
       },
     ],
-    'alert': <String, dynamic>{'symbol': 'PETR4', 'text': 'Monitorar concentracao'},
+    'alert': <String, dynamic>{
+      'symbol': 'PETR4',
+      'text': 'Monitorar concentracao',
+    },
     'alerts': <Map<String, dynamic>>[
-      <String, dynamic>{'type': 'Atencao', 'message': 'Sem alerta grave', 'asset': 'PETR4'},
+      <String, dynamic>{
+        'type': 'Atencao',
+        'message': 'Sem alerta grave',
+        'asset': 'PETR4',
+      },
     ],
     'orders': <String, dynamic>{
       'buy': <String, dynamic>{'symbol': 'PETR4', 'value': 'R\$ 500,00'},
@@ -592,7 +626,10 @@ DashboardPayload _fixturePayload() {
         'problem': 'Principal ponto de atencao: Nenhum ponto critico.',
       },
       'insights': <Map<String, dynamic>>[
-        <String, dynamic>{'title': 'Maior peso hoje', 'body': 'Acoes representam 40,0%.'},
+        <String, dynamic>{
+          'title': 'Maior peso hoje',
+          'body': 'Acoes representam 40,0%.',
+        },
       ],
     },
     'dataSource': 'spreadsheet-fallback',

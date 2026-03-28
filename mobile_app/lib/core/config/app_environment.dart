@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 class AppEnvironment {
   static const String releaseName = 'Esquilo Invest';
-  static const String version = '2.0.0';
+  static const String version = '2.1.0';
   static const String _defaultAppScriptBaseUrl =
       'https://script.google.com/macros/s/AKfycbya0mKpePyZV79S3ta0hJf0fhhwWfeUFwfopMOsZRSuqT7EF8LiTz6dV2suOuJNWve-/exec';
   static const String _defaultDebugAppScriptApiToken =

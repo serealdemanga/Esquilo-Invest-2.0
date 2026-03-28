@@ -17,12 +17,19 @@ class AppScriptApiException implements Exception {
 }
 
 class AppScriptDashboardService {
-  AppScriptDashboardService({http.Client? client})
-    : _client = client ?? http.Client();
+  AppScriptDashboardService({
+    http.Client? client,
+    String? baseUrl,
+    String? apiToken,
+  }) : _client = client ?? http.Client(),
+       _baseUrlOverride = baseUrl,
+       _apiTokenOverride = apiToken;
 
   final http.Client _client;
+  final String? _baseUrlOverride;
+  final String? _apiTokenOverride;
 
-  bool get isConfigured => AppEnvironment.appScriptBaseUrl.trim().isNotEmpty;
+  bool get isConfigured => _resolvedBaseUrl.trim().isNotEmpty;
 
   Future<DashboardPayload> fetchDashboard() async {
     final body = await _getResource('dashboard');
@@ -37,7 +44,9 @@ class AppScriptDashboardService {
   }
 
   Future<String> fetchAiAnalysis() async {
-    final body = await _getResource('ai-analysis');
+    final body = await _getResource('ai-analysis', const <String, String>{
+      'profile': 'mobile-brief',
+    });
     final data = _mapFrom(body['data']);
     final analysis = data['analysis'];
     if (analysis is String && analysis.trim().isNotEmpty) {
@@ -50,14 +59,17 @@ class AppScriptDashboardService {
     _client.close();
   }
 
-  Future<Map<String, dynamic>> _getResource(String resource) async {
+  Future<Map<String, dynamic>> _getResource(
+    String resource, [
+    Map<String, String> extraQuery = const <String, String>{},
+  ]) async {
     if (!isConfigured) {
       throw const AppScriptApiException(
         'Defina APP_SCRIPT_BASE_URL para conectar o AppScript.',
       );
     }
 
-    final uri = _buildUri(resource);
+    final uri = _buildUri(resource, extraQuery);
     final response = await _client
         .get(uri)
         .timeout(const Duration(seconds: 20));
@@ -116,20 +128,26 @@ class AppScriptDashboardService {
     }
   }
 
-  Uri _buildUri(String resource) {
-    final baseUri = Uri.parse(AppEnvironment.appScriptBaseUrl);
+  Uri _buildUri(String resource, Map<String, String> extraQuery) {
+    final baseUri = Uri.parse(_resolvedBaseUrl);
     final query = <String, String>{
       ...baseUri.queryParameters,
       'format': 'json',
       'resource': resource,
+      ...extraQuery,
     };
 
-    if (AppEnvironment.appScriptApiToken.isNotEmpty) {
-      query['token'] = AppEnvironment.appScriptApiToken;
+    if (_resolvedApiToken.isNotEmpty) {
+      query['token'] = _resolvedApiToken;
     }
 
     return baseUri.replace(queryParameters: query);
   }
+
+  String get _resolvedBaseUrl => _baseUrlOverride ?? AppEnvironment.appScriptBaseUrl;
+
+  String get _resolvedApiToken =>
+      _apiTokenOverride ?? AppEnvironment.appScriptApiToken;
 
   Map<String, dynamic> _mapFrom(Object? value) {
     if (value is Map<String, dynamic>) {

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../app/app_router.dart';
 import '../../app/app_theme.dart';
 import '../../core/utils/app_formatters.dart';
 import '../../models/dashboard_payload.dart';
 import '../../widgets/status_chip.dart';
 import '../../widgets/tactical_card.dart';
 import 'dashboard_presentation.dart';
+import 'dashboard_shell.dart';
 
 class HoldingDetailArgs {
   const HoldingDetailArgs({
@@ -32,285 +34,331 @@ class HoldingDetailScreen extends StatelessWidget {
     final accent = categoryAccent(args.holding.categoryKey);
 
     return Scaffold(
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: <Color>[AppPalette.background, AppPalette.backgroundAlt],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+      body: DashboardShellBackground(
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          bottom: false,
+          child: Column(
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  IconButton.filledTonal(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.arrow_back_rounded),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          args.holding.title,
-                          style: AppTheme.hudStyle(size: 18),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          args.holding.subtitle.isEmpty
-                              ? categoryLabel(args.holding.categoryKey)
-                              : args.holding.subtitle,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppPalette.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  StatusChip(
-                    label: args.holding.recommendation,
-                    tone: toneForText(args.holding.recommendation),
-                  ),
-                ],
+              DashboardHeaderBar(
+                subtitle:
+                    args.holding.subtitle.isEmpty
+                        ? categoryLabel(args.holding.categoryKey)
+                        : args.holding.subtitle,
+                onBack: () => Navigator.of(context).pop(),
               ),
-              const SizedBox(height: 18),
-              TacticalCard(
-                title: args.holding.currentValueLabel,
-                subtitle: 'Posicao atual no bloco ${categoryLabel(args.holding.categoryKey)}',
-                accent: accent,
-                trailing: StatusChip(
-                  label: args.holding.shareLabel.isEmpty
-                      ? args.holding.categoryShareLabel
-                      : args.holding.shareLabel,
-                  tone: StatusChipTone.info,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
                   children: <Widget>[
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                    Row(
                       children: <Widget>[
-                        if (args.holding.performanceLabel.isNotEmpty)
-                          StatusChip(
-                            label: args.holding.performanceLabel,
-                            tone: toneForText(args.holding.performanceLabel),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                args.holding.title,
+                                style: AppTheme.hudStyle(size: 18),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                args.holding.subtitle.isEmpty
+                                    ? categoryLabel(args.holding.categoryKey)
+                                    : args.holding.subtitle,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppPalette.textMuted),
+                              ),
+                            ],
                           ),
+                        ),
                         StatusChip(
-                          label: args.holding.statusLabel,
-                          tone: toneForText(args.holding.statusLabel),
-                        ),
-                        if (args.holding.tagLabel.isNotEmpty)
-                          StatusChip(
-                            label: args.holding.tagLabel,
-                            tone: StatusChipTone.neutral,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    _MetricGrid(
-                      items: <_MetricItem>[
-                        _MetricItem(
-                          label: 'Instituicao',
-                          value: compactText(args.holding.institution),
-                        ),
-                        _MetricItem(
-                          label: 'Participacao no bloco',
-                          value: compactText(
-                            args.holding.categoryShareLabel,
-                            fallback: 'Sem leitura',
-                          ),
-                        ),
-                        _MetricItem(
-                          label: 'Entrada',
-                          value: compactText(args.holding.entryLabel),
-                        ),
-                        _MetricItem(
-                          label: 'Stop',
-                          value: args.holding.stopRaw <= 0
-                              ? 'Nao informado'
-                              : args.holding.stopRaw.toStringAsFixed(2).replaceAll(
-                                  '.',
-                                  ',',
-                                ),
+                          label: args.holding.recommendation,
+                          tone: toneForText(args.holding.recommendation),
                         ),
                       ],
                     ),
-                    if (args.holding.observation.isNotEmpty) ...<Widget>[
-                      const SizedBox(height: 14),
-                      Text(
-                        args.holding.observation,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppPalette.textPrimary,
-                          height: 1.45,
-                        ),
+                    const SizedBox(height: 18),
+                    TacticalCard(
+                      title: args.holding.currentValueLabel,
+                      subtitle:
+                          'Posicao atual no bloco ${categoryLabel(args.holding.categoryKey)}',
+                      accent: accent,
+                      trailing: StatusChip(
+                        label:
+                            args.holding.shareLabel.isEmpty
+                                ? args.holding.categoryShareLabel
+                                : args.holding.shareLabel,
+                        tone: StatusChipTone.info,
                       ),
-                    ],
-                    if (args.holding.hasDetailUrl) ...<Widget>[
-                      const SizedBox(height: 16),
-                      FilledButton.icon(
-                        onPressed: () => _openExternalLink(context),
-                        icon: const Icon(Icons.open_in_new_rounded),
-                        label: const Text('Abrir referencia externa'),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-              TacticalCard(
-                title: 'Leitura inteligente',
-                subtitle: 'O que o backend ja decidiu sobre este ativo.',
-                accent: AppPalette.cobalt,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    if (!args.holding.smartRecommendation.isEmpty)
-                      _InsightBlock(
-                        title: compactText(
-                          args.holding.smartRecommendation.title,
-                          fallback: 'Sem titulo adicional',
-                        ),
-                        body: <String>[
-                          args.holding.smartRecommendation.reason,
-                          args.holding.smartRecommendation.impact,
-                        ].where((line) => line.trim().isNotEmpty).join('\n'),
-                      ),
-                    if (args.ranking != null) ...<Widget>[
-                      const SizedBox(height: 12),
-                      _MetricGrid(
-                        items: <_MetricItem>[
-                          _MetricItem(
-                            label: 'Score',
-                            value: formatRatioLabel(args.ranking!.score.toDouble()),
-                          ),
-                          _MetricItem(
-                            label: 'Status',
-                            value: compactText(args.ranking!.status),
-                          ),
-                          _MetricItem(
-                            label: 'Oportunidade',
-                            value: formatRatioLabel(
-                              args.ranking!.opportunityScore.toDouble(),
-                            ),
-                          ),
-                          _MetricItem(
-                            label: 'Rentabilidade',
-                            value: formatPercentValue(args.ranking!.rent),
-                          ),
-                        ],
-                      ),
-                      if (args.ranking!.motives.isNotEmpty) ...<Widget>[
-                        const SizedBox(height: 12),
-                        ...args.ranking!.motives.map(
-                          (String item) => Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 5),
-                                  child: Icon(
-                                    Icons.circle,
-                                    size: 7,
-                                    color: AppPalette.brand,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: <Widget>[
+                              if (args.holding.performanceLabel.isNotEmpty)
+                                StatusChip(
+                                  label: args.holding.performanceLabel,
+                                  tone: toneForText(
+                                    args.holding.performanceLabel,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    item,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: AppPalette.textMuted,
-                                          height: 1.4,
+                              StatusChip(
+                                label: args.holding.statusLabel,
+                                tone: toneForText(args.holding.statusLabel),
+                              ),
+                              if (args.holding.tagLabel.isNotEmpty)
+                                StatusChip(
+                                  label: args.holding.tagLabel,
+                                  tone: StatusChipTone.neutral,
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          _MetricGrid(
+                            items: <_MetricItem>[
+                              _MetricItem(
+                                label: 'Instituicao',
+                                value: compactText(args.holding.institution),
+                              ),
+                              _MetricItem(
+                                label: 'Participacao no bloco',
+                                value: compactText(
+                                  args.holding.categoryShareLabel,
+                                  fallback: 'Sem leitura',
+                                ),
+                              ),
+                              _MetricItem(
+                                label: 'Entrada',
+                                value: compactText(args.holding.entryLabel),
+                              ),
+                              _MetricItem(
+                                label: 'Stop',
+                                value:
+                                    args.holding.stopRaw <= 0
+                                        ? 'Nao informado'
+                                        : args.holding.stopRaw
+                                            .toStringAsFixed(2)
+                                            .replaceAll('.', ','),
+                              ),
+                            ],
+                          ),
+                          if (args.holding.observation.isNotEmpty) ...<Widget>[
+                            const SizedBox(height: 14),
+                            Text(
+                              args.holding.observation,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: AppPalette.textPrimary,
+                                    height: 1.45,
+                                  ),
+                            ),
+                          ],
+                          if (args.holding.hasDetailUrl) ...<Widget>[
+                            const SizedBox(height: 16),
+                            FilledButton.icon(
+                              onPressed: () => _openExternalLink(context),
+                              icon: const Icon(Icons.open_in_new_rounded),
+                              label: const Text('Abrir referencia externa'),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TacticalCard(
+                      title: 'Leitura inteligente',
+                      subtitle: 'O que o backend ja decidiu sobre este ativo.',
+                      accent: AppPalette.cobalt,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          if (!args.holding.smartRecommendation.isEmpty)
+                            _InsightBlock(
+                              title: compactText(
+                                args.holding.smartRecommendation.title,
+                                fallback: 'Sem titulo adicional',
+                              ),
+                              body: <String>[
+                                args.holding.smartRecommendation.reason,
+                                args.holding.smartRecommendation.impact,
+                              ].where((line) => line.trim().isNotEmpty).join('\n'),
+                            ),
+                          if (args.ranking != null) ...<Widget>[
+                            const SizedBox(height: 12),
+                            _MetricGrid(
+                              items: <_MetricItem>[
+                                _MetricItem(
+                                  label: 'Score',
+                                  value: formatRatioLabel(
+                                    args.ranking!.score.toDouble(),
+                                  ),
+                                ),
+                                _MetricItem(
+                                  label: 'Status',
+                                  value: compactText(args.ranking!.status),
+                                ),
+                                _MetricItem(
+                                  label: 'Oportunidade',
+                                  value: formatRatioLabel(
+                                    args.ranking!.opportunityScore.toDouble(),
+                                  ),
+                                ),
+                                _MetricItem(
+                                  label: 'Rentabilidade',
+                                  value: formatPercentValue(args.ranking!.rent),
+                                ),
+                              ],
+                            ),
+                            if (args.ranking!.motives.isNotEmpty) ...<Widget>[
+                              const SizedBox(height: 12),
+                              ...args.ranking!.motives.map(
+                                (String item) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 5),
+                                        child: Icon(
+                                          Icons.circle,
+                                          size: 7,
+                                          color: AppPalette.brand,
                                         ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          item,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: AppPalette.textMuted,
+                                                height: 1.4,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ] else if (args.holding.assetScore.score > 0) ...<
+                            Widget
+                          >[
+                            const SizedBox(height: 12),
+                            _MetricGrid(
+                              items: <_MetricItem>[
+                                _MetricItem(
+                                  label: 'Score',
+                                  value: formatRatioLabel(
+                                    args.holding.assetScore.score.toDouble(),
+                                  ),
+                                ),
+                                _MetricItem(
+                                  label: 'Status',
+                                  value: compactText(
+                                    args.holding.assetScore.status,
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                      ],
-                    ] else if (args.holding.assetScore.score > 0) ...<Widget>[
-                      const SizedBox(height: 12),
-                      _MetricGrid(
-                        items: <_MetricItem>[
-                          _MetricItem(
-                            label: 'Score',
-                            value: formatRatioLabel(args.holding.assetScore.score.toDouble()),
-                          ),
-                          _MetricItem(
-                            label: 'Status',
-                            value: compactText(args.holding.assetScore.status),
-                          ),
+                          ],
                         ],
                       ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-              TacticalCard(
-                title: 'Contexto de categoria',
-                subtitle: 'Relacao deste ativo com o bloco principal.',
-                accent: AppPalette.teal,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: <Widget>[
-                        if (args.snapshot != null)
-                          StatusChip(
-                            label: args.snapshot!.shareLabel,
-                            tone: StatusChipTone.info,
-                          ),
-                        if (args.snapshot != null)
-                          StatusChip(
-                            label: args.snapshot!.performanceLabel,
-                            tone: toneForText(args.snapshot!.performanceLabel),
-                          ),
-                        if (args.health != null)
-                          StatusChip(
-                            label: args.health!.risk,
-                            tone: toneForText(args.health!.risk),
-                          ),
-                      ],
                     ),
-                    if ((args.health?.primaryMessage ?? '').isNotEmpty) ...<Widget>[
-                      const SizedBox(height: 14),
-                      Text(
-                        args.health!.primaryMessage,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppPalette.textMuted,
-                          height: 1.45,
-                        ),
+                    const SizedBox(height: 14),
+                    TacticalCard(
+                      title: 'Contexto de categoria',
+                      subtitle: 'Relacao deste ativo com o bloco principal.',
+                      accent: AppPalette.teal,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: <Widget>[
+                              if (args.snapshot != null)
+                                StatusChip(
+                                  label: args.snapshot!.shareLabel,
+                                  tone: StatusChipTone.info,
+                                ),
+                              if (args.snapshot != null)
+                                StatusChip(
+                                  label: args.snapshot!.performanceLabel,
+                                  tone: toneForText(
+                                    args.snapshot!.performanceLabel,
+                                  ),
+                                ),
+                              if (args.health != null)
+                                StatusChip(
+                                  label: args.health!.risk,
+                                  tone: toneForText(args.health!.risk),
+                                ),
+                            ],
+                          ),
+                          if ((args.health?.primaryMessage ?? '').isNotEmpty) ...<
+                            Widget
+                          >[
+                            const SizedBox(height: 14),
+                            Text(
+                              args.health!.primaryMessage,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: AppPalette.textMuted,
+                                    height: 1.45,
+                                  ),
+                            ),
+                          ],
+                          if (!args.holding.sourceProfile.isEmpty) ...<Widget>[
+                            const SizedBox(height: 14),
+                            Text(
+                              args.holding.sourceProfile.description,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: AppPalette.textMuted,
+                                    height: 1.4,
+                                  ),
+                            ),
+                          ],
+                        ],
                       ),
-                    ],
-                    if (!args.holding.sourceProfile.isEmpty) ...<Widget>[
-                      const SizedBox(height: 14),
-                      Text(
-                        args.holding.sourceProfile.description,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppPalette.textMuted,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: DashboardBottomDock(
+        selectedIndex: dashboardPortfolioTabIndex,
+        onSelected: (int index) => _goToDashboard(context, index),
+        onOpenAi:
+            () => _goToDashboard(
+              context,
+              dashboardHomeTabIndex,
+              openAiOnStart: true,
+            ),
+      ),
+    );
+  }
+
+  void _goToDashboard(
+    BuildContext context,
+    int tabIndex, {
+    bool openAiOnStart = false,
+  }) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRouter.dashboardRoute,
+      (Route<dynamic> route) => false,
+      arguments: DashboardRouteArgs(
+        initialTabIndex: tabIndex,
+        openAiOnStart: openAiOnStart,
       ),
     );
   }
@@ -338,41 +386,41 @@ class _MetricGrid extends StatelessWidget {
     return Wrap(
       spacing: 10,
       runSpacing: 10,
-      children: items
-          .map(
-            (_MetricItem item) => SizedBox(
-              width: 150,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppPalette.panelSoft,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppPalette.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      item.label,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppPalette.textMuted,
-                      ),
+      children:
+          items
+              .map(
+                (_MetricItem item) => SizedBox(
+                  width: 150,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppPalette.panelSoft,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: AppPalette.border),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      item.value,
-                      style: AppTheme.tacticalLabel(
-                        size: 14,
-                        color: AppPalette.textPrimary,
-                        weight: FontWeight.w700,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          item.label,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppPalette.textMuted),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          item.value,
+                          style: AppTheme.tacticalLabel(
+                            size: 14,
+                            color: AppPalette.textPrimary,
+                            weight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          )
-          .toList(),
+              )
+              .toList(),
     );
   }
 }

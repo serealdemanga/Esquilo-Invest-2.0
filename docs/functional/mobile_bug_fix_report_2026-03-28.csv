@@ -1,0 +1,7 @@
+bug_id,titulo,classificacao,status_issue,acao_realizada
+#1,Bloco Grafico Dunut,resolvido,closed,"Removidos status, atualizacao e sinais auxiliares do bloco donut; o circulo passou a focar apenas em composicao real da carteira e rentabilidade total no centro."
+#2,Bloco Categorias,resolvido,closed,"O bloco foi removido como card com titulo; os atalhos ficaram soltos na tela, alinhados e com iconografia mais coerente com o produto, mantendo navegacao real."
+#3,Radar IA,resolvido,closed,"Radar IA foi removido da home e da navegacao inferior; alertas, ranking e historico do backend foram redistribuidos na aba Carteira."
+#4,Portfolio Scan,resolvido,closed,"Titulo corrigido para Portfolio Scan e subtitulo removido para deixar a leitura mais objetiva."
+#5,Diretriz tatico_ia,parcial - aguardando deploy App Script,open,"Card removido e substituido por acionador discreto da IA sob demanda com painel objetivo; o backend agora aceita o perfil mobile-brief e tem fallback deterministico, mas o /exec publicado ainda precisa ser atualizado para refletir o novo contrato."
+#6,Header,resolvido,closed,"Versionamento removido do header; botao atualizar substituido por icone de usuario levando para Base; item Base removido do rodape; app e backend agora aparecem separados na Base."
