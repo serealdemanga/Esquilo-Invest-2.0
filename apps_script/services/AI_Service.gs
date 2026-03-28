@@ -5,24 +5,44 @@
 
 function getInventoryLoot() {
   try {
-    const spreadsheet = openOperationalSpreadsheet_();
-    const sheets = spreadsheet.getSheets();
     let lootData = 'DADOS COMPLETOS DA BASE DE DADOS (TODAS AS ABAS):\n\n';
+    const inventory = getBigQueryOperationalInventory_();
 
-    sheets.forEach(function (sheet) {
-      lootData += '\n--- ABA: ' + sheet.getName() + ' ---\n';
-      const data = sheet.getDataRange().getDisplayValues();
+    Object.keys(inventory).forEach(function (sheetName) {
+      lootData += '\n--- ABA: ' + sheetName + ' ---\n';
+      const rows = inventory[sheetName] || [];
+      if (!rows.length) {
+        lootData += 'Sem registros.\n';
+        return;
+      }
 
-      data.forEach(function (row) {
-        if (row.join('').trim() !== '') {
-          lootData += row.join(' | ') + '\n';
-        }
+      rows.forEach(function (row) {
+        const line = Object.keys(row || {}).map(function (fieldName) {
+          return fieldName + ': ' + row[fieldName];
+        }).join(' | ');
+        if (line.trim()) lootData += line + '\n';
       });
     });
 
     return lootData;
   } catch (error) {
-    return 'Erro ao extrair os dados da base: ' + error.toString();
+    try {
+      const spreadsheet = openOperationalSpreadsheet_();
+      const sheets = spreadsheet.getSheets();
+      let fallbackLoot = 'DADOS COMPLETOS DA BASE DE DADOS (FALLBACK PLANILHA):\n\n';
+
+      sheets.forEach(function (sheet) {
+        fallbackLoot += '\n--- ABA: ' + sheet.getName() + ' ---\n';
+        const data = sheet.getDataRange().getDisplayValues();
+        data.forEach(function (row) {
+          if (row.join('').trim() !== '') fallbackLoot += row.join(' | ') + '\n';
+        });
+      });
+
+      return fallbackLoot;
+    } catch (fallbackError) {
+      return 'Erro ao extrair os dados da base: ' + fallbackError.toString();
+    }
   }
 }
 
@@ -42,6 +62,7 @@ function buildStrategyContext_() {
 
   return {
     summary: dashboardContext.domainData.summary,
+    dataSource: dashboardContext.dataSource || 'bigquery',
     marketIntel: buildStrategyMarketIntel_(dashboardContext.domainData.actions),
     assetIntel: buildStrategyAssetIntel_(insights.assetRanking),
     metrics: insights.metrics,

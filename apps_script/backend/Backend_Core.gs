@@ -1,7 +1,7 @@
 ﻿/**
  * BACKEND CORE
  * Orquestracao principal do backend para Google Apps Script.
- * Esta base abre explicitamente a planilha operacional por ID.
+ * BigQuery opera como fonte principal, com fallback seguro para a planilha.
  */
 
 function doGet() {
@@ -19,7 +19,7 @@ function doGet() {
  */
 function getDashboardData() {
   const dashboardContext = buildDashboardContext_();
-  return buildDashboardPayload_(dashboardContext.domainData, dashboardContext.insights);
+  return buildDashboardPayload_(dashboardContext);
 }
 
 /**
@@ -28,15 +28,38 @@ function getDashboardData() {
  */
 function buildDashboardContext_() {
   const spreadsheetContext = getSpreadsheetContext_();
-  const domainData = collectDashboardDomainData_(spreadsheetContext);
-  const insights = buildDashboardInsights_(domainData);
+  const dataContext = getPrimaryDashboardDataContext_(spreadsheetContext);
+  const domainData = collectDashboardDomainData_(dataContext);
+  const insights = buildDashboardInsights_(domainData, dataContext);
 
   return {
-    spreadsheet: spreadsheetContext.spreadsheet,
-    sheets: spreadsheetContext.sheets,
+    spreadsheet: dataContext.spreadsheet,
+    sheets: dataContext.sheets,
+    dataSource: dataContext.dataSource,
+    sourceWarning: dataContext.sourceWarning,
     domainData,
     insights
   };
+}
+
+function getPrimaryDashboardDataContext_(spreadsheetContext) {
+  const dataContext = {
+    spreadsheet: spreadsheetContext.spreadsheet,
+    sheets: spreadsheetContext.sheets,
+    rawData: null,
+    dataSource: 'bigquery',
+    sourceWarning: ''
+  };
+
+  try {
+    dataContext.rawData = getBigQueryStructuredPortfolioData_();
+    return dataContext;
+  } catch (error) {
+    dataContext.rawData = readSpreadsheetData_(spreadsheetContext);
+    dataContext.dataSource = 'spreadsheet-fallback';
+    dataContext.sourceWarning = String(error && error.message ? error.message : error);
+    return dataContext;
+  }
 }
 
 function getSpreadsheetContext_() {
@@ -61,20 +84,26 @@ function getSpreadsheetContext_() {
  * Coleta os blocos de dados brutos consumidos pelo dashboard.
  * Mantem leitura de planilha separada das transformacoes e recomendacoes.
  */
-function collectDashboardDomainData_(spreadsheetContext) {
-  const rawData = readSpreadsheetData_(spreadsheetContext);
+function collectDashboardDomainData_(dataContext) {
+  const rawData = dataContext?.rawData || {};
+  const spreadsheet = dataContext?.spreadsheet || null;
+  const sheets = dataContext?.sheets || {};
   const mappedActions = mapStocks_(rawData.actions);
   const actions = enrichActionsWithMarketData_(
     mappedActions,
-    safeGetActionMarketData_(mappedActions, spreadsheetContext.spreadsheet)
+    safeGetActionMarketData_(mappedActions, spreadsheet)
   );
-  const investments = mapFunds_(rawData.funds, spreadsheetContext.spreadsheet, spreadsheetContext.sheets.funds);
-  const previdencias = mapPension_(rawData.previdencia, spreadsheetContext.spreadsheet, spreadsheetContext.sheets.previdencia);
+  const mappedInvestments = mapFunds_(rawData.funds, spreadsheet, sheets.funds || null);
+  const mappedPrevidencias = mapPension_(rawData.previdencia, spreadsheet, sheets.previdencia || null);
   const preOrders = mapPreOrders_(rawData.preOrders);
+  const summary = buildPortfolioSummaryFromDomains_(actions, mappedInvestments, mappedPrevidencias, preOrders);
+  const normalizedCollections = buildNormalizedPortfolioCollections_(summary, actions, mappedInvestments, mappedPrevidencias);
+  const investments = normalizedCollections.investments;
+  const previdencias = normalizedCollections.previdencias;
 
   return {
-    summary: buildPortfolioSummaryFromDomains_(actions, investments, previdencias, preOrders),
-    actions: actions,
+    summary: summary,
+    actions: normalizedCollections.actions,
     preOrders: preOrders,
     fundosTop: buildFundsTopFromMappedItems_(investments),
     investments: investments,
@@ -87,13 +116,13 @@ function collectDashboardDomainData_(spreadsheetContext) {
 /**
  * Calcula blocos analiticos do dashboard sem misturar leitura de planilha com payload final.
  */
-function buildDashboardInsights_(domainData) {
+function buildDashboardInsights_(domainData, dataContext) {
   const engine = buildPortfolioDecisionEngine_(domainData);
   const alert = getPrimaryAlert_(engine.alerts);
   const orders = buildOrdersPayload_(domainData.actions, domainData.preOrders);
   const messaging = buildPortfolioMessagingFromEngine_(engine);
   const actionPlan = getActionPlan_(engine);
-  const spreadsheet = openOperationalSpreadsheet_();
+  const spreadsheet = dataContext?.spreadsheet || openOperationalSpreadsheet_();
   const decisionHistory = buildDecisionHistory_(spreadsheet, domainData.actions, engine, actionPlan);
   const intelligentAlerts = buildIntelligentAlerts_(engine, actionPlan, decisionHistory);
 
@@ -110,11 +139,16 @@ function buildDashboardInsights_(domainData) {
     decisionHistory: decisionHistory,
     intelligentAlerts: intelligentAlerts,
     assetRanking: engine.assetRanking,
-    decisionEngine: engine
+    decisionEngine: engine,
+    dataSource: dataContext?.dataSource || 'bigquery'
   };
 }
 
-function buildDashboardPayload_(domainData, insights) {
+function buildDashboardPayload_(dashboardContext) {
+  const domainData = dashboardContext?.domainData || {};
+  const insights = dashboardContext?.insights || {};
+  const categories = insights.decisionEngine ? insights.decisionEngine.categories : {};
+
   return {
     summary: domainData.summary,
     actions: domainData.actions,
@@ -134,8 +168,60 @@ function buildDashboardPayload_(domainData, insights) {
     decisionHistory: insights.decisionHistory,
     intelligentAlerts: insights.intelligentAlerts,
     assetRanking: insights.assetRanking,
-    categories: insights.decisionEngine ? insights.decisionEngine.categories : {},
+    dataSource: insights.dataSource || 'bigquery',
+    sourceWarning: dashboardContext?.sourceWarning || '',
+    categorySnapshots: buildCategorySnapshots_(domainData.summary, categories),
+    dataProfiles: buildDashboardDataProfiles_(),
+    operations: {
+      canChangeStatus: true,
+      canDelete: true,
+      canUpdate: true,
+      canCreate: true,
+      financialExecutionEnabled: false
+    },
+    categories: categories,
     portfolioDecision: insights.decisionEngine ? insights.decisionEngine.portfolioDecision : {}
+  };
+}
+
+function buildDashboardDataProfiles_() {
+  return {
+    actions: {
+      sourceType: 'cotacao-mercado',
+      description: 'Acoes usam a leitura normalizada da carteira com enriquecimento de cotacao e contexto de mercado.'
+    },
+    funds: {
+      sourceType: 'registro-fundo',
+      description: 'Fundos usam payload normalizado do backend, pronto para integrar fonte regulatoria sem expor resposta bruta na UI.'
+    },
+    previdencia: {
+      sourceType: 'registro-plano',
+      description: 'Previdencia usa modelagem propria de plano e nao replica a estrutura de fundos no frontend.'
+    }
+  };
+}
+
+function getDashboardActionsSnapshot() {
+  const dashboardContext = buildDashboardContext_();
+  const domainData = dashboardContext?.domainData || {};
+  const insights = dashboardContext?.insights || {};
+  const categories = insights?.decisionEngine ? insights.decisionEngine.categories : {};
+
+  return {
+    actions: domainData.actions || [],
+    summary: {
+      acoes: domainData?.summary?.acoes || '',
+      acoesRaw: domainData?.summary?.acoesRaw || 0,
+      totalRaw: domainData?.summary?.totalRaw || 0
+    },
+    orders: insights.orders || {},
+    categories: {
+      actions: categories?.actions || {}
+    },
+    assetRanking: insights.assetRanking || {},
+    dataSource: insights.dataSource || dashboardContext?.dataSource || 'bigquery',
+    sourceWarning: dashboardContext?.sourceWarning || '',
+    updatedAt: new Date().toISOString()
   };
 }
 

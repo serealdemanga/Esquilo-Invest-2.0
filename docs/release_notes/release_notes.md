@@ -2,6 +2,125 @@
 
 Nota: entradas antigas preservam nomes e caminhos historicos da epoca em que foram registradas.
 
+## Release Note - Trilha de Castanha v1.5.0
+
+### Leitura operacional da carteira
+
+O dashboard passou a usar macroclasses reais no topo da tela, com grafico consolidado de carteira, representatividade com valor, peso e rentabilidade, faixa discreta de insight abaixo do header e tabelas comparativas para fundos de investimento e previdencia.
+
+### Arquivos
+
+Foram ajustados:
+- `apps_script/backend/Backend_Core.gs`
+- `apps_script/services/Portfolio_Metrics.gs`
+- `apps_script/services/Sheet_Readers.gs`
+- `apps_script/utils/Config.gs`
+- `frontend/html/Dashboard.html`
+- `docs/project_context.md`
+- `docs/release_notes/release_notes.md`
+- `README.md`
+
+### Observacoes
+
+As acoes agora podem ser atualizadas automaticamente sem reload completo da pagina, preservando contexto visual e filtros.
+O Esquilo IA ganhou fallback local baseado em regras da carteira para nao deixar o CTA morto quando a resposta remota nao estiver disponivel.
+
+## Release Note - Trilha de Castanha v1.4.0
+
+### Reconsolidacao do frontend
+
+O frontend deixou de depender de includes HTML parciais e voltou a operar em um unico `Dashboard.html`, com HTML, CSS e JavaScript reunidos no mesmo arquivo para garantir compatibilidade total com o Apps Script classico.
+
+### Arquivos
+
+Foram ajustados:
+- `apps_script/backend/Backend_Core.gs`
+- `apps_script/utils/Config.gs`
+- `frontend/html/Dashboard.html`
+- `docs/project_context.md`
+- `docs/release_notes/release_notes.md`
+- `README.md`
+
+### Observacoes
+
+O helper `include(filename)` foi removido porque deixou de participar da execucao real.
+Os arquivos HTML parciais da modularizacao devem ser removidos do projeto Apps Script publicado e do repositorio local.
+
+## Release Note - Trilha de Castanha v1.3.1
+
+### Bootstrap e compatibilidade Apps Script
+
+Foram corrigidos os pontos mais sensiveis da modularizacao no frontend classico do Apps Script: bootstrap da tela, rebind de `google.script.run` e exposicao explicita no `window` das funcoes usadas pelos handlers inline do HTML.
+
+### Arquivos
+
+Foram ajustados:
+- `apps_script/utils/Config.gs`
+- `frontend/html/Dashboard_StateScript.html`
+- `frontend/html/Dashboard_EventsScript.html`
+
+### Observacoes
+
+O dashboard passa a tentar reconectar com o bridge do Apps Script quando `google.script.run` ainda nao estiver disponivel no primeiro ciclo de carga.
+As funcoes acionadas por `onclick` e `onkeydown` ficaram explicitamente registradas no escopo global para evitar falhas silenciosas em runtime.
+
+## Release Note - Trilha de Castanha v1.3.0
+
+### Frontend modular
+
+O frontend do dashboard foi modularizado para Apps Script com includes server-side, reduzindo o peso do `Dashboard.html` e separando layout, estilos e scripts por responsabilidade.
+
+### Arquivos
+
+Foram ajustados:
+- `apps_script/backend/Backend_Core.gs`
+- `apps_script/utils/Config.gs`
+- `frontend/html/Dashboard.html`
+- `frontend/html/Dashboard_Styles.html`
+- `frontend/html/Dashboard_SvgSprites.html`
+- `frontend/html/Dashboard_Header.html`
+- `frontend/html/Dashboard_PortfolioOverview.html`
+- `frontend/html/Dashboard_SummaryCards.html`
+- `frontend/html/Dashboard_RecommendedAction.html`
+- `frontend/html/Dashboard_ActionPlan.html`
+- `frontend/html/Dashboard_AISection.html`
+- `frontend/html/Dashboard_FeaturePopup.html`
+- `frontend/html/Dashboard_StateScript.html`
+- `frontend/html/Dashboard_UtilsScript.html`
+- `frontend/html/Dashboard_RenderScript.html`
+- `frontend/html/Dashboard_EventsScript.html`
+- `docs/project_context.md`
+- `README.md`
+
+### Observacoes
+
+Foi criado o helper `include(filename)` no Apps Script para montar as parciais via `HtmlService`.
+O comportamento visual e as chamadas para `google.script.run` foram preservados sem depender de build, framework ou `import/export`.
+
+## Release Note - Trilha de Castanha v1.1.0
+
+### BigQuery operacional
+
+O dashboard passou a usar o BigQuery como fonte primaria de dados, com fallback controlado para a planilha operacional quando a consulta principal nao estiver disponivel.
+
+### Arquivos
+
+Foram ajustados:
+- `apps_script/services/BigQueryService.gs`
+- `apps_script/backend/Backend_Core.gs`
+- `apps_script/backend/Operational_CRUD.gs`
+- `apps_script/services/AI_Service.gs`
+- `frontend/html/Dashboard.html`
+- `apps_script/utils/Config.gs`
+- `docs/project_context.md`
+- `README.md`
+
+### Observacoes
+
+Foram adicionadas operacoes basicas de CRUD no backend, sem qualquer execucao financeira real.
+A Esquilo IA passou a consumir o contexto consolidado vindo do BigQuery sempre que a fonte principal estiver disponivel.
+O frontend recebeu estrutura visual para futuras acoes de status, atualizacao e exclusao, ainda em modo guiado nesta sprint.
+
 ## Release Note - Trilha de Castanha v1.0.0
 
 ### Bootstrap estrutural

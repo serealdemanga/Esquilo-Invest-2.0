@@ -97,6 +97,7 @@ function mapStocks_(rawActionsData) {
 
 function mapFunds_(rawRows, spreadsheet, sheet) {
   return mapPassivePortfolioCategory_(rawRows, spreadsheet, sheet, {
+    sourceKey: 'funds',
     nameFields: ['fundo'],
     classificationFields: ['categoria'],
     investedFields: ['valorinvestido'],
@@ -107,6 +108,7 @@ function mapFunds_(rawRows, spreadsheet, sheet) {
 
 function mapPension_(rawRows, spreadsheet, sheet) {
   return mapPassivePortfolioCategory_(rawRows, spreadsheet, sheet, {
+    sourceKey: 'previdencia',
     nameFields: ['planofundo'],
     classificationFields: ['tipo'],
     investedFields: ['totalaportado'],
@@ -137,6 +139,13 @@ function buildPassivePortfolioMappedItem_(rawRow, detailUrl, config) {
   const name = String(getRecordValue_(record, config.nameFields) || '').trim();
   const institution = getRecordValue_(record, ['plataforma', 'instituicao']);
   const classification = getRecordValue_(record, config.classificationFields);
+  const strategy = getRecordValue_(record, ['estrategia', 'classe']);
+  const benchmark = getRecordValue_(record, ['benchmark', 'indice', 'indexador']);
+  const profile = getRecordValue_(record, ['perfil', 'perfilrisco', 'publicoalvo']);
+  const fee = getRecordValue_(record, ['taxa', 'taxaadm', 'taxaadministracao', 'taxaperformance']);
+  const cotization = getRecordValue_(record, ['cotizacao', 'cotizacaoresgate', 'prazoaplicacao']);
+  const liquidity = getRecordValue_(record, ['liquidez', 'carencia', 'resgate', 'prazoresgate']);
+  const risk = getRecordValue_(record, ['risco', 'nivelrisco']);
   const status = getRecordValue_(record, ['status']);
   const startedAt = getRecordValue_(record, ['inicio', 'entrada']);
   const investedCell = getRecordValue_(record, config.investedFields);
@@ -153,6 +162,13 @@ function buildPassivePortfolioMappedItem_(rawRow, detailUrl, config) {
     institution: String(institution || ''),
     institutionIcon: getInstitutionIcon_(institution),
     classification: String(classification || ''),
+    strategy: String(strategy || ''),
+    benchmark: String(benchmark || ''),
+    profileLabel: String(profile || ''),
+    feeLabel: String(fee || ''),
+    cotizationLabel: String(cotization || ''),
+    liquidityLabel: String(liquidity || ''),
+    riskLabel: String(risk || ''),
     statusLabel: String(status || ''),
     startedAt: String(startedAt || ''),
     observation: String(observation || ''),
@@ -161,11 +177,31 @@ function buildPassivePortfolioMappedItem_(rawRow, detailUrl, config) {
     rentRaw: rentData.rentNumeric,
     recommendation: recommendation,
     detailUrl: detailUrl,
-    valorAtualRaw: rentData.currentRaw
+    urlDetalhe: detailUrl,
+    valorAtualRaw: rentData.currentRaw,
+    sourceProfile: buildPassiveCategorySourceProfile_(config?.sourceKey)
   };
 
   item[config.investedField] = rentData.investedRaw;
   return item;
+}
+
+function buildPassiveCategorySourceProfile_(sourceKey) {
+  if (sourceKey === 'funds') {
+    return {
+      key: 'funds',
+      label: 'Fundos',
+      sourceType: 'registro-fundo',
+      description: 'Os fundos usam estrutura normalizada de carteira e ficam prontos para integrar fontes regulatorias sem expor resposta bruta ao frontend.'
+    };
+  }
+
+  return {
+    key: 'previdencia',
+    label: 'Previdencia',
+    sourceType: 'registro-plano',
+    description: 'A previdencia usa modelagem propria de plano e nao e tratada como fundo CVM no frontend.'
+  };
 }
 
 function buildPreOrderMappedItem_(rawRow) {

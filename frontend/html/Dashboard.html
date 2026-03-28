@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Esquilo Invest - Base Operacional</title>
     <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/serealdemanga/esquilo-invest/refs/heads/main/icons/esquilo.png">
-    <!-- Metadados minimos para o icone de tela inicial no iOS. -->
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/serealdemanga/esquilo-invest/refs/heads/main/icons/esquilo.png">
     <meta name="apple-mobile-web-app-title" content="Esquilo Invest">
     <meta name="theme-color" content="#05070a">
@@ -44,10 +43,342 @@
 
         .select-filter { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; padding: 0.4rem 0.6rem; border-radius: 0.25rem; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; }
         .select-filter:focus { outline: none; border-color: rgba(245, 158, 11, 0.5); }
-        .inst-icon { width: 24px; height: 24px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); padding: 4px; object-fit: contain; }
-        .inst-fallback { display: inline-flex; align-items: center; justify-content: center; padding: 0; font-size: 10px; font-weight: 700; color: #e2e8f0; text-transform: uppercase; }
+        .inst-icon { width: 24px; height: 24px; border-radius: 4px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(148, 163, 184, 0.08)); padding: 4px; object-fit: contain; border: 1px solid rgba(255, 255, 255, 0.08); }
+        .inst-fallback { display: inline-flex; align-items: center; justify-content: center; padding: 0; font-size: 10px; font-weight: 700; color: #e2e8f0; text-transform: uppercase; background: linear-gradient(145deg, rgba(30, 41, 59, 0.88), rgba(15, 23, 42, 0.92)); }
         .chart-btn { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; background: rgba(255, 255, 255, 0.06); transition: all 0.2s ease; }
         .chart-btn:hover { background: rgba(255, 255, 255, 0.12); }
+
+        /* Reorganiza o topo como painel de alocacao, com o grafico como ancora visual e a leitura operacional ao lado. */
+        .portfolio-allocation-shell {
+            background: linear-gradient(145deg, rgba(245, 158, 11, 0.1), rgba(15, 23, 42, 0.94));
+            border: 1px solid rgba(245, 158, 11, 0.12);
+            box-shadow: 0 22px 42px rgba(2, 6, 23, 0.18);
+        }
+
+        .portfolio-allocation-visual,
+        .portfolio-allocation-data {
+            background: rgba(2, 6, 23, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .portfolio-allocation-visual__body {
+            display: grid;
+            place-items: center;
+            min-height: 20rem;
+            gap: 1rem;
+        }
+
+        .portfolio-allocation-chart {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: min(100%, 18rem);
+            aspect-ratio: 1;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.95) 0 38%, transparent 39%), rgba(255, 255, 255, 0.03);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            overflow: hidden;
+        }
+
+        .portfolio-allocation-chart::after {
+            content: '';
+            position: absolute;
+            inset: 22%;
+            border-radius: 999px;
+            background: rgba(5, 7, 10, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        }
+
+        .portfolio-allocation-chart.is-empty {
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.95) 0 38%, transparent 39%), linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(51, 65, 85, 0.16));
+        }
+
+        .portfolio-allocation-chart__center {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .portfolio-allocation-executive {
+            background: linear-gradient(180deg, rgba(2, 6, 23, 0.24), rgba(2, 6, 23, 0.12));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .portfolio-allocation-breakdown-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .portfolio-allocation-breakdown-item {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1.1fr) minmax(0, 0.85fr) auto;
+            gap: 0.8rem;
+            align-items: center;
+            padding: 0.8rem 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .portfolio-allocation-breakdown-item__swatch {
+            width: 0.7rem;
+            height: 0.7rem;
+            border-radius: 999px;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
+        }
+
+        .portfolio-allocation-breakdown-item__meta {
+            min-width: 0;
+        }
+
+        .portfolio-allocation-breakdown-item__stats {
+            display: grid;
+            gap: 0.22rem;
+            justify-items: end;
+            text-align: right;
+            min-width: 0;
+        }
+
+        .portfolio-allocation-breakdown-item__label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: #f8fafc;
+        }
+
+        .portfolio-allocation-breakdown-item__support {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.74rem;
+            line-height: 1.3;
+            letter-spacing: 0.04em;
+            color: #94a3b8;
+        }
+
+        .portfolio-allocation-breakdown-item__share {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #f8fafc;
+            white-space: nowrap;
+        }
+
+        .portfolio-allocation-breakdown-item__value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #f8fafc;
+            white-space: nowrap;
+        }
+
+        .portfolio-allocation-breakdown-item__performance {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.74rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .portfolio-allocation-breakdown-item__performance--positive {
+            color: #6ee7b7;
+        }
+
+        .portfolio-allocation-breakdown-item__performance--negative {
+            color: #fca5a5;
+        }
+
+        .portfolio-allocation-breakdown-item__performance--neutral {
+            color: #cbd5e1;
+        }
+
+        .portfolio-allocation-fallback {
+            max-width: 20rem;
+            text-align: center;
+        }
+
+        .portfolio-insight-strip__shell {
+            border: 1px solid rgba(245, 158, 11, 0.16);
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.08), rgba(15, 23, 42, 0.82));
+            box-shadow: 0 14px 26px rgba(2, 6, 23, 0.12);
+        }
+
+        .portfolio-insight-strip__content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.9rem 1.2rem;
+            padding: 0.9rem 1rem;
+        }
+
+        .portfolio-insight-strip__headline {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.85rem;
+            min-width: 0;
+        }
+
+        .portfolio-insight-strip__meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-left: auto;
+        }
+
+        .portfolio-insight-strip__priority {
+            display: inline-flex;
+            align-items: center;
+            min-height: 1.9rem;
+            border: 1px solid rgba(251, 191, 36, 0.22);
+            background: rgba(251, 191, 36, 0.12);
+            padding: 0.32rem 0.58rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #fde68a;
+            white-space: nowrap;
+        }
+
+        .portfolio-insight-strip__cta {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.5rem 0.75rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #e2e8f0;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .portfolio-insight-strip__cta:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        /* Mantem o link de logo discreto e natural, sem parecer CTA separado. */
+        .inst-link {
+            display: inline-flex;
+            border-radius: 4px;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .inst-link:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .inst-link:focus-visible {
+            outline: 1px solid rgba(245, 158, 11, 0.42);
+            outline-offset: 2px;
+        }
+
+        .entity-link {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 0.1rem;
+            transition: color 0.2s ease;
+        }
+
+        .entity-link:hover .entity-link__title,
+        .entity-link:focus-visible .entity-link__title {
+            color: #fbbf24;
+        }
+
+        .entity-link__title {
+            transition: color 0.2s ease;
+        }
+
+        /* Permite cards internos clicaveis com expansao inline sem adicionar chrome pesado. */
+        .portfolio-inline-shell {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .portfolio-inline-card {
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            transition: border-color 0.22s ease, background 0.22s ease, transform 0.22s ease;
+        }
+
+        .portfolio-inline-card--interactive {
+            cursor: pointer;
+        }
+
+        .portfolio-inline-card--interactive:hover,
+        .portfolio-inline-card--interactive:focus-visible,
+        .portfolio-inline-card--active {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(245, 158, 11, 0.16);
+            transform: translateY(-1px);
+        }
+
+        .portfolio-inline-card__chevron {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        .portfolio-inline-detail-shell {
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(2, 6, 23, 0.32);
+            padding: 0.95rem;
+        }
+
+        .portfolio-inline-detail-grid {
+            display: grid;
+            gap: 0.7rem;
+        }
+
+        .portfolio-inline-detail-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .portfolio-inline-support-shell {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 0.95rem;
+            padding-top: 0.95rem;
+        }
+
+        .summary-card-surface {
+            cursor: pointer;
+        }
+
+        .summary-card-surface:focus-visible {
+            outline: 1px solid rgba(245, 158, 11, 0.32);
+            outline-offset: 2px;
+        }
+
+        .inventory-row--interactive {
+            cursor: pointer;
+        }
+
+        .inventory-row--interactive:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
 
         /* Orbitron = titulos curtos, labels de destaque e valores principais. Rajdhani = leitura operacional, descricoes e apoio tatico. */
         .font-display { font-family: 'Orbitron', sans-serif; }
@@ -461,6 +792,10 @@
             gap: 0.65rem;
         }
 
+        .dashboard-summary-card__filter-row--wide {
+            flex-wrap: wrap;
+        }
+
         .dashboard-summary-card__filter-row .select-filter {
             min-width: 8.75rem;
         }
@@ -549,6 +884,78 @@
         .dashboard-summary-card__table td {
             padding: 0.95rem 1rem;
             border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .passive-table-row {
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .passive-table-row:hover,
+        .passive-table-row:focus-visible {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .passive-table-row--active {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .passive-table-row__title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .passive-table-row__label {
+            min-width: 0;
+        }
+
+        .passive-table-row__detail {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .passive-table-row__detail-shell {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .passive-table-row__detail-grid {
+            display: grid;
+            gap: 0.7rem;
+            grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        }
+
+        .passive-table-row__detail-box {
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(2, 6, 23, 0.36);
+            padding: 0.75rem 0.8rem;
+        }
+
+        .passive-table-row__status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            justify-content: flex-end;
+        }
+
+        .passive-table-row__trend {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 999px;
+            background: #94a3b8;
+        }
+
+        .passive-table-row__trend--positive {
+            background: #34d399;
+        }
+
+        .passive-table-row__trend--negative {
+            background: #f87171;
+        }
+
+        .passive-table-row__trend--neutral {
+            background: #94a3b8;
         }
 
         .dashboard-summary-card__empty {
@@ -740,6 +1147,28 @@
 
         /* Empilha os pontos criticos do expandido no mobile para evitar compressao feia e overflow horizontal. */
         @media (max-width: 767px) {
+            .portfolio-allocation-breakdown-item {
+                grid-template-columns: auto minmax(0, 1fr);
+            }
+
+            .portfolio-allocation-breakdown-item__stats,
+            .portfolio-allocation-breakdown-item__share {
+                grid-column: 2;
+                justify-items: start;
+                text-align: left;
+            }
+
+            .portfolio-insight-strip__content,
+            .portfolio-insight-strip__headline,
+            .portfolio-insight-strip__meta {
+                align-items: stretch;
+            }
+
+            .portfolio-insight-strip__meta {
+                margin-left: 0;
+                justify-content: flex-start;
+            }
+
             .dashboard-header-meta {
                 gap: 0.45rem;
             }
@@ -842,6 +1271,14 @@
                 min-width: 30rem;
             }
 
+            #invest-list .dashboard-summary-card__table {
+                min-width: 44rem;
+            }
+
+            #previdencia-list .dashboard-summary-card__table {
+                min-width: 36rem;
+            }
+
             .actions-summary-card__support-item > div {
                 flex-direction: column;
                 align-items: flex-start;
@@ -915,6 +1352,7 @@
         .alert-pulse { animation: pulse-red 2s infinite; }
         .loading-dots:after { content: '.'; animation: dots 1s steps(5, end) infinite; }
     </style>
+
 </head>
 <body class="p-4 md:p-10 min-h-screen ghost-active" id="main-body">
     <svg aria-hidden="true" focusable="false" class="absolute h-0 w-0 overflow-hidden">
@@ -964,6 +1402,8 @@
             <circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.8" />
         </symbol>
     </svg>
+
+
     <div class="max-w-7xl mx-auto">
         <!-- Dashboard Header: START -->
         <header class="relative mb-6 lg:mb-7" data-block="dashboard-header">
@@ -1012,43 +1452,92 @@
         </header>
         <!-- Dashboard Header: END -->
 
-        <!-- Portfolio Brief: START -->
-        <section class="mb-6 lg:mb-7" data-block="portfolio-brief">
-            <div class="portfolio-brief-shell grid gap-4 rounded-none p-4 sm:p-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] lg:items-stretch lg:gap-5 lg:p-6" data-loading-block>
-                <div class="portfolio-brief-card rounded-none p-4 sm:p-5" data-empty-field>
+        <!-- Portfolio Insight Strip: START -->
+        <section id="portfolio-insight-strip" class="portfolio-insight-strip hidden mb-5 lg:mb-6" data-block="portfolio-insight-strip" data-loading-block>
+            <div class="portfolio-insight-strip__shell">
+                <div class="portfolio-insight-strip__content">
+                    <div class="portfolio-insight-strip__headline">
+                        <span id="portfolio-insight-priority" class="portfolio-insight-strip__priority hidden"></span>
+                        <div class="space-y-1">
+                            <p id="portfolio-insight-title" class="type-body-strong text-sm text-slate-50"></p>
+                            <p id="portfolio-insight-reason" class="type-body-xs text-slate-400"></p>
+                        </div>
+                    </div>
+                    <div class="portfolio-insight-strip__meta">
+                        <p id="portfolio-insight-impact" class="type-body-xs text-amber-100/80"></p>
+                        <button id="portfolio-insight-cta" type="button" class="portfolio-insight-strip__cta hidden" onclick="requestStrategyAnalysis()">Ver leitura</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Portfolio Insight Strip: END -->
+
+        <!-- Portfolio Overview: START -->
+        <section class="mb-6 lg:mb-7" data-block="portfolio-overview">
+            <div class="portfolio-allocation-shell grid gap-4 rounded-none p-4 sm:p-5 lg:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)] lg:items-stretch lg:gap-5 lg:p-6" data-loading-block>
+                <div class="portfolio-allocation-visual rounded-none p-4 sm:p-5">
                     <div class="space-y-3">
-                        <p class="type-kicker text-amber-200/72">Patrimonio consolidado</p>
-                        <p id="patrimonio-total" class="hide-value type-value-lg text-[2.25rem] sm:text-[2.65rem] lg:text-[2.9rem]"></p>
-                        <div class="flex flex-wrap items-center gap-2 type-body-label text-amber-100/72" data-empty-field>
-                            <span>Performance do periodo</span>
-                            <span id="exec-performance" class="hide-value type-value-sm text-sm text-emerald-300 md:text-base"></span>
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <p class="type-kicker text-amber-200/72">Divisao em campo</p>
+                                <p class="type-heading text-lg text-white">Alocacao da carteira</p>
+                            </div>
+                            <span id="allocation-context-label" class="type-body-label text-slate-500" data-empty-field></span>
+                        </div>
+                        <div class="portfolio-allocation-visual__body">
+                            <div id="allocation-chart" class="portfolio-allocation-chart is-empty" role="img" aria-label="Grafico de divisao da carteira">
+                                <div class="portfolio-allocation-chart__center">
+                                    <span class="type-body-label text-slate-500">Base</span>
+                                    <span id="allocation-chart-center-label" class="type-value-sm text-white">Sem dados</span>
+                                </div>
+                            </div>
+                            <p id="allocation-chart-fallback" class="portfolio-allocation-fallback type-body-xs text-slate-500">Quando houver dados suficientes, a divisao sera exibida aqui.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="portfolio-brief-message rounded-none p-4 sm:p-5" data-empty-field>
-                    <div class="space-y-3">
-                        <p class="type-kicker">Resumo executivo</p>
-                        <div class="portfolio-brief-copy">
-                            <p id="exec-status-text" class="portfolio-brief-copy__line" data-empty-field>Carteira em analise</p>
-                            <p id="exec-summary-line-2" class="portfolio-brief-copy__line" data-empty-field></p>
-                            <p id="exec-summary-line-3" class="portfolio-brief-copy__line" data-empty-field></p>
+                <div class="portfolio-allocation-data rounded-none p-4 sm:p-5">
+                    <div class="space-y-4">
+                        <div class="space-y-3">
+                            <p class="type-kicker text-amber-200/72">Patrimonio consolidado</p>
+                            <p id="patrimonio-total" class="hide-value type-value-lg text-[2.25rem] sm:text-[2.65rem] lg:text-[2.95rem]"></p>
+                            <div class="flex flex-wrap items-center gap-2 type-body-label text-amber-100/72" data-empty-field>
+                                <span>Performance do periodo</span>
+                                <span id="exec-performance" class="hide-value type-value-sm text-sm text-emerald-300 md:text-base"></span>
+                            </div>
                         </div>
-                        <div class="portfolio-brief-actions">
-                            <button onclick="requestStrategyAnalysis()" id="strategy-btn" class="btn-action type-action portfolio-brief-ai-button text-white px-5 py-2.5 rounded-sm">
-                                Chamar Esquilo IA
-                            </button>
+
+                        <div class="portfolio-allocation-executive rounded-none p-4" data-empty-field>
+                            <p class="type-kicker">Resumo executivo</p>
+                            <div class="portfolio-brief-copy mt-3">
+                                <p id="exec-status-text" class="portfolio-brief-copy__line" data-empty-field>Carteira em analise</p>
+                                <p id="exec-summary-line-2" class="portfolio-brief-copy__line" data-empty-field></p>
+                                <p id="exec-summary-line-3" class="portfolio-brief-copy__line" data-empty-field></p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-3">
+                                <div class="space-y-1">
+                                    <p class="type-kicker text-slate-400">Representatividade</p>
+                                    <p class="type-body-xs text-slate-500">Valor, peso e rentabilidade por macroclasse para leitura rapida da carteira.</p>
+                                </div>
+                                <button onclick="requestStrategyAnalysis()" id="strategy-btn" class="btn-action type-action portfolio-brief-ai-button text-white px-5 py-2.5 rounded-sm">
+                                    Chamar Esquilo IA
+                                </button>
+                            </div>
+                            <div id="allocation-breakdown-list" class="portfolio-allocation-breakdown-list"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <!-- Portfolio Brief: END -->
+        <!-- Portfolio Overview: END -->
 
         <!-- Expandable Summary Cards: START -->
         <section class="grid grid-cols-1 gap-4 mb-9 md:grid-cols-2 lg:grid-cols-3 lg:gap-5 lg:mb-10" data-block="summary-folder-grid">
             <!-- Previdencia Card: START -->
-            <div class="dashboard-summary-card dashboard-summary-card--blue overflow-hidden rounded-none p-4" data-block="previdencia-card" data-summary-card="previdencia" data-loading-block>
+            <div class="dashboard-summary-card dashboard-summary-card--blue overflow-hidden rounded-none p-4 summary-card-surface" data-block="previdencia-card" data-summary-card="previdencia" data-loading-block tabindex="0" onclick="handleSummaryCardClick(event, this)" onkeydown="handleSummaryCardKeydown(event, this)">
                 <div class="dashboard-summary-card__header">
                     <div class="flex min-w-0 items-start gap-3">
                         <div class="dashboard-summary-card__icon dashboard-summary-card__icon--blue">
@@ -1100,14 +1589,14 @@
                             <p id="previdencia-detail-caption" class="font-body px-1 text-[11px] leading-5 tracking-[0.02em] text-slate-500" data-empty-field></p>
                         </div>
                         <div class="dashboard-summary-card__detail-shell space-y-2.5">
-                            <p class="type-kicker text-blue-200/75">Carteira em campo</p>
+                            <p class="type-kicker text-blue-200/75">Tabela comparativa</p>
                             <div class="dashboard-summary-card__filter-row">
                                 <span class="dashboard-summary-card__label">Filtro</span>
                                 <select id="prev-filter-inst" class="select-filter">
                                     <option value="">Todas</option>
                                 </select>
                             </div>
-                            <div id="previdencia-list" class="space-y-2"></div>
+                            <div id="previdencia-list" class="dashboard-summary-card__table-shell rounded-none"></div>
                         </div>
                         <div class="dashboard-summary-card__actions">
                             <button class="dashboard-summary-card__action" type="button" onclick="showFeaturePopup('chart', 'Previdencia')">Grafico e analise</button>
@@ -1119,7 +1608,7 @@
             <!-- Previdencia Card: END -->
 
             <!-- Investments Card: START -->
-            <div class="dashboard-summary-card dashboard-summary-card--purple overflow-hidden rounded-none p-4" data-block="investments-card" data-summary-card="investimentos" data-loading-block>
+            <div class="dashboard-summary-card dashboard-summary-card--purple overflow-hidden rounded-none p-4 summary-card-surface" data-block="investments-card" data-summary-card="investimentos" data-loading-block tabindex="0" onclick="handleSummaryCardClick(event, this)" onkeydown="handleSummaryCardKeydown(event, this)">
                 <div class="dashboard-summary-card__header">
                     <div class="flex min-w-0 items-start gap-3">
                         <div class="dashboard-summary-card__icon dashboard-summary-card__icon--purple">
@@ -1171,14 +1660,19 @@
                             <p id="investimentos-detail-caption" class="font-body px-1 text-[11px] leading-5 tracking-[0.02em] text-slate-500" data-empty-field></p>
                         </div>
                         <div class="dashboard-summary-card__detail-shell space-y-2.5">
-                            <p class="type-kicker text-purple-200/75">Carteira em campo</p>
-                            <div class="dashboard-summary-card__filter-row">
+                            <p class="type-kicker text-purple-200/75">Tabela comparativa</p>
+                            <div class="dashboard-summary-card__filter-row dashboard-summary-card__filter-row--wide">
                                 <span class="dashboard-summary-card__label">Filtro</span>
                                 <select id="invest-filter-inst" class="select-filter">
                                     <option value="">Todas</option>
                                 </select>
+                                <select id="invest-filter-sort" class="select-filter">
+                                    <option value="saldo">Maior saldo</option>
+                                    <option value="rentabilidade">Melhor rentabilidade</option>
+                                    <option value="participacao">% da carteira</option>
+                                </select>
                             </div>
-                            <div id="invest-list" class="space-y-2"></div>
+                            <div id="invest-list" class="dashboard-summary-card__table-shell rounded-none"></div>
                         </div>
                         <div class="dashboard-summary-card__actions">
                             <button class="dashboard-summary-card__action" type="button" onclick="showFeaturePopup('chart', 'Fundos de investimento')">Grafico e analise</button>
@@ -1190,7 +1684,7 @@
             <!-- Investments Card: END -->
 
             <!-- Actions Summary Card: START -->
-            <div class="dashboard-summary-card actions-summary-card dashboard-summary-card--green overflow-hidden rounded-none p-4" data-block="actions-summary-card" data-summary-card="acoes" data-loading-block>
+            <div class="dashboard-summary-card actions-summary-card dashboard-summary-card--green overflow-hidden rounded-none p-4 summary-card-surface" data-block="actions-summary-card" data-summary-card="acoes" data-loading-block tabindex="0" onclick="handleSummaryCardClick(event, this)" onkeydown="handleSummaryCardKeydown(event, this)">
                 <div class="dashboard-summary-card__header">
                     <div class="flex min-w-0 items-start gap-3">
                         <div class="dashboard-summary-card__icon dashboard-summary-card__icon--green">
@@ -1246,6 +1740,7 @@
                                 <div class="space-y-1">
                                     <p class="type-kicker text-emerald-200/75">Ativos em carteira</p>
                                     <p id="alert-text" class="type-body-xs text-slate-400" data-empty-field>Sem alertas criticos</p>
+                                    <p id="acoes-live-status" class="type-body-xs text-slate-500" data-empty-field></p>
                                 </div>
                                 <div class="dashboard-summary-card__filters">
                                     <select id="acoes-filter-inst" class="select-filter">
@@ -1309,45 +1804,6 @@
         </section>
         <!-- Expandable Summary Cards: END -->
 
-        <!-- Recommended Action Card: START -->
-        <section class="glass p-6 rounded-none border-2 border-amber-500/70 bg-gradient-to-r from-amber-500/10 via-transparent to-red-500/10 mb-8" data-block="recommended-action-card" data-loading-block>
-            <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                <div class="space-y-2">
-                    <p class="type-kicker text-amber-300">Alerta e recomendacao</p>
-                    <p id="recommended-action-main" class="type-heading text-2xl md:text-3xl text-white">VENDER ATIVO</p>
-                </div>
-                <div class="space-y-2">
-                    <p id="recommended-action-reason" class="type-body text-sm text-slate-300"></p>
-                    <p id="recommended-action-impact" class="type-body-strong text-sm text-amber-200"></p>
-                </div>
-            </div>
-        </section>
-        <!-- Recommended Action Card: END -->
-
-        <!-- Action Plan Card: START -->
-        <section id="action-plan-card" class="glass hidden rounded-none border border-cyan-400/15 bg-gradient-to-r from-cyan-500/10 via-transparent to-slate-950/30 p-5 mb-8" data-block="action-plan-card" data-loading-block>
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div class="space-y-2 lg:max-w-md">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <p class="type-kicker text-cyan-200/72">Plano de acao</p>
-                        <span id="action-plan-priority" class="hidden rounded-none border border-cyan-400/18 bg-cyan-400/8 px-2 py-1 type-action text-cyan-200"></span>
-                    </div>
-                    <p id="action-plan-main" class="type-heading text-xl text-white" data-empty-field></p>
-                </div>
-                <div class="grid gap-3 sm:grid-cols-2 lg:min-w-[28rem] lg:max-w-2xl">
-                    <div class="rounded-none border border-white/6 bg-white/4 px-4 py-3" data-empty-field>
-                        <p class="type-body-label text-slate-500">Justificativa</p>
-                        <p id="action-plan-justification" class="mt-1 type-body text-sm text-slate-200"></p>
-                    </div>
-                    <div class="rounded-none border border-white/6 bg-white/4 px-4 py-3" data-empty-field>
-                        <p class="type-body-label text-slate-500">Impacto</p>
-                        <p id="action-plan-impact" class="mt-1 type-body text-sm text-cyan-100"></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Action Plan Card: END -->
-
         <!-- AI Analysis Card: START -->
         <section id="ai-analysis-card" class="glass ai-analysis-shell p-6 rounded-none ai-glow bg-gradient-to-br from-violet-900/15 to-transparent mb-6 md:mb-8 hidden" data-block="ai-analysis-card" data-loading-block>
             <div class="ai-analysis-header flex flex-col items-start justify-between mb-4 md:flex-row md:items-center">
@@ -1357,7 +1813,7 @@
                     </svg>
                     <div>
                         <h2 class="type-heading text-lg text-violet-400">Esquilo IA</h2>
-                        <p class="type-body-label text-slate-400">Analise tatica disponivel</p>
+                        <p id="ai-analysis-status" class="type-body-label text-slate-400">Leitura contextual pronta</p>
                     </div>
                 </div>
             </div>
@@ -1380,45 +1836,62 @@
             </div>
         </div>
         <!-- Feature Popup: END -->
+
     </div>
 
     <script>
-        // ---------------------------------------------------------------------
-        // Application State
-        // ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
+// Application State
+// ---------------------------------------------------------------------
 
-        /**
-         * Estado unico do dashboard. Centraliza dados carregados, filtros ativos
-         * e controles de comportamento para evitar dependencias implicitas entre cards.
-         */
-        const appState = {
-            dashboardData: null,
-            activeSummaryCard: '',
-            filtersBound: false,
-            isLoading: false,
-            isStrategyLoading: false,
-            strategyAnalysisText: '',
-            refreshTimerId: null,
-            filters: {
-                actionsInst: '',
-                actionsRec: '',
-                investInst: '',
-                prevInst: ''
-            }
-        };
+/**
+ * Estado unico do dashboard. Centraliza dados carregados, filtros ativos
+ * e controles de comportamento para evitar dependencias implicitas entre cards.
+ */
+const appState = {
+    dashboardData: null,
+    activeSummaryCard: '',
+    expandedDetails: {
+        action: '',
+        fund: '',
+        previdencia: ''
+    },
+    filtersBound: false,
+    hasInitialized: false,
+    isLoading: false,
+    isStrategyLoading: false,
+    strategyAnalysisText: '',
+    strategyAnalysisMode: '',
+    refreshTimerId: null,
+    bridgeRetryTimerId: null,
+    bridgeRetryCount: 0,
+    actionsRefreshInFlight: false,
+    filters: {
+        actionsInst: '',
+        actionsRec: '',
+        investInst: '',
+        investSort: 'saldo',
+        prevInst: ''
+    }
+};
 
-        /**
-         * Configuracoes operacionais da interface.
-         */
-        const appConfig = {
-            refreshIntervalMs: 60000,
-            releaseName: 'Trilha de Castanha',
-            versionNumber: '1.0.0',
-            chartSvg: '<svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 13L7 9L11 12L17 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-        };
+/**
+ * Configuracoes operacionais da interface.
+ */
+const appConfig = {
+    refreshIntervalMs: 60000,
+    appsScriptBridgeRetryMs: 600,
+    appsScriptBridgeMaxRetries: 6,
+    releaseName: 'Trilha de Castanha',
+    versionNumber: '1.5.0',
+    chartSvg: '<svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 13L7 9L11 12L17 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
 
-        // ---------------------------------------------------------------------
-        // DOM and Formatting Helpers
+// ---------------------------------------------------------------------
+
+</script>
+    <script>
+// DOM and Formatting Helpers
         // ---------------------------------------------------------------------
 
         function getElement(id) {
@@ -1555,6 +2028,38 @@
             card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        function handleSummaryCardClick(event, card) {
+            if (!card || !event) return;
+            if (event.target.closest('a, button, select, input, textarea, label')) return;
+            if (card.classList.contains('is-active') && event.target.closest('.folder-content')) return;
+
+            const trigger = card.querySelector('[data-summary-trigger]');
+            if (!trigger) return;
+            toggleSummaryCard(trigger);
+        }
+
+        function handleSummaryCardKeydown(event, card) {
+            if (!event || !card) return;
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            if (event.target.closest('a, button, select, input, textarea, label') && event.target !== card) return;
+            event.preventDefault();
+            handleSummaryCardClick(event, card);
+        }
+
+        function toggleInlineItemDetail(type, itemKey) {
+            if (!type || !itemKey) return;
+            const currentKey = appState.expandedDetails[type] || '';
+            appState.expandedDetails[type] = currentKey === itemKey ? '' : itemKey;
+            renderFilteredCards();
+        }
+
+        function handleInlineCardKeydown(event, type, itemKey) {
+            if (!event) return;
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            toggleInlineItemDetail(type, itemKey);
+        }
+
         /**
          * Exibe um popup simples para recursos ainda indisponiveis nesta versao.
          * Entrada: tipo do recurso e rotulo opcional de contexto.
@@ -1612,11 +2117,29 @@
             popup.classList.remove('flex');
         }
 
+        function sanitizeInstitutionLabel(name) {
+            const rawValue = String(name || '')
+                .replace(/[�]+/g, '')
+                .replace(/[Â]+/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            const normalized = normalizeInteractionKey(rawValue);
+            if (!normalized) return '';
+            if (normalized.indexOf('xp') >= 0) return 'XP';
+            if (normalized.indexOf('ion') >= 0) return 'Ion Itaú';
+            if (normalized.indexOf('itau') >= 0) return 'Itaú';
+            if (normalized.indexOf('rico') >= 0) return 'Rico';
+            if (normalized.indexOf('inter') >= 0) return 'Inter';
+            if (normalized.indexOf('nubank') >= 0 || normalized.indexOf('nuinvest') >= 0 || normalized === 'nu') return 'Nubank';
+            if (normalized.indexOf('btg') >= 0) return 'BTG Pactual';
+            return rawValue;
+        }
+
         function getInitials(name) {
-            const cleaned = String(name || '').trim();
+            const cleaned = sanitizeInstitutionLabel(name) || String(name || '').trim();
             if (!cleaned) return 'SD';
 
-            const parts = cleaned.split(/\s+/).filter(Boolean);
+            const parts = cleaned.replace(/[^A-Za-zÀ-ÿ0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
             if (!parts.length) return 'SD';
 
             const first = parts[0].charAt(0);
@@ -1624,8 +2147,60 @@
             return (first + second).toUpperCase();
         }
 
-        function isValidIconUrl(url) {
+        function isValidNavigationUrl(url) {
             return typeof url === 'string' && /^https?:\/\/.+/i.test(url);
+        }
+
+        function normalizeInteractionKey(value) {
+            return String(value || '')
+                .trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-');
+        }
+
+        function buildInlineItemKey(type, value) {
+            return String(type || 'item') + ':' + normalizeInteractionKey(value);
+        }
+
+        function getInstitutionDestinationUrl(name) {
+            const normalizedName = normalizeInteractionKey(sanitizeInstitutionLabel(name) || name);
+            if (!normalizedName) return '';
+            if (normalizedName.indexOf('xp') >= 0) return 'https://www.xpi.com.br/';
+            if (normalizedName.indexOf('ion') >= 0) return 'https://ion.itau/';
+            if (normalizedName.indexOf('itau') >= 0) return 'https://www.itau.com.br/investimentos';
+            if (normalizedName.indexOf('rico') >= 0) return 'https://www.rico.com.vc/';
+            if (normalizedName.indexOf('inter') >= 0) return 'https://www.bancointer.com.br/';
+            if (normalizedName.indexOf('nubank') >= 0 || normalizedName.indexOf('nuinvest') >= 0 || normalizedName === 'nu') return 'https://nubank.com.br/';
+            if (normalizedName.indexOf('btg') >= 0) return 'https://www.btgpactual.com/';
+            return '';
+        }
+
+        function getActionNavigationUrl(action) {
+            const preferredUrl = action?.urlDetalhe || action?.externalUrl || action?.websiteUrl || action?.chartUrl || '';
+            return isValidNavigationUrl(preferredUrl) ? preferredUrl : '';
+        }
+
+        function getFundNavigationUrl(item) {
+            const preferredUrl = item?.urlDetalhe || item?.externalUrl || item?.websiteUrl || item?.siteUrl || '';
+            return isValidNavigationUrl(preferredUrl) ? preferredUrl : '';
+        }
+
+        function buildEntityTextMarkup(title, subtitle, url) {
+            const safeTitle = escapeHtml(displayValue(title, '-'));
+            const safeSubtitle = escapeHtml(displayValue(sanitizeInstitutionLabel(subtitle) || subtitle, ''));
+            const subtitleHtml = safeSubtitle ? '<div class="type-body-xs text-slate-400">' + safeSubtitle + '</div>' : '';
+
+            if (!isValidNavigationUrl(url)) {
+                return '<div><div class="type-body-strong text-xs text-slate-200">' + safeTitle + '</div>' + subtitleHtml + '</div>';
+            }
+
+            return ''
+                + '<a class="entity-link" href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">'
+                + '  <span class="entity-link__title type-body-strong text-xs text-slate-100">' + safeTitle + '</span>'
+                +     subtitleHtml
+                + '</a>';
         }
 
         /**
@@ -1633,14 +2208,26 @@
          * Consome nome e URL opcional retornados pelo backend.
          */
         function getInstitutionIconMarkup(name, url) {
-            const safeName = escapeHtml(name || '');
+            const displayName = sanitizeInstitutionLabel(name) || String(name || '');
+            const safeName = escapeHtml(displayName || '');
             const initials = getInitials(name);
             const fallbackHtml = '<div class="inst-icon inst-fallback">' + escapeHtml(initials) + '</div>';
+            const destinationUrl = getInstitutionDestinationUrl(name);
 
-            if (isValidIconUrl(url)) {
+            if (isValidNavigationUrl(url)) {
                 const safeUrl = escapeHtml(url);
                 const safeFallback = fallbackHtml.replace(/'/g, '&#39;');
-                return '<img class="inst-icon" src="' + safeUrl + '" alt="' + safeName + '" onerror="this.outerHTML=\'' + safeFallback + '\'">';
+                const imageHtml = '<img class="inst-icon" src="' + safeUrl + '" alt="' + safeName + '" onerror="this.outerHTML=\'' + safeFallback + '\'">';
+
+                if (isValidNavigationUrl(destinationUrl)) {
+                    return '<a class="inst-link" href="' + escapeHtml(destinationUrl) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" aria-label="Abrir plataforma ' + safeName + '">' + imageHtml + '</a>';
+                }
+
+                return imageHtml;
+            }
+
+            if (isValidNavigationUrl(destinationUrl)) {
+                return '<a class="inst-link" href="' + escapeHtml(destinationUrl) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" aria-label="Abrir plataforma ' + safeName + '">' + fallbackHtml + '</a>';
             }
 
             return fallbackHtml;
@@ -1650,7 +2237,7 @@
          * Preenche seletores de filtro com opcoes derivadas dos dados ja carregados.
          * Mantem a selecao atual sempre que o valor ainda existir na lista.
          */
-        function populateSelect(id, options, selected) {
+        function populateSelect(id, options, selected, labelResolver) {
             const select = getElement(id);
             if (!select) return;
 
@@ -1658,7 +2245,8 @@
             const html = ['<option value="">Todos</option>']
                 .concat(unique.map(function (option) {
                     const safeOption = escapeHtml(option);
-                    return '<option value="' + safeOption + '">' + safeOption + '</option>';
+                    const displayOption = escapeHtml(labelResolver ? labelResolver(option) : option);
+                    return '<option value="' + safeOption + '">' + displayOption + '</option>';
                 }))
                 .join('');
 
@@ -1689,6 +2277,190 @@
             const numericValue = Number(value);
             if (Number.isNaN(numericValue) || numericValue <= 0) return formattedValue;
             return '+' + formattedValue;
+        }
+
+        function formatCurrencyValue(value) {
+            const numericValue = Number(value);
+            if (!Number.isFinite(numericValue)) return 'Sem dados';
+            return numericValue.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function getPerformanceTone(value) {
+            const numericValue = Number(value);
+            if (!Number.isFinite(numericValue)) return 'neutral';
+            if (numericValue > 0) return 'positive';
+            if (numericValue < 0) return 'negative';
+            return 'neutral';
+        }
+
+        function buildCategorySnapshotsFromSummary(data) {
+            const summary = data?.summary || {};
+            const items = [
+                {
+                    key: 'acoes',
+                    label: 'Ações',
+                    totalRaw: Number(summary?.acoesRaw),
+                    totalLabel: summary?.acoes || '',
+                    performanceRaw: summary?.acoesPerformanceRaw,
+                    performanceLabel: formatSignedPercentValue(summary?.acoesPerformanceRaw) || '—',
+                    color: '#34d399',
+                    status: data?.categories?.actions?.status || '',
+                    recommendation: data?.categories?.actions?.recommendation || ''
+                },
+                {
+                    key: 'fundos',
+                    label: 'Fundos de Investimento',
+                    totalRaw: Number(summary?.fundosRaw),
+                    totalLabel: summary?.fundos || '',
+                    performanceRaw: summary?.fundosPerformanceRaw,
+                    performanceLabel: formatSignedPercentValue(summary?.fundosPerformanceRaw) || '—',
+                    color: '#c084fc',
+                    status: data?.categories?.funds?.status || '',
+                    recommendation: data?.categories?.funds?.recommendation || ''
+                },
+                {
+                    key: 'previdencia',
+                    label: 'Previdência',
+                    totalRaw: Number(summary?.previdenciaRaw),
+                    totalLabel: summary?.previdencia || '',
+                    performanceRaw: summary?.previdenciaPerformanceRaw,
+                    performanceLabel: formatSignedPercentValue(summary?.previdenciaPerformanceRaw) || '—',
+                    color: '#60a5fa',
+                    status: data?.categories?.previdencia?.status || '',
+                    recommendation: data?.categories?.previdencia?.recommendation || ''
+                }
+            ].filter(function (item) {
+                return Number.isFinite(item.totalRaw) && item.totalRaw > 0;
+            });
+
+            const totalPortfolio = items.reduce(function (total, item) {
+                return total + item.totalRaw;
+            }, 0);
+
+            return items.map(function (item) {
+                const shareRaw = totalPortfolio > 0 ? item.totalRaw / totalPortfolio : 0;
+                return Object.assign({}, item, {
+                    shareRaw: shareRaw,
+                    shareLabel: formatPercentValue(shareRaw),
+                    trend: getPerformanceTone(item.performanceRaw)
+                });
+            });
+        }
+
+        function buildPortfolioAllocationDataset(data) {
+            const rawSnapshots = Array.isArray(data?.categorySnapshots) && data.categorySnapshots.length
+                ? data.categorySnapshots
+                : buildCategorySnapshotsFromSummary(data);
+            const categoryItems = rawSnapshots
+                .filter(function (item) {
+                    return Number(item?.totalRaw) > 0;
+                })
+                .map(function (item) {
+                    const statusParts = [item?.recommendation, item?.status].filter(Boolean);
+                    return {
+                        key: item?.key || '',
+                        label: item?.label || 'Categoria',
+                        rawValue: Number(item?.totalRaw),
+                        displayValue: item?.totalLabel || formatCurrencyValue(item?.totalRaw),
+                        share: Number(item?.shareRaw || 0),
+                        shareLabel: item?.shareLabel || formatPercentValue(item?.shareRaw || 0),
+                        performanceRaw: item?.performanceRaw,
+                        performanceLabel: item?.performanceLabel || '—',
+                        supportLabel: statusParts.length ? statusParts.join(' · ') : 'Leitura consolidada',
+                        trend: item?.trend || getPerformanceTone(item?.performanceRaw),
+                        color: item?.color || '#94a3b8'
+                    };
+                })
+                .sort(function (left, right) {
+                    return right.rawValue - left.rawValue;
+                });
+
+            const totalPortfolio = categoryItems.reduce(function (total, item) {
+                return total + item.rawValue;
+            }, 0);
+
+            return {
+                contextLabel: categoryItems.length ? (categoryItems.length + ' macroclasses ativas') : '',
+                centerLabel: totalPortfolio > 0 ? 'Macroclasses' : 'Sem dados',
+                fallbackText: totalPortfolio > 0 ? '' : 'Ainda nao ha base suficiente para montar a divisao grafica. A lista ao lado continua pronta para receber os dados assim que estiverem disponiveis.',
+                items: categoryItems.map(function (item) {
+                    const share = totalPortfolio > 0 ? item.rawValue / totalPortfolio : item.share;
+                    return Object.assign({}, item, {
+                        share: share,
+                        shareLabel: formatPercentValue(share)
+                    });
+                })
+            };
+        }
+
+        function renderPortfolioOverview(data) {
+            const summary = data?.summary || {};
+            const messaging = data?.messaging || {};
+            const executiveSummary = messaging.executiveSummary || {};
+            const dataset = buildPortfolioAllocationDataset(data);
+            const summaryLines = getExecutiveSummaryLines(data?.score || {}, executiveSummary);
+            const chart = getElement('allocation-chart');
+            const fallback = getElement('allocation-chart-fallback');
+            const breakdown = getElement('allocation-breakdown-list');
+
+            setText('patrimonio-total', summary?.total || '');
+            setText('exec-performance', executiveSummary.performanceText || '');
+            setText('exec-status-text', summaryLines[0] || '');
+            setText('exec-summary-line-2', summaryLines[1] || '');
+            setText('exec-summary-line-3', summaryLines[2] || '');
+            setText('allocation-context-label', dataset.contextLabel || '');
+            setText('allocation-chart-center-label', dataset.centerLabel || 'Sem dados');
+
+            if (chart) {
+                if (Array.isArray(dataset.items) && dataset.items.length) {
+                    let currentOffset = 0;
+                    const segments = dataset.items.map(function (item) {
+                        const start = currentOffset;
+                        const end = currentOffset + (item.share * 100);
+                        currentOffset = end;
+                        return item.color + ' ' + start.toFixed(2) + '% ' + end.toFixed(2) + '%';
+                    });
+                    chart.style.background = 'radial-gradient(circle at center, rgba(15, 23, 42, 0.95) 0 38%, transparent 39%), conic-gradient(' + segments.join(', ') + ')';
+                    chart.classList.remove('is-empty');
+                } else {
+                    chart.style.background = '';
+                    chart.classList.add('is-empty');
+                }
+            }
+
+            if (fallback) {
+                fallback.textContent = dataset.fallbackText || '';
+                fallback.classList.toggle('hidden', !dataset.fallbackText);
+            }
+
+            if (breakdown) {
+                if (!Array.isArray(dataset.items) || !dataset.items.length) {
+                    breakdown.innerHTML = '<div class="portfolio-allocation-breakdown-item"><span class="portfolio-allocation-breakdown-item__swatch bg-slate-600"></span><div class="portfolio-allocation-breakdown-item__meta"><p class="portfolio-allocation-breakdown-item__label">Dados indisponiveis</p><p class="portfolio-allocation-breakdown-item__support">A composicao sera exibida aqui quando houver valores suficientes.</p></div><div class="portfolio-allocation-breakdown-item__stats"><span class="portfolio-allocation-breakdown-item__value">—</span><span class="portfolio-allocation-breakdown-item__performance portfolio-allocation-breakdown-item__performance--neutral">Rent. —</span></div><span class="portfolio-allocation-breakdown-item__share">--</span></div>';
+                    return;
+                }
+
+                breakdown.innerHTML = dataset.items.map(function (item) {
+                    const performanceTone = getPerformanceTone(item.performanceRaw);
+                    return ''
+                        + '<div class="portfolio-allocation-breakdown-item">'
+                        + '  <span class="portfolio-allocation-breakdown-item__swatch" style="background:' + escapeHtml(item.color) + '"></span>'
+                        + '  <div class="portfolio-allocation-breakdown-item__meta">'
+                        + '    <p class="portfolio-allocation-breakdown-item__label">' + escapeHtml(item.label) + '</p>'
+                        + '    <p class="portfolio-allocation-breakdown-item__support">' + escapeHtml(item.supportLabel || 'Sem dados') + '</p>'
+                        + '  </div>'
+                        + '  <div class="portfolio-allocation-breakdown-item__stats">'
+                        + '    <span class="portfolio-allocation-breakdown-item__value hide-value">' + escapeHtml(item.displayValue || formatCurrencyValue(item.rawValue)) + '</span>'
+                        + '    <span class="portfolio-allocation-breakdown-item__performance portfolio-allocation-breakdown-item__performance--' + escapeHtml(performanceTone) + '">Rent. ' + escapeHtml(item.performanceLabel || '—') + '</span>'
+                        + '  </div>'
+                        + '  <span class="portfolio-allocation-breakdown-item__share">' + escapeHtml(item.shareLabel || '--') + '</span>'
+                        + '</div>';
+                }).join('');
+            }
         }
 
         function buildActionMarketContextLine(action) {
@@ -1728,6 +2500,103 @@
             return 'bg-emerald-500/20 text-emerald-400';
         }
 
+        function buildInlineDetailRowMarkup(label, value, accentClass) {
+            return ''
+                + '<div class="portfolio-inline-detail-row">'
+                + '  <span class="type-body-xs text-slate-400">' + escapeHtml(label || 'Campo') + '</span>'
+                + '  <span class="' + escapeHtml(accentClass || 'type-body-strong text-xs text-slate-100') + '">' + escapeHtml(displayValue(value, 'Dados indisponiveis')) + '</span>'
+                + '</div>';
+        }
+
+        function buildFundDetailMarkup(item) {
+            const externalUrl = getFundNavigationUrl(item);
+            const sourceProfile = item?.sourceProfile || {};
+            const optionalLinkMarkup = externalUrl
+                ? '<p class="type-body-xs text-slate-500">Consulta externa disponivel no titulo do fundo.</p>'
+                : '<p class="type-body-xs text-slate-500">Nenhum link externo confiavel disponivel para este fundo no momento.</p>';
+
+            return ''
+                + '<div class="portfolio-inline-detail-shell">'
+                + '  <div class="portfolio-inline-detail-grid">'
+                +       buildInlineDetailRowMarkup('Instituicao', sanitizeInstitutionLabel(item?.institution) || item?.institution)
+                +       buildInlineDetailRowMarkup('Categoria', item?.classification)
+                +       buildInlineDetailRowMarkup('Classe', item?.strategy)
+                +       buildInlineDetailRowMarkup('Benchmark', item?.benchmark)
+                +       buildInlineDetailRowMarkup('Inicio', item?.startedAt)
+                +       buildInlineDetailRowMarkup('Valor atual', item?.valorAtual, 'hide-value type-value-sm text-xs text-slate-100')
+                +       buildInlineDetailRowMarkup('Rentabilidade', item?.rentPct, 'hide-value type-value-sm text-xs ' + (item?.rentRaw < 0 ? 'text-red-400' : 'text-emerald-300'))
+                +       buildInlineDetailRowMarkup('Taxa', item?.feeLabel)
+                +       buildInlineDetailRowMarkup('Cotizacao', item?.cotizationLabel)
+                +       buildInlineDetailRowMarkup('Resgate', item?.liquidityLabel)
+                +       buildInlineDetailRowMarkup('Risco', item?.riskLabel)
+                +       buildInlineDetailRowMarkup('Observacao', item?.observation)
+                + '  </div>'
+                + '  <div class="portfolio-inline-support-shell">'
+                + '      <p class="type-kicker text-purple-200/75">Dados atualizados</p>'
+                + '      <p class="mt-2 type-body-xs text-slate-300">A integracao externa deste fundo ainda nao esta disponivel nesta sprint. Quando entrar, este bloco vai receber dados atualizados sem mudar a navegacao.</p>'
+                + '      <p class="mt-2 type-body-xs text-slate-500">' + escapeHtml(displayValue(sourceProfile?.description, 'O backend ja entrega um payload normalizado e pronto para receber integracao regulatoria futura.')) + '</p>'
+                + '      <div class="mt-2">' + optionalLinkMarkup + '</div>'
+                + '  </div>'
+                + '</div>';
+        }
+
+        function buildPrevidenciaDetailMarkup(item) {
+            const sourceProfile = item?.sourceProfile || {};
+            return ''
+                + '<div class="portfolio-inline-detail-shell">'
+                + '  <div class="portfolio-inline-detail-grid">'
+                +       buildInlineDetailRowMarkup('Instituicao', sanitizeInstitutionLabel(item?.institution) || item?.institution)
+                +       buildInlineDetailRowMarkup('Plano', item?.classification)
+                +       buildInlineDetailRowMarkup('Perfil', item?.profileLabel)
+                +       buildInlineDetailRowMarkup('Inicio', item?.startedAt)
+                +       buildInlineDetailRowMarkup('Valor atual', item?.valorAtual, 'hide-value type-value-sm text-xs text-slate-100')
+                +       buildInlineDetailRowMarkup('Rentabilidade', item?.rentPct, 'hide-value type-value-sm text-xs ' + (item?.rentRaw < 0 ? 'text-red-400' : 'text-emerald-300'))
+                +       buildInlineDetailRowMarkup('Taxa', item?.feeLabel)
+                +       buildInlineDetailRowMarkup('Carencia ou liquidez', item?.liquidityLabel)
+                +       buildInlineDetailRowMarkup('Observacao', item?.observation)
+                + '  </div>'
+                + '  <div class="portfolio-inline-support-shell">'
+                + '      <p class="type-body-xs text-slate-500">' + escapeHtml(displayValue(sourceProfile?.description, 'Detalhamento pronto para futuras extensoes do plano, mantendo fallback amigavel quando nao houver dado extra.')) + '</p>'
+                + '  </div>'
+                + '</div>';
+        }
+
+        function buildCrudActionButtonsMarkup(itemType, itemCode, itemLabel) {
+            const safeType = escapeJsString(itemType || 'registro');
+            const safeCode = escapeJsString(itemCode || '');
+            const safeLabel = escapeJsString(itemLabel || itemCode || 'registro');
+
+            return ''
+                + '<div class="mt-3 flex flex-wrap gap-2">'
+                + '  <button type="button" class="rounded-none border border-white/10 bg-white/5 px-2 py-1 type-action text-slate-300 transition hover:bg-white/10 hover:text-white" onclick="requestOperationalAction(\'status\', \'' + safeType + '\', \'' + safeCode + '\', \'' + safeLabel + '\')">Alterar status</button>'
+                + '  <button type="button" class="rounded-none border border-cyan-400/16 bg-cyan-400/8 px-2 py-1 type-action text-cyan-200 transition hover:bg-cyan-400/12" onclick="requestOperationalAction(\'update\', \'' + safeType + '\', \'' + safeCode + '\', \'' + safeLabel + '\')">Atualizar dados</button>'
+                + '  <button type="button" class="rounded-none border border-red-400/16 bg-red-400/8 px-2 py-1 type-action text-red-200 transition hover:bg-red-400/12" onclick="requestOperationalAction(\'delete\', \'' + safeType + '\', \'' + safeCode + '\', \'' + safeLabel + '\')">Excluir item</button>'
+                + '</div>';
+        }
+
+        function requestOperationalAction(actionType, itemType, itemCode, itemLabel) {
+            const actionMap = {
+                status: 'alterar status',
+                update: 'atualizar dados',
+                delete: 'excluir item'
+            };
+            const data = appState.dashboardData || {};
+            const operations = data.operations || {};
+            const actionText = actionMap[actionType] || 'manipular registro';
+            const label = itemLabel || itemCode || 'registro';
+            const isCrudReady = !!(operations.canChangeStatus || operations.canDelete || operations.canUpdate || operations.canCreate);
+            const dataSourceLabel = data.dataSource === 'spreadsheet-fallback' ? 'planilha (fallback)' : 'BigQuery';
+            const sourceWarning = data.sourceWarning ? ' Motivo do fallback atual: ' + data.sourceWarning + '.' : '';
+
+            showFeaturePopup('crud', label, {
+                tag: isCrudReady ? 'Operacao preparada' : 'Operacao indisponivel',
+                title: 'Fluxo visual em modo seguro para ' + label + '.',
+                message: isCrudReady
+                    ? 'O backend ja esta preparado para ' + actionText + ' com fonte principal em ' + dataSourceLabel + ', mas este botao ainda permanece em modo guiado nesta sprint. Nenhuma ordem financeira e executada; o proximo passo e ligar a interacao visual ao CRUD controlado.' + sourceWarning
+                    : 'A camada visual ainda nao esta liberada para ' + actionText + '. O dashboard continua somente em modo consultivo e nenhuma ordem financeira e executada.' + sourceWarning
+            });
+        }
+
         // ---------------------------------------------------------------------
         // Filter State
         // ---------------------------------------------------------------------
@@ -1736,11 +2605,13 @@
             const actionsInst = getElement('acoes-filter-inst');
             const actionsRec = getElement('acoes-filter-rec');
             const investInst = getElement('invest-filter-inst');
+            const investSort = getElement('invest-filter-sort');
             const prevInst = getElement('prev-filter-inst');
 
             if (actionsInst) appState.filters.actionsInst = actionsInst.value;
             if (actionsRec) appState.filters.actionsRec = actionsRec.value;
             if (investInst) appState.filters.investInst = investInst.value;
+            if (investSort) appState.filters.investSort = investSort.value;
             if (prevInst) appState.filters.prevInst = prevInst.value;
         }
 
@@ -1749,10 +2620,12 @@
          * atual da aplicacao. Deve ser executado antes de renderizar listas filtradas.
          */
         function renderFilterControls(data) {
-            populateSelect('acoes-filter-inst', (data.actions || []).map(function (item) { return item.institution; }), appState.filters.actionsInst);
+            populateSelect('acoes-filter-inst', (data.actions || []).map(function (item) { return item.institution; }), appState.filters.actionsInst, sanitizeInstitutionLabel);
             populateSelect('acoes-filter-rec', (data.actions || []).map(function (item) { return item.recommendation; }), appState.filters.actionsRec);
-            populateSelect('invest-filter-inst', (data.investments || []).map(function (item) { return item.institution; }), appState.filters.investInst);
-            populateSelect('prev-filter-inst', (data.previdencias || []).map(function (item) { return item.institution; }), appState.filters.prevInst);
+            populateSelect('invest-filter-inst', (data.investments || []).map(function (item) { return item.institution; }), appState.filters.investInst, sanitizeInstitutionLabel);
+            populateSelect('prev-filter-inst', (data.previdencias || []).map(function (item) { return item.institution; }), appState.filters.prevInst, sanitizeInstitutionLabel);
+            const investSort = getElement('invest-filter-sort');
+            if (investSort) investSort.value = appState.filters.investSort || 'saldo';
             updateFilterStateFromDom();
         }
 
@@ -1767,8 +2640,18 @@
 
         function getFilteredInvestments() {
             const items = appState.dashboardData?.investments || [];
-            return items.filter(function (item) {
+            const filteredItems = items.filter(function (item) {
                 return !appState.filters.investInst || item.institution === appState.filters.investInst;
+            });
+            const sortKey = appState.filters.investSort || 'saldo';
+            return filteredItems.slice().sort(function (left, right) {
+                if (sortKey === 'rentabilidade') {
+                    return Number(right?.performanceRaw ?? right?.rentRaw ?? 0) - Number(left?.performanceRaw ?? left?.rentRaw ?? 0);
+                }
+                if (sortKey === 'participacao') {
+                    return Number(right?.portfolioShareRaw || 0) - Number(left?.portfolioShareRaw || 0);
+                }
+                return Number(right?.valorAtualRaw || 0) - Number(left?.valorAtualRaw || 0);
             });
         }
 
@@ -1835,6 +2718,97 @@
             });
 
             return isEmptyValue(firstAvailable) ? '' : String(firstAvailable);
+        }
+
+        function buildPortfolioInsightItems(data) {
+            const groups = [
+                { type: 'Ação', items: Array.isArray(data?.actions) ? data.actions : [], getLabel: function (item) { return item?.ticker || item?.name || 'Ação'; }, getPerformance: function (item) { return item?.rent; } },
+                { type: 'Fundo', items: Array.isArray(data?.investments) ? data.investments : [], getLabel: function (item) { return item?.name || 'Fundo'; }, getPerformance: function (item) { return item?.performanceRaw ?? item?.rentRaw; } },
+                { type: 'Previdência', items: Array.isArray(data?.previdencias) ? data.previdencias : [], getLabel: function (item) { return item?.name || 'Plano'; }, getPerformance: function (item) { return item?.performanceRaw ?? item?.rentRaw; } }
+            ];
+
+            return groups.reduce(function (items, group) {
+                return items.concat(group.items.map(function (item) {
+                    return {
+                        type: group.type,
+                        label: group.getLabel(item),
+                        shareRaw: Number(item?.portfolioShareRaw || 0),
+                        performanceRaw: Number(group.getPerformance(item)),
+                        recommendation: item?.recommendation || '',
+                        valueLabel: item?.valorAtual || item?.positionValue || ''
+                    };
+                }));
+            }, []).filter(function (item) {
+                return item.label;
+            });
+        }
+
+        function buildLocalStrategyAnalysis(data) {
+            const categorySnapshots = Array.isArray(data?.categorySnapshots) && data.categorySnapshots.length
+                ? data.categorySnapshots.slice()
+                : buildCategorySnapshotsFromSummary(data);
+            const insightItems = buildPortfolioInsightItems(data);
+            if (!categorySnapshots.length && !insightItems.length) {
+                return 'Os dados da carteira ainda nao chegaram completos o suficiente para gerar uma leitura contextual confiavel.';
+            }
+            const lines = ['Leitura local baseada nas regras e nos dados atuais da carteira.'];
+            const heaviestCategory = categorySnapshots.slice().sort(function (left, right) {
+                return Number(right?.shareRaw || 0) - Number(left?.shareRaw || 0);
+            })[0];
+            const heaviestItem = insightItems.slice().sort(function (left, right) {
+                return Number(right?.shareRaw || 0) - Number(left?.shareRaw || 0);
+            })[0];
+            const worstItem = insightItems
+                .filter(function (item) { return Number.isFinite(item.performanceRaw); })
+                .sort(function (left, right) { return left.performanceRaw - right.performanceRaw; })[0];
+            const actionPlan = data?.actionPlan || {};
+            const primaryRecommendation = data?.messaging?.primaryRecommendation || {};
+
+            if (heaviestCategory) {
+                lines.push('Maior peso hoje: ' + heaviestCategory.label + ' com ' + displayValue(heaviestCategory.shareLabel, '--') + ' da carteira.');
+            }
+
+            if (heaviestItem && heaviestItem.shareRaw >= 0.12) {
+                lines.push('Concentração em destaque: ' + heaviestItem.type + ' ' + heaviestItem.label + ' responde por ' + formatPercentValue(heaviestItem.shareRaw) + '.');
+            }
+
+            if (worstItem && Number.isFinite(worstItem.performanceRaw)) {
+                lines.push('Ponto que mais pressiona a rentabilidade: ' + worstItem.label + ' com ' + formatSignedPercentValue(worstItem.performanceRaw) + '.');
+            }
+
+            if (!isEmptyValue(actionPlan?.acao_principal)) {
+                lines.push('Plano sugerido: ' + String(actionPlan.acao_principal) + '.');
+            } else if (!isEmptyValue(primaryRecommendation?.title)) {
+                lines.push('Leitura prioritária: ' + String(primaryRecommendation.title) + '.');
+            }
+
+            if (!isEmptyValue(actionPlan?.justificativa)) {
+                lines.push('Justificativa: ' + String(actionPlan.justificativa));
+            } else if (!isEmptyValue(primaryRecommendation?.reason)) {
+                lines.push('Justificativa: ' + String(primaryRecommendation.reason));
+            }
+
+            if (!isEmptyValue(data?.generalAdvice)) {
+                lines.push(String(data.generalAdvice));
+            }
+
+            return lines.filter(Boolean).join('\n');
+        }
+
+        function getAIAnalysisStatusText() {
+            if (appState.isStrategyLoading && appState.strategyAnalysisMode === 'local') {
+                return 'Leitura local ativa enquanto a IA remota atualiza.';
+            }
+            if (appState.strategyAnalysisMode === 'remote') {
+                return 'Leitura remota da carteira pronta.';
+            }
+            if (appState.strategyAnalysisMode === 'local-fallback') {
+                return 'Leitura local ativa. IA remota indisponivel nesta rodada.';
+            }
+            if (appState.strategyAnalysisMode === 'local') {
+                return 'Leitura local baseada nas regras atuais.';
+            }
+            return 'Leitura contextual pronta';
         }
 
         /**
@@ -1970,11 +2944,17 @@
             setStrategyButtonState(false);
 
             if (isStrategyAnalysisError(response)) {
+                if (!isEmptyValue(appState.strategyAnalysisText)) {
+                    appState.strategyAnalysisMode = 'local-fallback';
+                    renderAIAnalysisCard(appState.dashboardData || {});
+                    return;
+                }
                 showStrategyAnalysisError(response);
                 return;
             }
 
             appState.strategyAnalysisText = String(response).trim();
+            appState.strategyAnalysisMode = 'remote';
             renderAIAnalysisCard(appState.dashboardData || {});
             getElement('ai-analysis-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -1986,6 +2966,11 @@
         function handleStrategyAnalysisFailure(error) {
             setStrategyButtonState(false);
             const errorMessage = error && error.message ? error.message : String(error || 'Erro: chamada Apps Script indisponivel.');
+            if (!isEmptyValue(appState.strategyAnalysisText)) {
+                appState.strategyAnalysisMode = 'local-fallback';
+                renderAIAnalysisCard(appState.dashboardData || {});
+                return;
+            }
             showStrategyAnalysisError(errorMessage);
         }
 
@@ -1993,7 +2978,10 @@
          * Renderiza o bloco superior do dashboard.
          * Consome patrimonio bruto e resumo executivo pronto do backend.
          */
-        function renderHeader(summary, score, profile, executiveSummary) {
+
+</script>
+    <script>
+function renderHeader(summary, score, profile, executiveSummary) {
             const headerMessaging = executiveSummary || {};
             const summaryLines = getExecutiveSummaryLines(score, headerMessaging);
 
@@ -2016,42 +3004,38 @@
         }
 
         /**
-         * Renderiza o card de acao recomendada.
-         * Recebe a recomendacao pronta do backend e so aplica formatacao visual.
+         * Renderiza a faixa tática logo abaixo do header.
+         * Consolida prioridade, justificativa e impacto sem competir com o conteudo principal.
          */
-        function renderRecommendedActionCard(primaryRecommendation) {
-            const recommendation = primaryRecommendation || {};
-            const impactText = recommendation.impact || '';
-
-            setText('recommended-action-main', recommendation.title || '');
-            setText('recommended-action-reason', recommendation.reason || '');
-            setText('recommended-action-impact', impactText ? (/^Impacto:/i.test(impactText) ? impactText : ('Impacto: ' + impactText)) : '');
-        }
-
-        /**
-         * Renderiza o plano de acao como bloco tatico curto.
-         * Exibe apenas prioridade, acao principal, justificativa e impacto quando houver leitura util.
-         */
-        function renderActionPlanCard(actionPlan) {
-            const card = getElement('action-plan-card');
-            const priorityElement = getElement('action-plan-priority');
-            const plan = actionPlan || {};
-            const priorityText = isEmptyValue(plan.prioridade) ? '' : String(plan.prioridade);
-            const hasContent = !isEmptyValue(plan.acao_principal)
-                || !isEmptyValue(plan.justificativa)
-                || !isEmptyValue(plan.impacto);
+        function renderInsightStrip(data) {
+            const strip = getElement('portfolio-insight-strip');
+            const priorityElement = getElement('portfolio-insight-priority');
+            const ctaElement = getElement('portfolio-insight-cta');
+            const primaryRecommendation = data?.messaging?.primaryRecommendation || {};
+            const actionPlan = data?.actionPlan || {};
+            const priorityText = !isEmptyValue(actionPlan?.prioridade)
+                ? String(actionPlan.prioridade)
+                : '';
+            const titleText = actionPlan?.acao_principal || primaryRecommendation?.title || '';
+            const reasonText = actionPlan?.justificativa || primaryRecommendation?.reason || '';
+            const impactText = actionPlan?.impacto || primaryRecommendation?.impact || '';
+            const hasContent = !isEmptyValue(titleText) || !isEmptyValue(reasonText) || !isEmptyValue(impactText);
 
             if (priorityElement) {
                 priorityElement.textContent = priorityText;
                 priorityElement.classList.toggle('hidden', isEmptyValue(priorityText));
             }
 
-            setText('action-plan-main', plan.acao_principal || '');
-            setText('action-plan-justification', plan.justificativa || '');
-            setText('action-plan-impact', plan.impacto || '');
+            if (ctaElement) {
+                ctaElement.classList.toggle('hidden', !hasContent);
+            }
 
-            if (card) {
-                card.classList.toggle('hidden', !hasContent);
+            setText('portfolio-insight-title', titleText);
+            setText('portfolio-insight-reason', reasonText);
+            setText('portfolio-insight-impact', impactText ? (/^Impacto:/i.test(impactText) ? impactText : ('Impacto: ' + impactText)) : '');
+
+            if (strip) {
+                strip.classList.toggle('hidden', !hasContent);
             }
         }
 
@@ -2062,6 +3046,7 @@
         function renderAIAnalysisCard(data) {
             const card = getElement('ai-analysis-card');
             const responseContainer = getElement('ai-response');
+            const statusElement = getElement('ai-analysis-status');
             const analysisText = getAvailableAIAnalysis(data);
 
             if (!card || !responseContainer) return;
@@ -2069,11 +3054,13 @@
             if (isEmptyValue(analysisText)) {
                 responseContainer.innerHTML = '';
                 card.classList.add('hidden');
+                if (statusElement) statusElement.textContent = 'Leitura contextual pronta';
                 if (!appState.isStrategyLoading) setStrategyButtonState(false);
                 return;
             }
 
             responseContainer.innerHTML = escapeHtml(analysisText).replace(/\n/g, '<br>');
+            if (statusElement) statusElement.textContent = getAIAnalysisStatusText();
             card.classList.remove('hidden');
             if (!appState.isStrategyLoading) setStrategyButtonState(false);
         }
@@ -2217,7 +3204,7 @@
                 return;
             }
 
-            alertElement.textContent = '';
+            alertElement.textContent = 'Sem alertas criticos.';
         }
 
         /**
@@ -2263,38 +3250,80 @@
                 const rentClass = action.rent < 0 ? 'text-red-400' : 'text-emerald-400';
                 const recommendationClass = getRecommendationClass(action.recommendation);
                 const marketContextLine = buildActionMarketContextLine(action);
+                const crudButtons = buildCrudActionButtonsMarkup('acoes', action.ticker, action.name || action.ticker);
+                const itemKey = buildInlineItemKey('action', action.ticker || action.name);
+                const isExpanded = appState.expandedDetails.action === itemKey;
+                const actionUrl = getActionNavigationUrl(action);
+                const titleMarkup = buildEntityTextMarkup(
+                    displayValue(action.ticker, '-'),
+                    displayValue(action.name, '-'),
+                    actionUrl
+                );
 
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-white/5 transition-all border-b border-white/5';
+                row.className = 'inventory-row--interactive transition-all border-b border-white/5' + (isExpanded ? ' bg-white/6' : '');
+                row.setAttribute('tabindex', '0');
+                row.setAttribute('role', 'button');
+                row.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                row.setAttribute('onclick', 'toggleInlineItemDetail(\'action\', \'' + escapeJsString(itemKey) + '\')');
+                row.setAttribute('onkeydown', 'handleInlineCardKeydown(event, \'action\', \'' + escapeJsString(itemKey) + '\')');
                 row.innerHTML = ''
                     + '<td class="p-5">'
-                    + '    <div class="type-heading text-xs">' + escapeHtml(displayValue(action.ticker, '-')) + '</div>'
-                    + '    <div class="type-body-xs text-slate-400">' + escapeHtml(displayValue(action.name, '-')) + '</div>'
+                    +      titleMarkup
                     + '</td>'
                     + '<td class="p-5">'
                     + '    <div class="hide-value type-value-sm ' + rentClass + '">' + escapeHtml(displayValue(action.rendimentoAbs, '-')) + '</div>'
                     + '    <div class="hide-value type-body-xs text-slate-400">' + escapeHtml(displayValue(action.rendimentoPct, '-')) + '</div>'
                     + '</td>'
                     + '<td class="p-5"><span class="px-2 py-1 ' + recommendationClass + ' rounded-none type-action">' + escapeHtml(displayValue(action.recommendation, '-')) + '</span></td>'
-                    + '<td class="p-5"><button class="btn-action type-action text-amber-300 hover:text-amber-200" onclick="toggleActionDetails(this)">Detalhes</button></td>';
+                    + '<td class="p-5"><span class="portfolio-inline-card__chevron">' + (isExpanded ? 'Fechar' : 'Abrir') + '</span></td>';
 
                 const detailsRow = document.createElement('tr');
-                detailsRow.className = 'action-detail-row hidden border-b border-white/5 bg-white/5';
+                detailsRow.className = 'action-detail-row border-b border-white/5 bg-white/5' + (isExpanded ? '' : ' hidden');
                 detailsRow.innerHTML = ''
                     + '<td class="p-5 type-body text-xs text-slate-300" colspan="4">'
-                    + '    <div class="flex flex-wrap gap-6">'
-                    + '        <div><span class="type-body-xs text-slate-500">Preco medio:</span> <span class="hide-value type-value-sm">' + escapeHtml(displayValue(action.avgPrice, '-')) + '</span></div>'
-                    + '        <div><span class="type-body-xs text-slate-500">Preco atual:</span> <span class="hide-value type-value-sm">' + escapeHtml(displayValue(action.currentPrice, '-')) + '</span></div>'
-                    + '        <div><span class="type-body-xs text-slate-500">Quantidade:</span> <span class="hide-value type-value-sm">' + escapeHtml(displayValue(action.qty, '-')) + '</span></div>'
+                    + '    <div class="portfolio-inline-detail-grid">'
+                    +          buildInlineDetailRowMarkup('Preco medio', action.avgPrice, 'hide-value type-value-sm text-xs text-slate-100')
+                    +          buildInlineDetailRowMarkup('Preco atual', action.currentPrice, 'hide-value type-value-sm text-xs text-slate-100')
+                    +          buildInlineDetailRowMarkup('Quantidade', action.qty, 'hide-value type-value-sm text-xs text-slate-100')
+                    +          buildInlineDetailRowMarkup('Posicao atual', action.positionValue, 'hide-value type-value-sm text-xs text-slate-100')
                     + '    </div>'
                     + (marketContextLine
                         ? '    <div class="mt-3 border-t border-white/5 pt-3 type-body-xs text-slate-500">' + escapeHtml(marketContextLine) + '</div>'
                         : '')
+                    + '    <div class="mt-3 border-t border-white/5 pt-3">'
+                    + '      <p class="type-body-xs text-slate-500">' + (actionUrl ? 'O link do ativo foi embutido no nome para consulta externa quando necessario.' : 'Link externo indisponivel para este ativo neste momento.') + '</p>'
+                    + '    </div>'
+                    + '    <div class="mt-3 border-t border-white/5 pt-3">'
+                    + '      <p class="type-body-xs text-slate-500">Operacoes futuras do registro</p>'
+                    +        crudButtons
+                    + '    </div>'
                     + '</td>';
 
                 tbody.appendChild(row);
                 tbody.appendChild(detailsRow);
             });
+        }
+
+        function getPassivePerformanceLabel(item) {
+            return displayValue(item?.performanceLabel || item?.rentPct, '—');
+        }
+
+        function getPassivePerformanceClass(item) {
+            const tone = getPerformanceTone(item?.performanceRaw ?? item?.rentRaw);
+            if (tone === 'positive') return 'text-emerald-300';
+            if (tone === 'negative') return 'text-red-400';
+            return 'text-slate-300';
+        }
+
+        function buildPassiveRecommendationMarkup(item) {
+            const recommendationClass = getRecommendationClass(item?.recommendation);
+            const tone = getPerformanceTone(item?.performanceRaw ?? item?.rentRaw);
+            return ''
+                + '<span class="passive-table-row__status">'
+                + '  <span class="passive-table-row__trend passive-table-row__trend--' + escapeHtml(tone) + '"></span>'
+                + '  <span class="px-2 py-1 ' + recommendationClass + ' rounded-none type-action">' + escapeHtml(displayValue(item?.recommendation, 'Manter')) + '</span>'
+                + '</span>';
         }
 
         /**
@@ -2307,38 +3336,74 @@
 
             container.innerHTML = '';
             const detailedItems = Array.isArray(items) ? items : [];
+            const table = document.createElement('div');
+            table.className = 'dashboard-summary-card__table-scroll';
 
             if (!detailedItems.length) {
-                container.innerHTML = '<div class="type-body-xs text-slate-500">Nenhum investimento encontrado.</div>';
+                container.innerHTML = '<div class="dashboard-summary-card__empty type-body-xs text-slate-500">Nenhum investimento encontrado.</div>';
                 return;
             }
 
+            table.innerHTML = ''
+                + '<table class="dashboard-summary-card__table">'
+                + '  <thead class="type-table-head">'
+                + '    <tr>'
+                + '      <th>Fundo</th>'
+                + '      <th>Instituicao</th>'
+                + '      <th>Categoria</th>'
+                + '      <th>Saldo atual</th>'
+                + '      <th>% carteira</th>'
+                + '      <th>Rent. periodo</th>'
+                + '      <th>Recomendacao</th>'
+                + '    </tr>'
+                + '  </thead>'
+                + '  <tbody></tbody>'
+                + '</table>';
+
+            const tbody = table.querySelector('tbody');
+
             detailedItems.forEach(function (item) {
-                const rentClass = item.rentRaw < 0 ? 'text-red-400' : 'text-emerald-400';
-                const recommendationClass = getRecommendationClass(item.recommendation);
                 const iconHtml = getInstitutionIconMarkup(item.institution, item.institutionIcon);
                 const itemLabel = displayValue(item.name, 'Fundos de investimento');
-                const chartHtml = '<button type="button" class="chart-btn text-slate-300" onclick="showFeaturePopup(\'chart\', \'' + escapeJsString(itemLabel) + '\')" title="Grafico e analise" aria-label="Grafico e analise de ' + escapeHtml(itemLabel) + '">' + appConfig.chartSvg + '</button>';
-
-                const row = document.createElement('div');
-                row.className = 'flex items-center justify-between gap-3 bg-white/5 p-3 rounded-none';
+                const itemKey = buildInlineItemKey('fund', item.name || item.institution || itemLabel);
+                const isExpanded = appState.expandedDetails.fund === itemKey;
+                const fundUrl = getFundNavigationUrl(item);
+                const titleMarkup = buildEntityTextMarkup(itemLabel, '', fundUrl);
+                const row = document.createElement('tr');
+                row.className = 'passive-table-row border-b border-white/5' + (isExpanded ? ' passive-table-row--active' : '');
+                row.setAttribute('tabindex', '0');
+                row.setAttribute('role', 'button');
+                row.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                row.setAttribute('onclick', 'toggleInlineItemDetail(\'fund\', \'' + escapeJsString(itemKey) + '\')');
+                row.setAttribute('onkeydown', 'handleInlineCardKeydown(event, \'fund\', \'' + escapeJsString(itemKey) + '\')');
                 row.innerHTML = ''
-                    + '<div class="flex items-center gap-3">'
-                    + iconHtml
-                    + '    <div>'
-                    + '        <p class="type-body-strong text-xs text-slate-200">' + escapeHtml(displayValue(item.name, '-')) + '</p>'
-                    + '        <p class="type-body-xs text-slate-400">' + escapeHtml(displayValue(item.institution, '-')) + '</p>'
-                    + '    </div>'
-                    + '</div>'
-                    + '<div class="text-right">'
-                    + '    <p class="type-value-sm text-xs hide-value">' + escapeHtml(displayValue(item.valorAtual, '-')) + '</p>'
-                    + '    <p class="type-body-xs ' + rentClass + ' hide-value">' + escapeHtml(displayValue(item.rentPct, '-')) + '</p>'
-                    + '    <span class="px-2 py-1 ' + recommendationClass + ' rounded-none type-action">' + escapeHtml(displayValue(item.recommendation, '-')) + '</span>'
-                    + '</div>'
-                    + '<div>' + chartHtml + '</div>';
+                    + '<td>'
+                    + '  <div class="passive-table-row__title">'
+                    +        iconHtml
+                    + '      <div class="passive-table-row__label">' + titleMarkup + '</div>'
+                    + '  </div>'
+                    + '</td>'
+                    + '<td class="type-body text-sm text-slate-300">' + escapeHtml(displayValue(sanitizeInstitutionLabel(item.institution) || item.institution, '—')) + '</td>'
+                    + '<td class="type-body-xs text-slate-300">' + escapeHtml(displayValue(item.classification || item.strategy, '—')) + '</td>'
+                    + '<td class="hide-value type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.valorAtual, '—')) + '</td>'
+                    + '<td class="type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.portfolioShareLabel, '—')) + '</td>'
+                    + '<td class="hide-value type-value-sm text-xs ' + getPassivePerformanceClass(item) + '">' + escapeHtml(getPassivePerformanceLabel(item)) + '</td>'
+                    + '<td>' + buildPassiveRecommendationMarkup(item) + '</td>';
 
-                container.appendChild(row);
+                const detailsRow = document.createElement('tr');
+                detailsRow.className = 'passive-table-row__detail border-b border-white/5' + (isExpanded ? '' : ' hidden');
+                detailsRow.innerHTML = ''
+                    + '<td colspan="7" class="p-4 type-body text-xs text-slate-300">'
+                    + '  <div class="passive-table-row__detail-shell">'
+                    +        buildFundDetailMarkup(item)
+                    + '  </div>'
+                    + '</td>';
+
+                tbody.appendChild(row);
+                tbody.appendChild(detailsRow);
             });
+
+            container.appendChild(table);
         }
 
         /**
@@ -2351,35 +3416,71 @@
 
             container.innerHTML = '';
             const detailedItems = Array.isArray(items) ? items : [];
+            const table = document.createElement('div');
+            table.className = 'dashboard-summary-card__table-scroll';
 
             if (!detailedItems.length) {
-                container.innerHTML = '<div class="type-body-xs text-slate-500">Nenhum plano encontrado.</div>';
+                container.innerHTML = '<div class="dashboard-summary-card__empty type-body-xs text-slate-500">Nenhum plano encontrado.</div>';
                 return;
             }
 
+            table.innerHTML = ''
+                + '<table class="dashboard-summary-card__table">'
+                + '  <thead class="type-table-head">'
+                + '    <tr>'
+                + '      <th>Plano</th>'
+                + '      <th>Instituicao</th>'
+                + '      <th>Saldo atual</th>'
+                + '      <th>% carteira</th>'
+                + '      <th>Rent. periodo</th>'
+                + '      <th>Recomendacao</th>'
+                + '    </tr>'
+                + '  </thead>'
+                + '  <tbody></tbody>'
+                + '</table>';
+
+            const tbody = table.querySelector('tbody');
+
             detailedItems.forEach(function (item) {
-                const rentClass = item.rentRaw < 0 ? 'text-red-400' : 'text-emerald-400';
-                const recommendationClass = getRecommendationClass(item.recommendation);
                 const iconHtml = getInstitutionIconMarkup(item.institution, item.institutionIcon);
-
-                const row = document.createElement('div');
-                row.className = 'flex items-center justify-between gap-3 bg-white/5 p-3 rounded-none';
+                const itemLabel = displayValue(item.name, 'Plano de previdencia');
+                const itemKey = buildInlineItemKey('previdencia', item.name || item.institution || itemLabel);
+                const isExpanded = appState.expandedDetails.previdencia === itemKey;
+                const titleMarkup = buildEntityTextMarkup(itemLabel, displayValue(item.classification || item.profileLabel, ''), '');
+                const row = document.createElement('tr');
+                row.className = 'passive-table-row border-b border-white/5' + (isExpanded ? ' passive-table-row--active' : '');
+                row.setAttribute('tabindex', '0');
+                row.setAttribute('role', 'button');
+                row.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                row.setAttribute('onclick', 'toggleInlineItemDetail(\'previdencia\', \'' + escapeJsString(itemKey) + '\')');
+                row.setAttribute('onkeydown', 'handleInlineCardKeydown(event, \'previdencia\', \'' + escapeJsString(itemKey) + '\')');
                 row.innerHTML = ''
-                    + '<div class="flex items-center gap-3">'
-                    + iconHtml
-                    + '    <div>'
-                    + '        <p class="type-body-strong text-xs text-slate-200">' + escapeHtml(displayValue(item.name, '-')) + '</p>'
-                    + '        <p class="type-body-xs text-slate-400">' + escapeHtml(displayValue(item.institution, '-')) + '</p>'
-                    + '    </div>'
-                    + '</div>'
-                    + '<div class="text-right">'
-                    + '    <p class="type-value-sm text-xs hide-value">' + escapeHtml(displayValue(item.valorAtual, '-')) + '</p>'
-                    + '    <p class="type-body-xs ' + rentClass + ' hide-value">' + escapeHtml(displayValue(item.rentPct, '-')) + '</p>'
-                    + '    <span class="px-2 py-1 ' + recommendationClass + ' rounded-none type-action">' + escapeHtml(displayValue(item.recommendation, '-')) + '</span>'
-                    + '</div>';
+                    + '<td>'
+                    + '  <div class="passive-table-row__title">'
+                    +        iconHtml
+                    + '      <div class="passive-table-row__label">' + titleMarkup + '</div>'
+                    + '  </div>'
+                    + '</td>'
+                    + '<td class="type-body text-sm text-slate-300">' + escapeHtml(displayValue(sanitizeInstitutionLabel(item.institution) || item.institution, '—')) + '</td>'
+                    + '<td class="hide-value type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.valorAtual, '—')) + '</td>'
+                    + '<td class="type-value-sm text-xs text-slate-100">' + escapeHtml(displayValue(item.portfolioShareLabel, '—')) + '</td>'
+                    + '<td class="hide-value type-value-sm text-xs ' + getPassivePerformanceClass(item) + '">' + escapeHtml(getPassivePerformanceLabel(item)) + '</td>'
+                    + '<td>' + buildPassiveRecommendationMarkup(item) + '</td>';
 
-                container.appendChild(row);
+                const detailsRow = document.createElement('tr');
+                detailsRow.className = 'passive-table-row__detail border-b border-white/5' + (isExpanded ? '' : ' hidden');
+                detailsRow.innerHTML = ''
+                    + '<td colspan="6" class="p-4 type-body text-xs text-slate-300">'
+                    + '  <div class="passive-table-row__detail-shell">'
+                    +        buildPrevidenciaDetailMarkup(item)
+                    + '  </div>'
+                    + '</td>';
+
+                tbody.appendChild(row);
+                tbody.appendChild(detailsRow);
             });
+
+            container.appendChild(table);
         }
 
         function renderFilteredCards() {
@@ -2397,8 +3498,8 @@
             const messaging = data.messaging || {};
 
             renderHeader(data.summary || {}, data.score || {}, data.profile || {}, messaging.executiveSummary || {});
-            renderRecommendedActionCard(messaging.primaryRecommendation || {});
-            renderActionPlanCard(data.actionPlan || {});
+            renderPortfolioOverview(data);
+            renderInsightStrip(data);
             renderAIAnalysisCard(data);
             renderPortfolioSummaryCards(data.summary || {}, data.previdenciaInfo || {}, data.fundosTop || []);
             renderInvestmentsCardSummary(data);
@@ -2411,197 +3512,392 @@
         }
 
         // ---------------------------------------------------------------------
-        // User Actions and Data Loading
-        // ---------------------------------------------------------------------
 
-        function handleDashboardDataLoaded(data) {
-            appState.dashboardData = data || {};
-            renderApp();
-            setDashboardLoading(false);
+</script>
+    <script>
+// User Actions and Data Loading
+// ---------------------------------------------------------------------
+
+function isAppsScriptBridgeAvailable() {
+    return typeof google !== 'undefined' && !!(google.script && google.script.run);
+}
+
+function clearBridgeRetryTimer_() {
+    if (!appState.bridgeRetryTimerId) return;
+    window.clearTimeout(appState.bridgeRetryTimerId);
+    appState.bridgeRetryTimerId = null;
+}
+
+/**
+ * Usa o bloco de alertas ja existente para comunicar estados de bootstrap
+ * sem criar mais UI nem esconder erros reais do backend.
+ */
+function setDashboardRuntimeMessage(message) {
+    const alertElement = getElement('alert-text');
+    if (!alertElement) return;
+
+    alertElement.textContent = message || '';
+}
+
+function scheduleAppsScriptBridgeRetry_() {
+    if (appState.bridgeRetryTimerId) return;
+    if (appState.bridgeRetryCount >= appConfig.appsScriptBridgeMaxRetries) return;
+
+    appState.bridgeRetryCount += 1;
+    appState.bridgeRetryTimerId = window.setTimeout(function () {
+        appState.bridgeRetryTimerId = null;
+        loadDashboardData();
+    }, appConfig.appsScriptBridgeRetryMs);
+}
+
+function handleDashboardDataLoaded(data) {
+    clearBridgeRetryTimer_();
+    appState.bridgeRetryCount = 0;
+    appState.dashboardData = data || {};
+    if (appState.strategyAnalysisMode === 'local' || appState.strategyAnalysisMode === 'local-fallback') {
+        appState.strategyAnalysisText = buildLocalStrategyAnalysis(appState.dashboardData);
+    }
+    renderApp();
+    setActionsRefreshStatus('Cotacoes das acoes atualizam sem recarregar a pagina.');
+    setDashboardLoading(false);
+}
+
+function handleDashboardLoadFailure(error) {
+    setDashboardLoading(false);
+    setDashboardRuntimeMessage(
+        error && error.message
+            ? error.message
+            : 'Erro ao carregar dados'
+    );
+}
+
+/**
+ * Carrega o payload principal do dashboard via Apps Script.
+ * Entrada: nenhuma. Saida: atualiza appState.dashboardData e dispara renderApp.
+ */
+function loadDashboardData() {
+    setDashboardLoading(true);
+
+    if (!isAppsScriptBridgeAvailable()) {
+        setDashboardLoading(false);
+        setDashboardRuntimeMessage('Apps Script indisponivel no momento. Tentando reconectar...');
+        scheduleAppsScriptBridgeRetry_();
+        return;
+    }
+
+    clearBridgeRetryTimer_();
+    setDashboardRuntimeMessage('');
+
+    google.script.run
+        .withSuccessHandler(handleDashboardDataLoaded)
+        .withFailureHandler(handleDashboardLoadFailure)
+        .getDashboardData();
+}
+
+/**
+ * Decide entre abrir a analise real da Esquilo IA ou mostrar o feedback de indisponibilidade.
+ * Mantem o botao no Resumo Executivo como unico gatilho da funcionalidade.
+ */
+function requestStrategyAnalysis() {
+    const data = appState.dashboardData || {};
+    const analysisText = getAvailableAIAnalysis(data);
+    const analysisCard = getElement('ai-analysis-card');
+    const localAnalysis = buildLocalStrategyAnalysis(data);
+
+    if (appState.isStrategyLoading) return;
+
+    if (!isEmptyValue(analysisText) && appState.strategyAnalysisMode === 'remote') {
+        renderAIAnalysisCard(data);
+        analysisCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+    }
+
+    if (!isEmptyValue(analysisText)) {
+        renderAIAnalysisCard(data);
+        analysisCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    if (!isEmptyValue(localAnalysis)) {
+        appState.strategyAnalysisText = localAnalysis;
+        appState.strategyAnalysisMode = 'local';
+        renderAIAnalysisCard(data);
+        analysisCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    if (!isAppsScriptBridgeAvailable()) {
+        if (isEmptyValue(localAnalysis)) {
+            showStrategyAnalysisError('Erro: chamada Apps Script indisponivel.');
+        } else {
+            setStrategyButtonState(false);
         }
+        return;
+    }
 
-        function handleDashboardLoadFailure() {
-            setDashboardLoading(false);
-            setText('alert-text', 'Erro ao carregar dados');
-        }
+    setStrategyButtonState(true);
 
-        /**
-         * Carrega o payload principal do dashboard via Apps Script.
-         * Entrada: nenhuma. Saida: atualiza appState.dashboardData e dispara renderApp.
-         */
-        function loadDashboardData() {
-            setDashboardLoading(true);
-            if (typeof google === 'undefined' || !google.script?.run) {
-                setDashboardLoading(false);
-                return;
-            }
+    google.script.run
+        .withSuccessHandler(handleStrategyAnalysisSuccess)
+        .withFailureHandler(handleStrategyAnalysisFailure)
+        .getPortfolioAIAnalysis();
+}
 
-            google.script.run
-                .withSuccessHandler(handleDashboardDataLoaded)
-                .withFailureHandler(handleDashboardLoadFailure)
-                .getDashboardData();
-        }
+/**
+ * Mantem compatibilidade com o fluxo legado de analise tatica.
+ * Redireciona para o gatilho atual dentro do Resumo Executivo.
+ */
+function requestAIAnalysis() {
+    requestStrategyAnalysis();
+}
 
-        /**
-         * Decide entre abrir a analise real da Esquilo IA ou mostrar o feedback de indisponibilidade.
-         * Mantem o botao no Resumo Executivo como unico gatilho da funcionalidade.
-         */
-        function requestStrategyAnalysis() {
-            const data = appState.dashboardData || {};
-            const analysisText = getAvailableAIAnalysis(data);
-            const analysisCard = getElement('ai-analysis-card');
+/**
+ * Simula o envio visual da ordem na interface atual.
+ * Mantido sem alterar a regra existente de apenas desabilitar o botao.
+ */
+function executeSwap() {
+    const button = getElement('swap-btn');
+    if (!button) return;
 
-            if (appState.isStrategyLoading) return;
+    button.innerHTML = 'ORDEM ENVIADA';
+    button.disabled = true;
+    button.classList.replace('bg-amber-500', 'bg-slate-800');
+    button.classList.add('text-slate-500', 'cursor-not-allowed');
+}
 
-            if (!isEmptyValue(analysisText)) {
-                renderAIAnalysisCard(data);
-                analysisCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                return;
-            }
+// ---------------------------------------------------------------------
+// UI Events
+// ---------------------------------------------------------------------
 
-            if (typeof google === 'undefined' || !google.script?.run) {
-                showStrategyAnalysisError('Erro: chamada Apps Script indisponivel.');
-                return;
-            }
+/**
+ * Mantem compatibilidade com interacoes legadas de expansao fora do grid principal.
+ * Entrada: elemento clicado.
+ * Saida: alterna apenas a classe visual folder-active.
+ */
+function toggleFolder(element) {
+    if (!element) return;
+    element.classList.toggle('folder-active');
+}
 
-            setStrategyButtonState(true);
+/**
+ * Alterna o modo fantasma da interface.
+ * Usa o body principal e o botao do header para sincronizar estado visual e protecao de dados.
+ */
+function toggleGhostMode() {
+    const body = getElement('main-body');
+    const icon = getElement('ghost-icon');
+    const button = getElement('ghost-toggle');
+    if (!body) return;
 
-            google.script.run
-                .withSuccessHandler(handleStrategyAnalysisSuccess)
-                .withFailureHandler(handleStrategyAnalysisFailure)
-                .getPortfolioAIAnalysis();
-        }
+    const active = body.classList.toggle('ghost-active');
+    if (button) {
+        button.classList.toggle('app-icon-button--active', active);
+    }
+    if (icon) {
+        icon.classList.toggle('text-amber-300', active);
+        icon.classList.toggle('text-slate-300', !active);
+    }
+}
 
-        /**
-         * Mantem compatibilidade com o fluxo legado de analise tatica.
-         * Redireciona para o gatilho atual dentro do Resumo Executivo.
-         */
-        function requestAIAnalysis() {
-            requestStrategyAnalysis();
-        }
+/**
+ * Registra os eventos dos filtros uma unica vez.
+ * Cada alteracao apenas atualiza o estado local e re-renderiza os cards dependentes.
+ */
+function bindFilterEvents() {
+    if (appState.filtersBound) return;
+    appState.filtersBound = true;
 
-        /**
-         * Simula o envio visual da ordem na interface atual.
-         * Mantido sem alterar a regra existente de apenas desabilitar o botao.
-         */
-        function executeSwap() {
-            const button = getElement('swap-btn');
-            if (!button) return;
+    const actionsInst = getElement('acoes-filter-inst');
+    const actionsRec = getElement('acoes-filter-rec');
+    const investInst = getElement('invest-filter-inst');
+    const investSort = getElement('invest-filter-sort');
+    const prevInst = getElement('prev-filter-inst');
 
-            button.innerHTML = 'ORDEM ENVIADA';
-            button.disabled = true;
-            button.classList.replace('bg-amber-500', 'bg-slate-800');
-            button.classList.add('text-slate-500', 'cursor-not-allowed');
-        }
+    if (actionsInst) {
+        actionsInst.addEventListener('change', function (event) {
+            appState.filters.actionsInst = event.target.value;
+            renderFilteredCards();
+        });
+}
 
-        // ---------------------------------------------------------------------
-        // UI Events
-        // ---------------------------------------------------------------------
+    if (actionsRec) {
+        actionsRec.addEventListener('change', function (event) {
+            appState.filters.actionsRec = event.target.value;
+            renderFilteredCards();
+        });
+    }
 
-        /**
-         * Mantem compatibilidade com interacoes legadas de expansao fora do grid principal.
-         * Entrada: elemento clicado.
-         * Saida: alterna apenas a classe visual folder-active.
-         */
-        function toggleFolder(element) {
-            if (!element) return;
-            element.classList.toggle('folder-active');
-        }
+    if (investInst) {
+        investInst.addEventListener('change', function (event) {
+            appState.filters.investInst = event.target.value;
+            renderFilteredCards();
+        });
+    }
 
-        /**
-         * Alterna o modo fantasma da interface.
-         * Usa o body principal e o botao do header para sincronizar estado visual e protecao de dados.
-         */
-        function toggleGhostMode() {
-            const body = getElement('main-body');
-            const icon = getElement('ghost-icon');
-            const button = getElement('ghost-toggle');
-            if (!body) return;
+    if (investSort) {
+        investSort.addEventListener('change', function (event) {
+            appState.filters.investSort = event.target.value;
+            renderFilteredCards();
+        });
+    }
 
-            const active = body.classList.toggle('ghost-active');
-            if (button) {
-                button.classList.toggle('app-icon-button--active', active);
-            }
-            if (icon) {
-                icon.classList.toggle('text-amber-300', active);
-                icon.classList.toggle('text-slate-300', !active);
-            }
-        }
+    if (prevInst) {
+        prevInst.addEventListener('change', function (event) {
+            appState.filters.prevInst = event.target.value;
+            renderFilteredCards();
+        });
+    }
+}
 
-        function toggleActionDetails(button) {
-            const row = button?.closest('tr');
-            const detailsRow = row?.nextElementSibling;
-            if (!row || !detailsRow || !detailsRow.classList.contains('action-detail-row')) return;
+function setActionsRefreshStatus(message) {
+    const statusElement = getElement('acoes-live-status');
+    if (!statusElement) return;
+    statusElement.textContent = message || '';
+}
 
-            detailsRow.classList.toggle('hidden');
-            button.textContent = detailsRow.classList.contains('hidden') ? 'Detalhes' : 'Ocultar';
-        }
+function calculateActionsPerformanceFromItems(items) {
+    const actionItems = Array.isArray(items) ? items : [];
+    const investedRaw = actionItems.reduce(function (total, item) {
+        return total + Number(item?.valorInvestidoRaw || 0);
+    }, 0);
+    const currentRaw = actionItems.reduce(function (total, item) {
+        return total + Number(item?.valorAtualRaw || 0);
+    }, 0);
+    if (!investedRaw) return 0;
+    return currentRaw / investedRaw - 1;
+}
 
-        /**
-         * Registra os eventos dos filtros uma unica vez.
-         * Cada alteracao apenas atualiza o estado local e re-renderiza os cards dependentes.
-         */
-        function bindFilterEvents() {
-            if (appState.filtersBound) return;
-            appState.filtersBound = true;
+function mergeActionsSnapshotIntoDashboardData(snapshot) {
+    const currentData = appState.dashboardData || {};
+    const currentSummary = currentData.summary || {};
+    const actions = Array.isArray(snapshot?.actions) ? snapshot.actions : [];
+    const acoesRaw = Number(snapshot?.summary?.acoesRaw);
+    const totalRaw = Number(snapshot?.summary?.totalRaw);
+    const nextSummary = Object.assign({}, currentSummary, {
+        acoes: snapshot?.summary?.acoes || currentSummary.acoes || formatCurrencyValue(acoesRaw),
+        acoesRaw: Number.isFinite(acoesRaw) ? acoesRaw : Number(currentSummary.acoesRaw || 0),
+        acoesPerformanceRaw: calculateActionsPerformanceFromItems(actions)
+    });
 
-            const actionsInst = getElement('acoes-filter-inst');
-            const actionsRec = getElement('acoes-filter-rec');
-            const investInst = getElement('invest-filter-inst');
-            const prevInst = getElement('prev-filter-inst');
+    if (Number.isFinite(totalRaw) && totalRaw > 0) {
+        nextSummary.totalRaw = totalRaw;
+        nextSummary.total = formatCurrencyValue(totalRaw);
+    }
 
-            if (actionsInst) {
-                actionsInst.addEventListener('change', function (event) {
-                    appState.filters.actionsInst = event.target.value;
-                    renderFilteredCards();
-                });
-            }
+    const nextData = Object.assign({}, currentData, {
+        actions: actions,
+        orders: snapshot?.orders || currentData.orders || {},
+        assetRanking: snapshot?.assetRanking || currentData.assetRanking || {},
+        dataSource: snapshot?.dataSource || currentData.dataSource || '',
+        sourceWarning: snapshot?.sourceWarning || currentData.sourceWarning || '',
+        updatedAt: snapshot?.updatedAt || new Date().toISOString(),
+        summary: nextSummary,
+        categories: Object.assign({}, currentData.categories || {}, snapshot?.categories || {})
+    });
 
-            if (actionsRec) {
-                actionsRec.addEventListener('change', function (event) {
-                    appState.filters.actionsRec = event.target.value;
-                    renderFilteredCards();
-                });
-            }
+    nextData.categorySnapshots = buildCategorySnapshotsFromSummary(nextData);
+    return nextData;
+}
 
-            if (investInst) {
-                investInst.addEventListener('change', function (event) {
-                    appState.filters.investInst = event.target.value;
-                    renderFilteredCards();
-                });
-            }
+function refreshActionsDependentBlocks() {
+    const data = appState.dashboardData || {};
+    renderPortfolioOverview(data);
+    renderInsightStrip(data);
+    renderPortfolioSummaryCards(data.summary || {}, data.previdenciaInfo || {}, data.fundosTop || []);
+    renderActionsCardSummary(data);
+    renderOrdersCard(data.orders || {});
+    renderFilterControls(data);
+    renderActionsTable(getFilteredActions());
+    if (appState.strategyAnalysisMode === 'local' || appState.strategyAnalysisMode === 'local-fallback') {
+        appState.strategyAnalysisText = buildLocalStrategyAnalysis(data);
+    }
+    renderAIAnalysisCard(data);
+}
 
-            if (prevInst) {
-                prevInst.addEventListener('change', function (event) {
-                    appState.filters.prevInst = event.target.value;
-                    renderFilteredCards();
-                });
-            }
-        }
+function handleActionsSnapshotLoaded(snapshot) {
+    appState.actionsRefreshInFlight = false;
+    appState.dashboardData = mergeActionsSnapshotIntoDashboardData(snapshot);
+    refreshActionsDependentBlocks();
+    setActionsRefreshStatus('Acoes atualizadas sem recarregar a tela.');
+}
 
-        function startDashboardAutoRefresh() {
-            if (appState.refreshTimerId) {
-                window.clearInterval(appState.refreshTimerId);
-            }
+function handleActionsSnapshotFailure(error) {
+    appState.actionsRefreshInFlight = false;
+    const message = error && error.message ? error.message : '';
+    setActionsRefreshStatus(message ? ('Ultimo dado valido mantido. ' + message) : 'Ultimo dado valido mantido. Nao foi possivel atualizar as acoes agora.');
+}
 
-            appState.refreshTimerId = window.setInterval(function () {
-                loadDashboardData();
-            }, appConfig.refreshIntervalMs);
-        }
+function refreshActionsSnapshot() {
+    if (appState.actionsRefreshInFlight || !appState.dashboardData) return;
+    if (!isAppsScriptBridgeAvailable()) {
+        setActionsRefreshStatus('Atualizacao automatica pausada: Apps Script indisponivel.');
+        return;
+    }
 
-        /**
-         * Ponto unico de inicializacao do frontend.
-         * Deve ser chamado apenas apos o carregamento completo do documento.
-         */
-        function initApp() {
-            bindFilterEvents();
-            renderSystemVersion();
-            loadDashboardData();
-            startDashboardAutoRefresh();
-        }
+    appState.actionsRefreshInFlight = true;
+    setActionsRefreshStatus('Atualizando apenas as acoes...');
 
-        window.addEventListener('load', initApp);
-    </script>
+    google.script.run
+        .withSuccessHandler(handleActionsSnapshotLoaded)
+        .withFailureHandler(handleActionsSnapshotFailure)
+        .getDashboardActionsSnapshot();
+}
+
+function startDashboardAutoRefresh() {
+    if (appState.refreshTimerId) {
+        window.clearInterval(appState.refreshTimerId);
+    }
+
+    appState.refreshTimerId = window.setInterval(function () {
+        refreshActionsSnapshot();
+    }, appConfig.refreshIntervalMs);
+}
+
+/**
+ * Explicita no escopo global as funcoes chamadas por onclick/onkeydown
+ * para evitar diferencas de binding entre navegadores e runtime do Apps Script.
+ */
+function registerDashboardGlobalHandlers() {
+    if (typeof window === 'undefined') return;
+
+    window.loadDashboardData = loadDashboardData;
+    window.requestStrategyAnalysis = requestStrategyAnalysis;
+    window.requestAIAnalysis = requestAIAnalysis;
+    window.executeSwap = executeSwap;
+    window.toggleFolder = toggleFolder;
+    window.toggleGhostMode = toggleGhostMode;
+    window.toggleSummaryCard = toggleSummaryCard;
+    window.handleSummaryCardClick = handleSummaryCardClick;
+    window.handleSummaryCardKeydown = handleSummaryCardKeydown;
+    window.toggleInlineItemDetail = toggleInlineItemDetail;
+    window.handleInlineCardKeydown = handleInlineCardKeydown;
+    window.showFeaturePopup = showFeaturePopup;
+    window.closeFeaturePopup = closeFeaturePopup;
+    window.requestOperationalAction = requestOperationalAction;
+}
+
+/**
+ * Ponto unico de inicializacao do frontend.
+ * Deve ser chamado apenas apos o carregamento completo do documento.
+ */
+function initApp() {
+    if (appState.hasInitialized) return;
+
+    appState.hasInitialized = true;
+    bindFilterEvents();
+    renderSystemVersion();
+    loadDashboardData();
+    startDashboardAutoRefresh();
+}
+
+registerDashboardGlobalHandlers();
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    window.setTimeout(initApp, 0);
+} else {
+    document.addEventListener('DOMContentLoaded', initApp);
+    window.addEventListener('load', initApp);
+}
+
+</script>
 </body>
 </html>
 

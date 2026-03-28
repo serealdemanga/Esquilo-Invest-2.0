@@ -8,7 +8,15 @@ function buildPortfolioSummaryFromDomains_(actions, investments, previdencias, p
   const fundosRaw = sumBy_(investments, 'valorAtualRaw');
   const previdenciaRaw = sumBy_(previdencias, 'valorAtualRaw');
   const preOrdensRaw = sumBy_(preOrders, 'valorPotencialRaw');
+  const acoesInvestidoRaw = sumBy_(actions, 'valorInvestidoRaw');
+  const fundosInvestidoRaw = sumBy_(investments, 'valorInvestidoRaw');
+  const previdenciaInvestidoRaw = sumBy_(previdencias, 'totalAportadoRaw');
   const totalRaw = acoesRaw + fundosRaw + previdenciaRaw;
+  const totalInvestidoRaw = acoesInvestidoRaw + fundosInvestidoRaw + previdenciaInvestidoRaw;
+  const acoesPerformanceRaw = calculatePortfolioCategoryPerformance_(acoesRaw, acoesInvestidoRaw);
+  const fundosPerformanceRaw = calculatePortfolioCategoryPerformance_(fundosRaw, fundosInvestidoRaw);
+  const previdenciaPerformanceRaw = calculatePortfolioCategoryPerformance_(previdenciaRaw, previdenciaInvestidoRaw);
+  const totalPerformanceRaw = calculatePortfolioCategoryPerformance_(totalRaw, totalInvestidoRaw);
 
   return {
     acoes: formatMoney_(acoesRaw),
@@ -19,7 +27,15 @@ function buildPortfolioSummaryFromDomains_(actions, investments, previdencias, p
     acoesRaw: acoesRaw,
     fundosRaw: fundosRaw,
     previdenciaRaw: previdenciaRaw,
-    totalRaw: totalRaw
+    totalRaw: totalRaw,
+    acoesInvestidoRaw: acoesInvestidoRaw,
+    fundosInvestidoRaw: fundosInvestidoRaw,
+    previdenciaInvestidoRaw: previdenciaInvestidoRaw,
+    totalInvestidoRaw: totalInvestidoRaw,
+    acoesPerformanceRaw: acoesPerformanceRaw,
+    fundosPerformanceRaw: fundosPerformanceRaw,
+    previdenciaPerformanceRaw: previdenciaPerformanceRaw,
+    totalPerformanceRaw: totalPerformanceRaw
   };
 }
 
@@ -73,6 +89,105 @@ function buildPrevidenciaInfoFromMappedItems_(items) {
     topPlan: topPlan.name,
     topPlanValue: topPlan.name ? formatMoney_(topPlan.value) : 'Sem dados'
   };
+}
+
+function calculatePortfolioCategoryPerformance_(currentRaw, investedRaw) {
+  const currentValue = Number(currentRaw || 0);
+  const investedValue = Number(investedRaw || 0);
+  if (!investedValue) return null;
+  return currentValue / investedValue - 1;
+}
+
+function buildNormalizedPortfolioCollections_(summary, actions, investments, previdencias) {
+  const portfolioTotalRaw = Number(summary?.totalRaw || 0);
+
+  return {
+    actions: attachAllocationMetricsToItems_(actions, portfolioTotalRaw, Number(summary?.acoesRaw || 0)),
+    investments: attachAllocationMetricsToItems_(investments, portfolioTotalRaw, Number(summary?.fundosRaw || 0)),
+    previdencias: attachAllocationMetricsToItems_(previdencias, portfolioTotalRaw, Number(summary?.previdenciaRaw || 0))
+  };
+}
+
+function attachAllocationMetricsToItems_(items, totalPortfolioRaw, totalCategoryRaw) {
+  return (items || []).map(function (item) {
+    const currentRaw = Number(item?.valorAtualRaw || 0);
+    const portfolioShareRaw = totalPortfolioRaw > 0 ? currentRaw / totalPortfolioRaw : 0;
+    const categoryShareRaw = totalCategoryRaw > 0 ? currentRaw / totalCategoryRaw : 0;
+
+    return Object.assign({}, item, {
+      portfolioShareRaw: portfolioShareRaw,
+      portfolioShareLabel: portfolioShareRaw > 0 ? formatPct_(portfolioShareRaw) : '',
+      categoryShareRaw: categoryShareRaw,
+      categoryShareLabel: categoryShareRaw > 0 ? formatPct_(categoryShareRaw) : '',
+      performanceRaw: item?.rentRaw,
+      performanceLabel: item?.rentPct || ''
+    });
+  });
+}
+
+function buildCategorySnapshots_(summary, categories) {
+  const summaryData = summary || {};
+  const totalRaw = Number(summaryData.totalRaw || 0);
+  const snapshots = [
+    {
+      key: 'acoes',
+      label: 'Ações',
+      totalRaw: Number(summaryData.acoesRaw || 0),
+      totalLabel: summaryData.acoes || formatMoney_(summaryData.acoesRaw || 0),
+      performanceRaw: summaryData.acoesPerformanceRaw,
+      category: categories?.actions || null,
+      color: '#34d399',
+      sourceType: 'mercado'
+    },
+    {
+      key: 'fundos',
+      label: 'Fundos de Investimento',
+      totalRaw: Number(summaryData.fundosRaw || 0),
+      totalLabel: summaryData.fundos || formatMoney_(summaryData.fundosRaw || 0),
+      performanceRaw: summaryData.fundosPerformanceRaw,
+      category: categories?.funds || null,
+      color: '#c084fc',
+      sourceType: 'registro-fundo'
+    },
+    {
+      key: 'previdencia',
+      label: 'Previdência',
+      totalRaw: Number(summaryData.previdenciaRaw || 0),
+      totalLabel: summaryData.previdencia || formatMoney_(summaryData.previdenciaRaw || 0),
+      performanceRaw: summaryData.previdenciaPerformanceRaw,
+      category: categories?.previdencia || null,
+      color: '#60a5fa',
+      sourceType: 'registro-plano'
+    }
+  ];
+
+  return snapshots
+    .filter(function (item) {
+      return item.totalRaw > 0;
+    })
+    .map(function (item) {
+      const shareRaw = totalRaw > 0 ? item.totalRaw / totalRaw : 0;
+      const performanceRaw = Number(item.performanceRaw);
+      const isPerformanceKnown = item.performanceRaw !== null && item.performanceRaw !== undefined && !isNaN(performanceRaw);
+
+      return {
+        key: item.key,
+        label: item.label,
+        totalRaw: item.totalRaw,
+        totalLabel: item.totalLabel,
+        shareRaw: shareRaw,
+        shareLabel: shareRaw > 0 ? formatPct_(shareRaw) : '',
+        performanceRaw: isPerformanceKnown ? performanceRaw : null,
+        performanceLabel: isPerformanceKnown ? formatPct_(performanceRaw) : '—',
+        trend: !isPerformanceKnown
+          ? 'neutral'
+          : (performanceRaw > 0 ? 'positive' : (performanceRaw < 0 ? 'negative' : 'neutral')),
+        status: item.category?.status || '',
+        recommendation: item.category?.recommendation || '',
+        color: item.color,
+        sourceType: item.sourceType
+      };
+    });
 }
 
 /**
