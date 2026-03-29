@@ -14,13 +14,10 @@
       - substitua o content abaixo pela URL real do /exec publicado no Apps Script
       - o token e opcional e so deve ser usado se MOBILE_APP_API_TOKEN estiver ativo no backend
     -->
-	<meta
-		name="esquilo-api-base-url"
-		content="https://script.google.com/macros/s/AKfycbya0mKpePyZV79S3ta0hJf0fhhwWfeUFwfopMOsZRSuqT7EF8LiTz6dV2suOuJNWve-/exec"
-	/>
-	<meta name="esquilo-api-token" content="" />
-	<meta name="esquilo-api-timeout-ms" content="20000" />
-	<meta name="esquilo-use-legacy-appsscript" content="false" />
+    <meta name="esquilo-api-base-url" content="https://script.google.com/macros/s/SEU_DEPLOY/exec" />
+    <meta name="esquilo-api-token" content="" />
+    <meta name="esquilo-api-timeout-ms" content="20000" />
+    <meta name="esquilo-use-legacy-appsscript" content="false" />
 
     <title>Esquilo Invest | Dashboard</title>
 
@@ -82,6 +79,11 @@
       }
 
       .dashboard-brand__mark {
+        object-fit: contain;
+        padding: 0.35rem;
+      }
+
+      .dashboard-brand__mark--fallback {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -280,7 +282,8 @@
             <div class="dashboard-topbar__row">
               <div>
                 <a class="dashboard-brand" href="./index.html" aria-label="Voltar para a entrada do Esquilo Invest">
-                  <span class="dashboard-brand__mark" aria-hidden="true">EI</span>
+                  <img class="dashboard-brand__mark" src="./assets/logos/esquilo-logo.png" alt="Logo do Esquilo Invest" loading="eager" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+                  <span class="dashboard-brand__mark dashboard-brand__mark--fallback" aria-hidden="true" style="display:none;">EI</span>
                   <span class="dashboard-brand__copy">
                     <span class="type-brand">Esquilo Invest</span>
                     <span class="type-body-sm u-text-tertiary">Dashboard operacional externo</span>
