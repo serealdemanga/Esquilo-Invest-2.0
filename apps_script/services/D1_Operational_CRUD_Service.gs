@@ -519,12 +519,25 @@ function d1NormalizeTimestampLike_(value) {
   return String(value).trim();
 }
 
-function d1ToNumberOrNull_(value) {
+function toNumberOrNull_(value) {
   if (value === null || value === undefined || value === '') return null;
   if (typeof value === 'number') return isNaN(value) ? null : value;
-  var normalized = String(value).replace(/\s+/g, '').replace(/\./g, '').replace(',', '.');
+
+  var text = String(value).trim();
+
+  if (/^-?\d+(\.\d+)?$/.test(text)) {
+    var direct = Number(text);
+    return isNaN(direct) ? null : direct;
+  }
+
+  var normalized = text
+    .replace(/\s+/g, '')
+    .replace(/\./g, '')
+    .replace(',', '.');
+
   var numericValue = Number(normalized);
   return isNaN(numericValue) ? null : numericValue;
+}
 }
 
 function d1BlankToNull_(value) {

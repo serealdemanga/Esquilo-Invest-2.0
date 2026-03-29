@@ -1,15 +1,24 @@
 /**
  * Carga inicial BigQuery -> Cloudflare D1
- * Versão temporária com credenciais no código para destravar a execução.
- * Ajustada para diagnosticar dependências do Apps Script.
- * Apague esta versão depois de usar.
+ *
+ * Objetivo:
+ * - ler dados do BigQuery atual
+ * - transformar para o schema D1 aprovado
+ * - enviar lotes SQL para a REST API do D1
+ * - inserir sem apagar, usando INSERT OR IGNORE
+ *
+ * Requisitos:
+ * - BigQuery Advanced Service habilitado no Apps Script
+ * - Script Properties configuradas
+ * - schema do D1 já executado antes da carga
  */
 
-var MIGRATION_DEFAULTS_ = {
+const MIGRATION_DEFAULTS_ = {
   bigQueryProjectId: 'esquilo-invest',
   bigQueryDatasetId: 'esquilo_invest',
   d1ApiBaseUrl: 'https://api.cloudflare.com/client/v4',
   d1BatchSize: 50,
+  dryRun: false,
   sourceTables: {
     acoes: 'acoes',
     fundos: 'fundos',
@@ -24,53 +33,9 @@ var MIGRATION_DEFAULTS_ = {
   }
 };
 
-var HARD_CODED_MIGRATION_CONFIG_ = {
-  CLOUDFLARE_ACCOUNT_ID: '2f38f7354f204d7b3f7d6c750b3e43ff',
-  CLOUDFLARE_D1_DATABASE_ID: 'f7ee1506-ae01-45e4-875d-781042ea3f00',
-  CLOUDFLARE_API_TOKEN: 'cfut_11HoBXPDcjXPjwpZenqBRaYRuZETYSl21Rk9JsYtcf523cd8',
-  MIGRATION_USER_ID: 'user_migracao_inicial',
-  MIGRATION_PORTFOLIO_ID: 'portfolio_principal_inicial',
-  MIGRATION_PORTFOLIO_NAME: 'Carteira Principal',
-  MIGRATION_USER_DEVICE_ID: '',
-  MIGRATION_DRY_RUN: 'false',
-  BIGQUERY_PROJECT_ID: 'esquilo-invest',
-  BIGQUERY_DATASET_ID: 'esquilo_invest',
-  D1_API_BASE_URL: 'https://api.cloudflare.com/client/v4',
-  D1_BATCH_SIZE: '50'
-};
-
-function diagnosticarDependenciasMigracao() {
-  var info = {
-    hasUrlFetchApp: typeof UrlFetchApp !== 'undefined',
-    hasPropertiesService: typeof PropertiesService !== 'undefined',
-    hasUtilities: typeof Utilities !== 'undefined',
-    hasBigQueryAdvancedService: typeof BigQuery !== 'undefined'
-  };
-  Logger.log(JSON.stringify(info));
-
-  if (typeof BigQuery === 'undefined') {
-    throw new Error(
-      'BigQuery não está habilitado neste projeto Apps Script. ' +
-      'Ative o Advanced Google Service BigQuery antes de executar a migração.'
-    );
-  }
-
-  return info;
-}
-
-function executarCargaBigQueryParaD1() {
-  return runInitialBigQueryToD1Load_(false);
-}
-
-function testarCargaBigQueryParaD1() {
-  return runInitialBigQueryToD1Load_(true);
-}
-
-function runInitialBigQueryToD1Load_(forceDryRun) {
-  assertMigrationDependencies_();
-
-  var config = getMigrationConfig_(forceDryRun);
-  var startedAt = new Date();
+function runInitialBigQueryToD1Load() {
+  const config = getMigrationConfig_();
+  const startedAt = new Date();
 
   logInfo_('Inicio da carga BigQuery -> D1');
   logInfo_(JSON.stringify({
@@ -81,32 +46,32 @@ function runInitialBigQueryToD1Load_(forceDryRun) {
     batchSize: config.d1BatchSize
   }));
 
-  var acoes = fetchBigQueryRows_(config, config.sourceTables.acoes, [
+  const acoes = fetchBigQueryRows_(config, config.sourceTables.acoes, [
     'tipo', 'ativo', 'plataforma', 'status', 'situacao', 'data_entrada', 'quantidade',
     'preco_medio', 'cotacao_atual', 'valor_investido', 'valor_atual', 'stop_loss',
     'alvo', 'rentabilidade', 'observacao', 'atualizado_em'
   ]);
 
-  var fundos = fetchBigQueryRows_(config, config.sourceTables.fundos, [
+  const fundos = fetchBigQueryRows_(config, config.sourceTables.fundos, [
     'fundo', 'plataforma', 'categoria', 'estrategia', 'status', 'situacao', 'data_inicio',
     'valor_investido', 'valor_atual', 'rentabilidade', 'observacao', 'atualizado_em'
   ]);
 
-  var previdencia = fetchBigQueryRows_(config, config.sourceTables.previdencia, [
+  const previdencia = fetchBigQueryRows_(config, config.sourceTables.previdencia, [
     'plano', 'plataforma', 'tipo', 'estrategia', 'status', 'situacao', 'data_inicio',
     'valor_investido', 'valor_atual', 'rentabilidade', 'observacao', 'atualizado_em'
   ]);
 
-  var preOrdens = fetchBigQueryRows_(config, config.sourceTables.preOrdens, [
+  const preOrdens = fetchBigQueryRows_(config, config.sourceTables.preOrdens, [
     'tipo', 'ativo', 'plataforma', 'tipo_ordem', 'quantidade', 'preco_alvo', 'validade',
     'valor_potencial', 'cotacao_atual', 'status', 'observacao'
   ]);
 
-  var aportes = fetchBigQueryRows_(config, config.sourceTables.aportes, [
+  const aportes = fetchBigQueryRows_(config, config.sourceTables.aportes, [
     'mes_ano', 'destino', 'categoria', 'plataforma', 'valor', 'acumulado', 'status'
   ]);
 
-  var prepared = prepareMigrationPayload_(config, {
+  const prepared = prepareMigrationPayload_(config, {
     acoes: acoes,
     fundos: fundos,
     previdencia: previdencia,
@@ -114,15 +79,15 @@ function runInitialBigQueryToD1Load_(forceDryRun) {
     aportes: aportes
   });
 
-  var statements = [];
-  statements = statements.concat(buildBootstrapStatements_(config));
-  statements = statements.concat(buildPlatformStatements_(prepared.platforms));
-  statements = statements.concat(buildAssetStatements_(prepared.assets));
-  statements = statements.concat(buildPortfolioPositionStatements_(prepared.positions));
-  statements = statements.concat(buildPlannedOrderStatements_(prepared.plannedOrders));
-  statements = statements.concat(buildContributionStatements_(prepared.contributions));
+  const statements = [];
+  Array.prototype.push.apply(statements, buildBootstrapStatements_(config));
+  Array.prototype.push.apply(statements, buildPlatformStatements_(prepared.platforms));
+  Array.prototype.push.apply(statements, buildAssetStatements_(prepared.assets));
+  Array.prototype.push.apply(statements, buildPortfolioPositionStatements_(prepared.positions));
+  Array.prototype.push.apply(statements, buildPlannedOrderStatements_(prepared.plannedOrders));
+  Array.prototype.push.apply(statements, buildContributionStatements_(prepared.contributions));
 
-  var summary = {
+  const summary = {
     source: {
       acoes: acoes.length,
       fundos: fundos.length,
@@ -150,45 +115,27 @@ function runInitialBigQueryToD1Load_(forceDryRun) {
 
   executeD1StatementsInBatches_(config, statements);
 
-  logInfo_('Carga concluida em ' + ((new Date().getTime() - startedAt.getTime()) / 1000).toFixed(2) + 's');
+  const finishedAt = new Date();
+  logInfo_('Carga concluida em ' + ((finishedAt.getTime() - startedAt.getTime()) / 1000).toFixed(2) + 's');
   return summary;
 }
 
-function assertMigrationDependencies_() {
-  if (typeof Utilities === 'undefined') {
-    throw new Error('Utilities não está disponível no Apps Script.');
-  }
-  if (typeof UrlFetchApp === 'undefined') {
-    throw new Error('UrlFetchApp não está disponível no Apps Script.');
-  }
-  if (typeof PropertiesService === 'undefined') {
-    throw new Error('PropertiesService não está disponível no Apps Script.');
-  }
-  if (typeof BigQuery === 'undefined') {
-    throw new Error(
-      'BigQuery não está habilitado neste projeto Apps Script. ' +
-      'Abra: Serviços > adicionar serviço > BigQuery API > ativar. ' +
-      'Sem isso, o script não consegue ler as tabelas de origem.'
-    );
-  }
-}
-
 function prepareMigrationPayload_(config, source) {
-  var platformsMap = {};
-  var assetsMap = {};
-  var positionsMap = {};
-  var plannedOrdersMap = {};
-  var contributionsMap = {};
+  const platformsMap = {};
+  const assetsMap = {};
+  const positionsMap = {};
+  const plannedOrdersMap = {};
+  const contributionsMap = {};
 
   (source.acoes || []).forEach(function (row) {
-    var platform = buildPlatformRecord_(row.plataforma);
+    const platform = buildPlatformRecord_(row.plataforma);
     if (platform) platformsMap[platform.id] = platform;
 
-    var asset = buildAssetRecord_('STOCK', row.ativo, row.ativo);
+    const asset = buildAssetRecord_('STOCK', row.ativo, row.ativo);
     assetsMap[asset.id] = asset;
 
-    positionsMap[buildStableId_('position', [config.migrationPortfolioId, 'ACOES', asset.id, platform ? platform.id : ''])] = {
-      id: buildStableId_('position', [config.migrationPortfolioId, 'ACOES', asset.id, platform ? platform.id : '']),
+    const position = {
+      id: buildStableId_('position', [config.migrationPortfolioId, 'ACOES', asset.id, platform ? platform.id : '', '']),
       portfolioId: config.migrationPortfolioId,
       assetId: asset.id,
       platformId: platform ? platform.id : null,
@@ -209,17 +156,19 @@ function prepareMigrationPayload_(config, source) {
       notes: toTextOrNull_(row.observacao),
       sourceUpdatedAt: toIsoTimestampOrNull_(row.atualizado_em)
     };
+
+    positionsMap[position.id] = position;
   });
 
   (source.fundos || []).forEach(function (row) {
-    var platform = buildPlatformRecord_(row.plataforma);
+    const platform = buildPlatformRecord_(row.plataforma);
     if (platform) platformsMap[platform.id] = platform;
 
-    var asset = buildAssetRecord_('FUND', null, row.fundo);
+    const asset = buildAssetRecord_('FUND', null, row.fundo);
     assetsMap[asset.id] = asset;
 
-    positionsMap[buildStableId_('position', [config.migrationPortfolioId, 'FUNDOS', asset.id, platform ? platform.id : ''])] = {
-      id: buildStableId_('position', [config.migrationPortfolioId, 'FUNDOS', asset.id, platform ? platform.id : '']),
+    const position = {
+      id: buildStableId_('position', [config.migrationPortfolioId, 'FUNDOS', asset.id, platform ? platform.id : '', '']),
       portfolioId: config.migrationPortfolioId,
       assetId: asset.id,
       platformId: platform ? platform.id : null,
@@ -240,17 +189,19 @@ function prepareMigrationPayload_(config, source) {
       notes: toTextOrNull_(row.observacao),
       sourceUpdatedAt: toIsoTimestampOrNull_(row.atualizado_em)
     };
+
+    positionsMap[position.id] = position;
   });
 
   (source.previdencia || []).forEach(function (row) {
-    var platform = buildPlatformRecord_(row.plataforma);
+    const platform = buildPlatformRecord_(row.plataforma);
     if (platform) platformsMap[platform.id] = platform;
 
-    var asset = buildAssetRecord_('PENSION', null, row.plano);
+    const asset = buildAssetRecord_('PENSION', null, row.plano);
     assetsMap[asset.id] = asset;
 
-    positionsMap[buildStableId_('position', [config.migrationPortfolioId, 'PREVIDENCIA', asset.id, platform ? platform.id : ''])] = {
-      id: buildStableId_('position', [config.migrationPortfolioId, 'PREVIDENCIA', asset.id, platform ? platform.id : '']),
+    const position = {
+      id: buildStableId_('position', [config.migrationPortfolioId, 'PREVIDENCIA', asset.id, platform ? platform.id : '', '']),
       portfolioId: config.migrationPortfolioId,
       assetId: asset.id,
       platformId: platform ? platform.id : null,
@@ -271,17 +222,26 @@ function prepareMigrationPayload_(config, source) {
       notes: toTextOrNull_(row.observacao),
       sourceUpdatedAt: toIsoTimestampOrNull_(row.atualizado_em)
     };
+
+    positionsMap[position.id] = position;
   });
 
   (source.preOrdens || []).forEach(function (row) {
-    var platform = buildPlatformRecord_(row.plataforma);
+    const platform = buildPlatformRecord_(row.plataforma);
     if (platform) platformsMap[platform.id] = platform;
 
-    var asset = isBlank_(row.ativo) ? null : buildAssetRecord_('STOCK', row.ativo, row.ativo);
+    const asset = isBlank_(row.ativo) ? null : buildAssetRecord_('STOCK', row.ativo, row.ativo);
     if (asset) assetsMap[asset.id] = asset;
 
-    plannedOrdersMap[buildStableId_('planned_order', [config.migrationPortfolioId, toTextOrEmpty_(row.ativo), toTextOrEmpty_(row.plataforma), toTextOrEmpty_(row.tipo_ordem), toTextOrEmpty_(row.validade), toTextOrEmpty_(row.preco_alvo)])] = {
-      id: buildStableId_('planned_order', [config.migrationPortfolioId, toTextOrEmpty_(row.ativo), toTextOrEmpty_(row.plataforma), toTextOrEmpty_(row.tipo_ordem), toTextOrEmpty_(row.validade), toTextOrEmpty_(row.preco_alvo)]),
+    const order = {
+      id: buildStableId_('planned_order', [
+        config.migrationPortfolioId,
+        toTextOrEmpty_(row.ativo),
+        toTextOrEmpty_(row.plataforma),
+        toTextOrEmpty_(row.tipo_ordem),
+        toTextOrEmpty_(row.validade),
+        toTextOrEmpty_(row.preco_alvo)
+      ]),
       portfolioId: config.migrationPortfolioId,
       assetId: asset ? asset.id : null,
       platformId: platform ? platform.id : null,
@@ -296,14 +256,22 @@ function prepareMigrationPayload_(config, source) {
       status: toTextOrNull_(row.status),
       notes: toTextOrNull_(row.observacao)
     };
+
+    plannedOrdersMap[order.id] = order;
   });
 
   (source.aportes || []).forEach(function (row) {
-    var platform = buildPlatformRecord_(row.plataforma);
+    const platform = buildPlatformRecord_(row.plataforma);
     if (platform) platformsMap[platform.id] = platform;
 
-    contributionsMap[buildStableId_('contribution', [config.migrationPortfolioId, toTextOrEmpty_(row.mes_ano), toTextOrEmpty_(row.destino), toTextOrEmpty_(row.plataforma), toTextOrEmpty_(row.valor)])] = {
-      id: buildStableId_('contribution', [config.migrationPortfolioId, toTextOrEmpty_(row.mes_ano), toTextOrEmpty_(row.destino), toTextOrEmpty_(row.plataforma), toTextOrEmpty_(row.valor)]),
+    const contribution = {
+      id: buildStableId_('contribution', [
+        config.migrationPortfolioId,
+        toTextOrEmpty_(row.mes_ano),
+        toTextOrEmpty_(row.destino),
+        toTextOrEmpty_(row.plataforma),
+        toTextOrEmpty_(row.valor)
+      ]),
       portfolioId: config.migrationPortfolioId,
       platformId: platform ? platform.id : null,
       contributionMonth: toIsoDateOrNull_(row.mes_ano),
@@ -313,14 +281,16 @@ function prepareMigrationPayload_(config, source) {
       accumulatedAmount: toNumberOrNull_(row.acumulado),
       status: toTextOrNull_(row.status)
     };
+
+    contributionsMap[contribution.id] = contribution;
   });
 
   return {
-    platforms: mapValues_(platformsMap).sort(sortByName_),
-    assets: mapValues_(assetsMap).sort(sortByDisplayName_),
-    positions: mapValues_(positionsMap),
-    plannedOrders: mapValues_(plannedOrdersMap),
-    contributions: mapValues_(contributionsMap)
+    platforms: Object.keys(platformsMap).map(function (key) { return platformsMap[key]; }).sort(sortByName_),
+    assets: Object.keys(assetsMap).map(function (key) { return assetsMap[key]; }).sort(sortByDisplayName_),
+    positions: Object.keys(positionsMap).map(function (key) { return positionsMap[key]; }),
+    plannedOrders: Object.keys(plannedOrdersMap).map(function (key) { return plannedOrdersMap[key]; }),
+    contributions: Object.keys(contributionsMap).map(function (key) { return contributionsMap[key]; })
   };
 }
 
@@ -443,10 +413,11 @@ function buildContributionStatements_(contributions) {
 }
 
 function executeD1StatementsInBatches_(config, statements) {
-  var chunks = chunkArray_(statements, config.d1BatchSize);
+  const chunks = chunkArray_(statements, config.d1BatchSize);
+
   chunks.forEach(function (chunk, index) {
-    var response = callD1BatchQuery_(config, chunk);
-    var hasErrors = !response.success || (response.errors && response.errors.length);
+    const response = callD1BatchQuery_(config, chunk);
+    const hasErrors = !response.success || (response.errors && response.errors.length);
     if (hasErrors) {
       throw new Error('Falha no lote ' + (index + 1) + ': ' + JSON.stringify(response));
     }
@@ -455,14 +426,14 @@ function executeD1StatementsInBatches_(config, statements) {
 }
 
 function callD1BatchQuery_(config, statements) {
-  var url = config.d1ApiBaseUrl + '/accounts/' + encodeURIComponent(config.cloudflareAccountId) + '/d1/database/' + encodeURIComponent(config.cloudflareD1DatabaseId) + '/query';
-  var payload = {
+  const url = config.d1ApiBaseUrl + '/accounts/' + encodeURIComponent(config.cloudflareAccountId) + '/d1/database/' + encodeURIComponent(config.cloudflareD1DatabaseId) + '/query';
+  const payload = {
     batch: statements.map(function (sql) {
       return { sql: sql };
     })
   };
 
-  var response = UrlFetchApp.fetch(url, {
+  const response = UrlFetchApp.fetch(url, {
     method: 'post',
     contentType: 'application/json',
     headers: {
@@ -472,9 +443,9 @@ function callD1BatchQuery_(config, statements) {
     muteHttpExceptions: true
   });
 
-  var statusCode = response.getResponseCode();
-  var bodyText = response.getContentText();
-  var body;
+  const statusCode = response.getResponseCode();
+  const bodyText = response.getContentText();
+  let body;
 
   try {
     body = JSON.parse(bodyText);
@@ -490,17 +461,21 @@ function callD1BatchQuery_(config, statements) {
 }
 
 function fetchBigQueryRows_(config, tableName, columns) {
-  var query = 'SELECT ' + columns.join(', ') + ' FROM `' + config.bigQueryProjectId + '.' + config.bigQueryDatasetId + '.' + tableName + '`';
-  var result = runBigQueryQuery_(config.bigQueryProjectId, query);
+  const query = 'SELECT ' + columns.join(', ') + ' FROM `' + config.bigQueryProjectId + '.' + config.bigQueryDatasetId + '.' + tableName + '`';
+  const result = runBigQueryQuery_(config.bigQueryProjectId, query);
   return mapBigQueryResultToObjects_(result, columns);
 }
 
 function runBigQueryQuery_(projectId, queryText) {
-  var request = { query: queryText, useLegacySql: false };
-  var result = BigQuery.Jobs.query(request, projectId);
+  const request = {
+    query: queryText,
+    useLegacySql: false
+  };
+
+  let result = BigQuery.Jobs.query(request, projectId);
   if (!result) throw new Error('BigQuery nao retornou resposta.');
 
-  var jobId = result.jobReference && result.jobReference.jobId ? result.jobReference.jobId : '';
+  const jobId = result.jobReference && result.jobReference.jobId ? result.jobReference.jobId : '';
   while (jobId && !result.jobComplete) {
     Utilities.sleep(300);
     result = BigQuery.Jobs.getQueryResults(projectId, jobId, { maxResults: 1000 });
@@ -512,11 +487,13 @@ function runBigQueryQuery_(projectId, queryText) {
 
   if (!jobId) return result;
 
-  var allRows = (result.rows || []).slice();
-  var pageToken = result.pageToken || '';
+  const allRows = (result.rows || []).slice();
+  let pageToken = result.pageToken || '';
   while (pageToken) {
-    var page = BigQuery.Jobs.getQueryResults(projectId, jobId, { pageToken: pageToken, maxResults: 1000 });
-    if (page.rows && page.rows.length) Array.prototype.push.apply(allRows, page.rows);
+    const page = BigQuery.Jobs.getQueryResults(projectId, jobId, { pageToken: pageToken, maxResults: 1000 });
+    if (page.rows && page.rows.length) {
+      Array.prototype.push.apply(allRows, page.rows);
+    }
     pageToken = page.pageToken || '';
   }
 
@@ -526,7 +503,7 @@ function runBigQueryQuery_(projectId, queryText) {
 
 function mapBigQueryResultToObjects_(queryResult, fieldNames) {
   return ((queryResult || {}).rows || []).map(function (row) {
-    var obj = {};
+    const obj = {};
     fieldNames.forEach(function (fieldName, index) {
       obj[fieldName] = extractBigQueryValue_(row && row.f && row.f[index] ? row.f[index].v : null);
     });
@@ -535,55 +512,74 @@ function mapBigQueryResultToObjects_(queryResult, fieldNames) {
 }
 
 function extractBigQueryValue_(value) {
-  if (value === undefined || value === null) return null;
+  if (value === undefined) return null;
+  if (value === null) return null;
   if (typeof value === 'object' && value.v !== undefined) return extractBigQueryValue_(value.v);
   return value;
 }
 
 function buildPlatformRecord_(platformName) {
-  var name = toTextOrNull_(platformName);
+  const name = toTextOrNull_(platformName);
   if (!name) return null;
-  return { id: buildStableId_('platform', [normalizeToken_(name)]), name: name, normalizedName: normalizeToken_(name) };
+  const normalizedName = normalizeToken_(name);
+  return {
+    id: buildStableId_('platform', [normalizedName]),
+    name: name,
+    normalizedName: normalizedName
+  };
 }
 
 function buildAssetRecord_(assetTypeCode, code, displayName) {
-  var cleanCode = toTextOrNull_(code);
-  var cleanDisplayName = toTextOrEmpty_(displayName);
-  var identity = cleanCode || cleanDisplayName;
+  const cleanCode = toTextOrNull_(code);
+  const cleanDisplayName = toTextOrEmpty_(displayName);
+  const identity = cleanCode || cleanDisplayName;
+  const normalizedName = normalizeToken_(identity);
   return {
     id: buildStableId_('asset', [assetTypeCode, identity]),
     assetTypeId: MIGRATION_DEFAULTS_.assetTypeIds[assetTypeCode],
     code: cleanCode,
     displayName: cleanDisplayName,
-    normalizedName: normalizeToken_(identity),
+    normalizedName: normalizedName,
     isCustom: !cleanCode
   };
 }
 
 function buildInsertOrIgnoreStatement_(tableName, payload) {
-  var keys = Object.keys(payload);
-  return 'INSERT OR IGNORE INTO ' + tableName + ' (' + keys.join(', ') + ') VALUES (' + keys.map(function (key) { return toSqlLiteral_(payload[key]); }).join(', ') + ');';
+  const keys = Object.keys(payload);
+  return 'INSERT OR IGNORE INTO ' + tableName + ' (' + keys.join(', ') + ') VALUES (' + keys.map(function (key) {
+    return toSqlLiteral_(payload[key]);
+  }).join(', ') + ');';
 }
 
 function toSqlLiteral_(value) {
   if (value === null || value === undefined || value === '') return 'NULL';
   if (typeof value === 'number') return isFinite(value) ? String(value) : 'NULL';
   if (typeof value === 'boolean') return value ? '1' : '0';
-  return '\'' + String(value).replace(/\\/g, '\\\\').replace(/'/g, "''") + '\'';
+  return '\'' + String(value)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "''") + '\'';
 }
 
 function buildStableId_(prefix, parts) {
-  var base = prefix + '|' + (parts || []).map(function (item) { return String(item || '').trim(); }).join('|');
-  var digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, base);
-  var hex = digest.map(function (b) {
-    var value = (b < 0 ? b + 256 : b).toString(16);
+  const base = prefix + '|' + (parts || []).map(function (item) {
+    return String(item || '').trim();
+  }).join('|');
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, base);
+  const hex = digest.map(function (b) {
+    const value = (b < 0 ? b + 256 : b).toString(16);
     return value.length === 1 ? '0' + value : value;
   }).join('');
   return prefix + '_' + hex.slice(0, 24);
 }
 
 function normalizeToken_(value) {
-  return String(value || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
 }
 
 function toTextOrNull_(value) {
@@ -598,31 +594,22 @@ function toTextOrEmpty_(value) {
 function toNumberOrNull_(value) {
   if (value === null || value === undefined || value === '') return null;
   if (typeof value === 'number') return isNaN(value) ? null : value;
-
-  var text = String(value).trim();
-
-  if (/^-?\d+(\.\d+)?$/.test(text)) {
-    var direct = Number(text);
-    return isNaN(direct) ? null : direct;
-  }
-
-  var normalized = text
+  const normalized = String(value)
     .replace(/\s+/g, '')
     .replace(/\./g, '')
     .replace(',', '.');
-
-  var numericValue = Number(normalized);
+  const numericValue = Number(normalized);
   return isNaN(numericValue) ? null : numericValue;
 }
 
 function toIsoDateOrNull_(value) {
-  var parsed = parseDateValue_(value);
+  const parsed = parseDateValue_(value);
   if (!parsed) return null;
   return Utilities.formatDate(parsed, 'GMT', 'yyyy-MM-dd');
 }
 
 function toIsoTimestampOrNull_(value) {
-  var parsed = parseDateValue_(value);
+  const parsed = parseDateValue_(value);
   if (!parsed) return null;
   return Utilities.formatDate(parsed, 'GMT', "yyyy-MM-dd'T'HH:mm:ss'Z'");
 }
@@ -630,33 +617,43 @@ function toIsoTimestampOrNull_(value) {
 function parseDateValue_(value) {
   if (value === null || value === undefined || value === '') return null;
   if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime())) return value;
-  var text = String(value).trim();
+
+  const text = String(value).trim();
   if (!text || text === '-' || text === '—') return null;
 
-  var match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (match) return new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  let match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    const year = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const day = Number(match[3]);
+    return new Date(Date.UTC(year, month, day));
+  }
 
   match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
   if (match) {
-    var year = Number(match[3]);
+    let year = Number(match[3]);
     if (year < 100) year += 2000;
     return new Date(Date.UTC(year, Number(match[2]) - 1, Number(match[1])));
   }
 
   match = text.match(/^([A-Za-zçÇ]{3})\/(\d{4})$/i);
   if (match) {
-    var monthKey = normalizeMonthKey_(match[1]);
-    var monthMap = { jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5, jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11 };
+    const monthKey = normalizeMonthKey_(match[1]);
+    const monthMap = { jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5, jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11 };
     if (monthMap[monthKey] === undefined) return null;
     return new Date(Date.UTC(Number(match[2]), monthMap[monthKey], 1));
   }
 
-  var nativeDate = new Date(text);
+  const nativeDate = new Date(text);
   return isNaN(nativeDate.getTime()) ? null : nativeDate;
 }
 
 function normalizeMonthKey_(value) {
-  return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').slice(0, 3);
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .slice(0, 3);
 }
 
 function isBlank_(value) {
@@ -664,13 +661,11 @@ function isBlank_(value) {
 }
 
 function chunkArray_(items, size) {
-  var output = [];
-  for (var i = 0; i < items.length; i += size) output.push(items.slice(i, i + size));
+  const output = [];
+  for (let index = 0; index < items.length; index += size) {
+    output.push(items.slice(index, index + size));
+  }
   return output;
-}
-
-function mapValues_(obj) {
-  return Object.keys(obj).map(function (key) { return obj[key]; });
 }
 
 function sortByName_(a, b) {
@@ -682,38 +677,43 @@ function sortByDisplayName_(a, b) {
 }
 
 function logInfo_(message) {
-  Logger.log('[BQ->D1] ' + message);
+  console.log('[BQ->D1] ' + message);
 }
 
 function maskValue_(value) {
-  var text = String(value || '');
+  const text = String(value || '');
   if (text.length <= 8) return '***';
   return text.slice(0, 4) + '***' + text.slice(-4);
 }
 
-function getMigrationConfig_(forceDryRun) {
-  return {
-    bigQueryProjectId: getConfigValue_('BIGQUERY_PROJECT_ID', MIGRATION_DEFAULTS_.bigQueryProjectId),
-    bigQueryDatasetId: getConfigValue_('BIGQUERY_DATASET_ID', MIGRATION_DEFAULTS_.bigQueryDatasetId),
-    cloudflareAccountId: getConfigValue_('CLOUDFLARE_ACCOUNT_ID'),
-    cloudflareD1DatabaseId: getConfigValue_('CLOUDFLARE_D1_DATABASE_ID'),
-    cloudflareApiToken: getConfigValue_('CLOUDFLARE_API_TOKEN'),
-    migrationUserId: getConfigValue_('MIGRATION_USER_ID', 'user_migracao_inicial'),
-    migrationPortfolioId: getConfigValue_('MIGRATION_PORTFOLIO_ID', 'portfolio_principal_inicial'),
-    migrationPortfolioName: getConfigValue_('MIGRATION_PORTFOLIO_NAME', 'Carteira Principal'),
-    migrationUserDeviceId: getConfigValue_('MIGRATION_USER_DEVICE_ID', ''),
-    d1ApiBaseUrl: getConfigValue_('D1_API_BASE_URL', MIGRATION_DEFAULTS_.d1ApiBaseUrl),
-    d1BatchSize: Number(getConfigValue_('D1_BATCH_SIZE', String(MIGRATION_DEFAULTS_.d1BatchSize))),
-    dryRun: forceDryRun === true ? true : String(getConfigValue_('MIGRATION_DRY_RUN', 'false')).toLowerCase() === 'true',
+function getMigrationConfig_() {
+  const props = PropertiesService.getScriptProperties();
+
+  const config = {
+    bigQueryProjectId: props.getProperty('BIGQUERY_PROJECT_ID') || MIGRATION_DEFAULTS_.bigQueryProjectId,
+    bigQueryDatasetId: props.getProperty('BIGQUERY_DATASET_ID') || MIGRATION_DEFAULTS_.bigQueryDatasetId,
+    cloudflareAccountId: requireProperty_(props, 'CLOUDFLARE_ACCOUNT_ID'),
+    cloudflareD1DatabaseId: requireProperty_(props, 'CLOUDFLARE_D1_DATABASE_ID'),
+    cloudflareApiToken: requireProperty_(props, 'CLOUDFLARE_API_TOKEN'),
+    migrationUserId: requireProperty_(props, 'MIGRATION_USER_ID'),
+    migrationPortfolioId: requireProperty_(props, 'MIGRATION_PORTFOLIO_ID'),
+    migrationPortfolioName: props.getProperty('MIGRATION_PORTFOLIO_NAME') || 'Carteira Principal',
+    migrationUserDeviceId: props.getProperty('MIGRATION_USER_DEVICE_ID') || '',
+    d1ApiBaseUrl: props.getProperty('D1_API_BASE_URL') || MIGRATION_DEFAULTS_.d1ApiBaseUrl,
+    d1BatchSize: Number(props.getProperty('D1_BATCH_SIZE') || MIGRATION_DEFAULTS_.d1BatchSize),
+    dryRun: String(props.getProperty('MIGRATION_DRY_RUN') || String(MIGRATION_DEFAULTS_.dryRun)).toLowerCase() === 'true',
     sourceTables: MIGRATION_DEFAULTS_.sourceTables
   };
+
+  if (!config.d1BatchSize || config.d1BatchSize < 1) {
+    throw new Error('D1_BATCH_SIZE invalido.');
+  }
+
+  return config;
 }
 
-function getConfigValue_(key, fallback) {
-  var props = PropertiesService.getScriptProperties();
-  var fromProps = props.getProperty(key);
-  if (fromProps !== null && fromProps !== '') return fromProps;
-  if (Object.prototype.hasOwnProperty.call(HARD_CODED_MIGRATION_CONFIG_, key) && HARD_CODED_MIGRATION_CONFIG_[key] !== '') return HARD_CODED_MIGRATION_CONFIG_[key];
-  if (fallback !== undefined) return fallback;
-  throw new Error('Configuracao obrigatoria ausente: ' + key);
+function requireProperty_(props, key) {
+  const value = props.getProperty(key);
+  if (!value) throw new Error('Script Property obrigatoria ausente: ' + key);
+  return value;
 }
