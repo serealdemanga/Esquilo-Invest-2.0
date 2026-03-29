@@ -46,25 +46,48 @@ function buildDashboardContext_() {
   };
 }
 
+/**
+ * PATCH para apps_script/backend/Backend_Core.gs
+ *
+ * Substitua a função getPrimaryDashboardDataContext_ inteira por esta versão.
+ *
+ * Comportamento:
+ * - fonte principal: D1
+ * - fallback 1: BigQuery
+ * - fallback 2: planilha
+ */
+
 function getPrimaryDashboardDataContext_(spreadsheetContext) {
-  const dataContext = {
+  var dataContext = {
     spreadsheet: spreadsheetContext.spreadsheet,
     sheets: spreadsheetContext.sheets,
     rawData: null,
-    dataSource: 'bigquery',
+    dataSource: 'd1',
     sourceWarning: ''
   };
 
   try {
-    dataContext.rawData = getBigQueryStructuredPortfolioData_();
+    dataContext.rawData = getD1StructuredPortfolioData_();
+    dataContext.dataSource = 'd1';
     return dataContext;
-  } catch (error) {
-    dataContext.rawData = readSpreadsheetData_(spreadsheetContext);
-    dataContext.dataSource = 'spreadsheet-fallback';
-    dataContext.sourceWarning = String(error && error.message ? error.message : error);
-    return dataContext;
+  } catch (d1Error) {
+    try {
+      dataContext.rawData = getBigQueryStructuredPortfolioData_();
+      dataContext.dataSource = 'bigquery-fallback';
+      dataContext.sourceWarning = 'D1 indisponivel. Fallback para BigQuery: ' + String(d1Error && d1Error.message ? d1Error.message : d1Error);
+      return dataContext;
+    } catch (bigQueryError) {
+      dataContext.rawData = readSpreadsheetData_(spreadsheetContext);
+      dataContext.dataSource = 'spreadsheet-fallback';
+      dataContext.sourceWarning = [
+        'D1 indisponivel: ' + String(d1Error && d1Error.message ? d1Error.message : d1Error),
+        'BigQuery indisponivel: ' + String(bigQueryError && bigQueryError.message ? bigQueryError.message : bigQueryError)
+      ].join(' | ');
+      return dataContext;
+    }
   }
 }
+
 
 function getSpreadsheetContext_() {
   const spreadsheet = openOperationalSpreadsheet_();
