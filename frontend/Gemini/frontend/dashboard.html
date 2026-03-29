@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Esquilo Invest</title>
+  
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Ícones (Lucide, super leve e combina com o visual) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- CSS (Carregado na ordem certa) -->
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <!-- Placeholder pro logo do rebranding -->
+        <img src="../assets/icons/esquilo-logo-source.png" alt="Esquilo Invest Logo" class="sidebar-logo" onerror="this.src='https://placehold.co/32x32/FF7A00/000000?text=E'">
+        <h3>Esquilo Invest</h3>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#carteira" class="nav-item">
+          <i data-lucide="wallet"></i>
+          <span>Minha Carteira</span>
+        </a>
+        <a href="#movimentacoes" class="nav-item">
+          <i data-lucide="arrow-left-right"></i>
+          <span>Movimentações</span>
+        </a>
+        <a href="#proventos" class="nav-item">
+          <i data-lucide="coins"></i>
+          <span>Proventos (Em breve)</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#config" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Configurações</span>
+        </a>
+        <button id="btnLogout" class="btn btn-outline" style="width: 100%; margin-top: var(--space-4);">
+          <i data-lucide="log-out"></i> Sair
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+      
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div>
+          <h2 id="greeting">Olá, Investidor</h2>
+          <p class="text-muted" id="lastUpdate">Última atualização: --/--/----</p>
+        </div>
+        <div style="display: flex; gap: var(--space-4); align-items: center;">
+          <button class="btn btn-primary" id="btnSync">
+            <i data-lucide="refresh-cw"></i> Sincronizar
+          </button>
+          <div class="user-avatar" style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--color-background-elevated); display: flex; align-items: center; justify-content: center;">
+            <i data-lucide="user" style="color: var(--color-text-muted);"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- ÁREA DE DADOS -->
+      <div class="content-wrapper">
+        
+        <!-- CARDS DE RESUMO (Top Row) -->
+        <section class="summary-grid">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="text-muted">Patrimônio Total</h4>
+              <i data-lucide="dollar-sign" style="color: var(--color-primary);"></i>
+            </div>
+            <h2 class="font-mono" id="valPatrimonioTotal">R$ 0,00</h2>
+            <p class="text-muted" style="margin-top: var(--space-2); font-size: var(--font-size-sm);">Valor bruto consolidado</p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h4 class="text-muted">Valor Investido</h4>
+              <i data-lucide="piggy-bank" style="color: var(--color-info);"></i>
+            </div>
+            <h2 class="font-mono" id="valAporteTotal">R$ 0,00</h2>
+            <p class="text-muted" style="margin-top: var(--space-2); font-size: var(--font-size-sm);">Total de aportes</p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h4 class="text-muted">Lucro Bruto</h4>
+              <i data-lucide="trending-up" id="iconLucro" style="color: var(--color-success);"></i>
+            </div>
+            <h2 class="font-mono text-success" id="valLucroTotal">R$ 0,00</h2>
+            <div style="display: flex; gap: var(--space-2); align-items: center; margin-top: var(--space-2);">
+              <span class="badge badge-success" id="badgeRentabilidade">0.00%</span>
+              <span class="text-muted" style="font-size: var(--font-size-sm);">Rentabilidade global</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- DASHBOARD GRID (Gráficos e Alocação) -->
+        <section class="dashboard-grid">
+          
+          <!-- Lado Esquerdo (Maior) - Pode ser Gráfico de Evolução -->
+          <div class="card" style="min-height: 400px;">
+            <div class="card-header">
+              <h3 class="card-title">Evolução do Patrimônio</h3>
+              <div class="badge badge-warning">Em construção</div>
+            </div>
+            <div id="chartEvolucao" style="flex: 1; display: flex; align-items: center; justify-content: center; background-color: var(--color-background-dark); border-radius: var(--radius-md); border: 1px dashed var(--color-border);">
+              <p class="text-muted">Área reservada para o gráfico (ex: Chart.js)</p>
+            </div>
+          </div>
+
+          <!-- Lado Direito (Menor) - Resumo de Alocação por Classe -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Composição da Carteira</h3>
+            </div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Classe</th>
+                    <th>Valor</th>
+                    <th>%</th>
+                  </tr>
+                </thead>
+                <tbody id="tableAlocacaoBody">
+                  <tr>
+                    <td colspan="3" class="text-muted" style="text-align: center;">Carregando dados...</td>
+                  </tr>
+                  <!-- Linhas injetadas via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+      </div> <!-- fim content-wrapper -->
+    </main>
+  </div>
+
+  <!-- Inicialização dos ícones Lucide -->
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <!-- Scripts da Aplicação (O motor JS vem depois!) -->
+  <!-- <script src="scripts/state.js"></script> -->
+  <!-- <script src="scripts/api.js"></script> -->
+  <!-- <script src="scripts/dashboard.js"></script> -->
+  <!-- <script src="scripts/app.js"></script> -->
+
+</body>
+</html>

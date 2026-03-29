@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#05070a" />
+    <meta
+      name="description"
+      content="Dashboard externo do Esquilo Invest, preparado para Cloudflare Pages e integrado ao backend atual via HTTP."
+    />
+
+    <!--
+      Configuracao do backend
+      - substitua o content abaixo pela URL real do /exec publicado no Apps Script
+      - o token e opcional e so deve ser usado se MOBILE_APP_API_TOKEN estiver ativo no backend
+    -->
+    <meta name="esquilo-api-base-url" content="https://script.google.com/macros/s/SEU_DEPLOY/exec" />
+    <meta name="esquilo-api-token" content="" />
+    <meta name="esquilo-api-timeout-ms" content="20000" />
+    <meta name="esquilo-use-legacy-appsscript" content="false" />
+
+    <title>Esquilo Invest | Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./styles/tokens.css" />
+    <link rel="stylesheet" href="./styles/base.css" />
+    <link rel="stylesheet" href="./styles/layout.css" />
+    <link rel="stylesheet" href="./styles/components.css" />
+
+    <style>
+      .dashboard-page {
+        position: relative;
+        min-height: 100vh;
+      }
+
+      .dashboard-page__shell {
+        width: min(100% - (var(--container-padding-inline) * 2), var(--container-width));
+        margin-inline: auto;
+        padding-block: var(--space-6) var(--space-10);
+        display: grid;
+        gap: var(--space-5);
+      }
+
+      .dashboard-topbar {
+        position: relative;
+        z-index: var(--z-sticky);
+        display: grid;
+        gap: var(--space-4);
+      }
+
+      .dashboard-topbar__surface {
+        padding: var(--space-5);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-2xl);
+        background: linear-gradient(180deg, rgba(8, 15, 28, 0.96), rgba(11, 18, 32, 0.92));
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(var(--blur-md));
+        -webkit-backdrop-filter: blur(var(--blur-md));
+      }
+
+      .dashboard-topbar__row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: var(--space-5);
+        align-items: start;
+      }
+
+      .dashboard-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-4);
+        min-width: 0;
+      }
+
+      .dashboard-brand__mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--border-brand);
+        background: linear-gradient(145deg, rgba(245, 158, 11, 0.18), rgba(15, 23, 42, 0.9));
+        box-shadow: var(--shadow-brand);
+        color: var(--brand-primary-soft);
+        font-family: var(--font-family-display);
+        font-size: 1.2rem;
+        font-weight: var(--font-weight-bold);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        flex-shrink: 0;
+      }
+
+      .dashboard-brand__copy {
+        display: grid;
+        gap: var(--space-1);
+        min-width: 0;
+      }
+
+      .dashboard-toolbar {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-2);
+      }
+
+      .dashboard-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding-top: var(--space-4);
+      }
+
+      .dashboard-meta__item {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        min-height: 1.9rem;
+        padding: 0.35rem 0.65rem;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .dashboard-status-stack {
+        display: grid;
+        gap: var(--space-3);
+      }
+
+      .dashboard-banner {
+        display: none;
+        padding: var(--space-4) var(--space-5);
+        border-radius: var(--radius-xl);
+        border: 1px solid transparent;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .dashboard-banner.is-visible {
+        display: grid;
+        gap: var(--space-2);
+      }
+
+      .dashboard-banner--warning {
+        border-color: rgba(245, 158, 11, 0.22);
+        background: rgba(245, 158, 11, 0.08);
+      }
+
+      .dashboard-banner--danger {
+        border-color: rgba(239, 68, 68, 0.22);
+        background: rgba(239, 68, 68, 0.08);
+      }
+
+      .dashboard-runtime {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+
+      .dashboard-runtime__dot {
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: var(--radius-pill);
+        background: var(--feedback-success);
+      }
+
+      .dashboard-modal {
+        border-radius: var(--radius-2xl);
+        border: 1px solid var(--border-default);
+        background: linear-gradient(180deg, rgba(8, 15, 28, 0.98), rgba(11, 18, 32, 0.96));
+        box-shadow: var(--shadow-xl);
+      }
+
+      .dashboard-toast {
+        position: fixed;
+        right: var(--space-5);
+        bottom: var(--space-5);
+        z-index: var(--z-toast);
+        width: min(100% - 2rem, 24rem);
+        padding: var(--space-4);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--border-default);
+        background: linear-gradient(180deg, rgba(8, 15, 28, 0.96), rgba(11, 18, 32, 0.94));
+        box-shadow: var(--shadow-xl);
+      }
+
+      .dashboard-toast[data-tone="success"] {
+        border-color: rgba(16, 185, 129, 0.22);
+      }
+
+      .dashboard-toast[data-tone="warning"] {
+        border-color: rgba(245, 158, 11, 0.22);
+      }
+
+      .dashboard-toast[data-tone="danger"] {
+        border-color: rgba(239, 68, 68, 0.22);
+      }
+
+      .dashboard-toast[data-tone="info"] {
+        border-color: rgba(56, 189, 248, 0.22);
+      }
+
+      .dashboard-toast__row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--space-3);
+      }
+
+      .dashboard-toast__body {
+        display: grid;
+        gap: var(--space-1);
+        min-width: 0;
+      }
+
+      .dashboard-root {
+        min-height: 20rem;
+      }
+
+      @media (max-width: 1023px) {
+        .dashboard-page__shell {
+          padding-block: var(--space-4) var(--space-8);
+        }
+
+        .dashboard-topbar__surface {
+          padding: var(--space-4);
+        }
+
+        .dashboard-topbar__row {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .dashboard-toolbar {
+          justify-content: flex-start;
+        }
+      }
+
+      @media (max-width: 767px) {
+        .dashboard-brand {
+          align-items: flex-start;
+        }
+
+        .dashboard-brand__mark {
+          width: 3rem;
+          height: 3rem;
+        }
+
+        .dashboard-meta {
+          gap: var(--space-2);
+        }
+
+        .dashboard-meta__item {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .dashboard-toast {
+          right: 1rem;
+          left: 1rem;
+          bottom: 1rem;
+          width: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-root dashboard-page">
+      <div class="dashboard-page__shell">
+        <header class="dashboard-topbar" aria-label="Cabecalho do dashboard externo">
+          <div class="dashboard-topbar__surface">
+            <div class="dashboard-topbar__row">
+              <div>
+                <a class="dashboard-brand" href="./index.html" aria-label="Voltar para a entrada do Esquilo Invest">
+                  <span class="dashboard-brand__mark" aria-hidden="true">EI</span>
+                  <span class="dashboard-brand__copy">
+                    <span class="type-brand">Esquilo Invest</span>
+                    <span class="type-body-sm u-text-tertiary">Dashboard operacional externo</span>
+                  </span>
+                </a>
+
+                <div class="dashboard-meta">
+                  <div class="dashboard-meta__item">
+                    <span class="type-label">Titulo</span>
+                    <strong class="type-body-strong" data-role="page-title">Esquilo Invest</strong>
+                  </div>
+                  <div class="dashboard-meta__item">
+                    <span class="type-label">Fonte</span>
+                    <strong class="type-body-strong" data-role="data-source">Aguardando backend</strong>
+                  </div>
+                  <div class="dashboard-meta__item">
+                    <span class="type-label">Atualizado em</span>
+                    <strong class="type-body-strong" data-role="updated-at">Aguardando leitura operacional</strong>
+                  </div>
+                  <div class="dashboard-meta__item">
+                    <span class="type-label">Versao</span>
+                    <strong class="type-body-strong" data-role="app-version">Cloudflare front</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="dashboard-toolbar" aria-label="Acoes globais do dashboard">
+                <button class="button-icon" type="button" data-action="toggle-ghost-mode" aria-label="Ativar ou desativar ghost mode" aria-pressed="false">
+                  <span aria-hidden="true">◐</span>
+                </button>
+                <button class="button button--secondary button--sm" type="button" data-action="refresh-dashboard">Atualizar carteira</button>
+                <button class="button button--ghost button--sm" type="button" data-action="refresh-actions">Atualizar acoes</button>
+                <button class="button button--ia button--sm" type="button" data-action="refresh-ai">Esquilo IA</button>
+              </div>
+            </div>
+
+            <div class="dashboard-meta" style="padding-top: var(--space-3);">
+              <div class="dashboard-meta__item" style="max-width: 44rem; align-items: flex-start;">
+                <span class="type-label">Resumo</span>
+                <span class="type-body-sm" data-role="page-subtitle">Clareza sobre o que voce tem, se faz sentido e o que vale revisar agora.</span>
+              </div>
+              <div class="dashboard-meta__item">
+                <span class="dashboard-runtime">
+                  <span class="dashboard-runtime__dot" aria-hidden="true"></span>
+                  <span class="type-body-sm">Front estatico pronto para Cloudflare Pages</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-status-stack" aria-live="polite">
+            <section class="dashboard-banner dashboard-banner--warning" data-role="global-warning" hidden></section>
+            <section class="dashboard-banner dashboard-banner--danger" data-role="global-error" hidden></section>
+          </div>
+        </header>
+
+        <main class="dashboard-root" data-app-root></main>
+      </div>
+
+      <div class="overlay" data-role="modal-overlay" aria-hidden="true">
+        <div class="modal dashboard-modal" role="dialog" aria-modal="true" aria-labelledby="dashboard-modal-title">
+          <div class="modal__shell">
+            <header class="modal__header">
+              <div class="panel__header">
+                <div class="panel__header-main">
+                  <span class="type-kicker">Detalhe</span>
+                  <h2 class="type-heading-3" id="dashboard-modal-title" data-role="modal-title"></h2>
+                </div>
+                <div class="panel__header-actions">
+                  <button class="button-icon" type="button" data-action="modal-close" aria-label="Fechar modal">
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+              </div>
+            </header>
+
+            <div class="modal__body" data-role="modal-body"></div>
+
+            <footer class="modal__footer">
+              <div class="popup-card__footer">
+                <button class="button button--secondary button--sm" type="button" data-action="modal-close">Fechar</button>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+
+      <aside class="dashboard-toast" data-role="toast" data-tone="info" hidden aria-live="assertive">
+        <div class="dashboard-toast__row">
+          <div class="dashboard-toast__body">
+            <strong class="type-body-strong" data-role="toast-title">Esquilo</strong>
+            <span class="type-body-sm" data-role="toast-message"></span>
+          </div>
+          <button class="button-icon" type="button" data-action="toast-close" aria-label="Fechar aviso">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <script type="module" src="./scripts/app.js"></script>
+  </body>
+</html>

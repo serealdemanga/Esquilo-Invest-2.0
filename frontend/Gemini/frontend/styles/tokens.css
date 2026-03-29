@@ -1,0 +1,92 @@
+/* ESQUILO INVEST - DESIGN TOKENS
+  Baseado no Rebranding e Pitch MVP.
+  Aqui a gente define o "DNA visual" do projeto.
+*/
+
+:root {
+  /* ==========================================
+     PALETA DE CORES (Esquilo Rebranding)
+     ========================================== */
+  
+  /* Cores Principais - O laranja marcante e o dark sofisticado */
+  --color-primary: #FF7A00; /* Laranja Esquilo - Chamadas para ação, destaques */
+  --color-primary-hover: #E06B00;
+  --color-primary-light: rgba(255, 122, 0, 0.1);
+  
+  --color-background-dark: #0D1117; /* Fundo principal - estilo tech/dark mode */
+  --color-background-card: #161B22; /* Fundo de painéis e cards */
+  --color-background-elevated: #21262D; /* Fundo para modais, dropdowns */
+  
+  /* Textos */
+  --color-text-main: #E6EDF3; /* Texto principal - alto contraste */
+  --color-text-muted: #8B949E; /* Texto secundário - legendas, descrições */
+  --color-text-inverse: #000000; /* Texto sobre o laranja principal */
+  
+  /* Feedback e Status (Financeiro exige isso claro) */
+  --color-success: #238636; /* Verde - Alta de ativos, lucros */
+  --color-success-bg: rgba(35, 134, 54, 0.1);
+  --color-danger: #DA3633; /* Vermelho - Baixa de ativos, prejuízos */
+  --color-danger-bg: rgba(218, 54, 51, 0.1);
+  --color-warning: #D29922; /* Alertas */
+  --color-info: #2F81F7; /* Informações neutras */
+
+  /* Bordas e Divisores */
+  --color-border: #30363D;
+  --color-border-hover: #8B949E;
+
+  /* ==========================================
+     TIPOGRAFIA
+     ========================================== */
+  /* Priorizando fontes de sistema modernas e limpas (sans-serif) */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace; /* Para números e dados financeiros */
+
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-base: 1rem;    /* 16px */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.25rem;   /* 20px */
+  --font-size-2xl: 1.5rem;   /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem;  /* 36px */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ==========================================
+     ESPAÇAMENTO E GRID (Base 4/8px)
+     ========================================== */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+
+  /* ==========================================
+     RAIOS DE BORDA (Border Radius)
+     ========================================== */
+  --radius-sm: 4px;
+  --radius-md: 8px; /* Padrão para cards e botões */
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ==========================================
+     SOMBRAS E PROFUNDIDADE (Dark mode friendly)
+     ========================================== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  
+  /* ==========================================
+     TRANSIÇÕES
+     ========================================== */
+  --transition-fast: 150ms ease;
+  --transition-default: 250ms ease;
+}

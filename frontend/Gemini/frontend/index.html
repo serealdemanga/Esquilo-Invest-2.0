@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esquilo Invest - Login</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+
+  <style>
+    /* Estilos específicos só pra tela de login, não precisa poluir o global */
+    .login-container {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-background-dark);
+      background-image: radial-gradient(circle at top right, rgba(255, 122, 0, 0.05), transparent 40%);
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      padding: var(--space-8);
+      text-align: center;
+    }
+
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto var(--space-6);
+      border-radius: var(--radius-md);
+    }
+
+    .form-group {
+      margin-bottom: var(--space-4);
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: var(--space-2);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: var(--space-3);
+      background-color: var(--color-background-dark);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-main);
+      transition: border-color var(--transition-fast);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: var(--space-3);
+      font-size: var(--font-size-base);
+      margin-top: var(--space-4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="card login-box">
+      <img src="../assets/icons/esquilo-logo-source.png" alt="Esquilo Invest Logo" class="login-logo" onerror="this.src='https://placehold.co/64x64/FF7A00/000000?text=E'">
+      
+      <h2 style="margin-bottom: var(--space-2);">Bem-vindo de volta</h2>
+      <p class="text-muted" style="margin-bottom: var(--space-6);">Acesse sua carteira de investimentos.</p>
+
+      <!-- Aqui, pra simular a navegação já que estamos quebrando do GAS -->
+      <form id="loginForm" onsubmit="event.preventDefault(); window.location.href='dashboard.html';">
+        
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail</label>
+          <input type="email" id="email" class="form-input" placeholder="exemplo@email.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="senha">Senha</label>
+          <input type="password" id="senha" class="form-input" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-login">
+          <i data-lucide="log-in"></i> Entrar no Painel
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
