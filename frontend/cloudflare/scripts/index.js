@@ -1,4 +1,4 @@
-const DASHBOARD_URL = './dashboard.final.html';
+const DASHBOARD_URL = './dashboard.html';
 const authModal = document.getElementById('authModal');
 const friendlyModal = document.getElementById('friendlyModal');
 const authModeLabel = document.getElementById('authModeLabel');
