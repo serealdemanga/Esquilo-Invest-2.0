@@ -3,384 +3,277 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#05070a" />
+    <meta name="theme-color" content="#f7eee9" />
     <meta
       name="description"
-      content="Esquilo Invest organiza, traduz e orienta sua vida de investimentos em linguagem normal."
+      content="Esquilo Invest organiza, traduz e orienta sua vida financeira com uma visão clara, humana e elegante."
     />
-    <title>Esquilo Invest | Clareza para sua carteira</title>
+    <title>Esquilo Invest | O tradutor da sua vida financeira</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
       rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
 
     <link rel="stylesheet" href="./styles/tokens.css" />
     <link rel="stylesheet" href="./styles/base.css" />
-    <link rel="stylesheet" href="./styles/layout.css" />
-    <link rel="stylesheet" href="./styles/components.css" />
-
-    <style>
-      .landing-shell {
-        width: min(100% - (var(--container-padding-inline) * 2), var(--container-width));
-        margin-inline: auto;
-        padding-block: var(--space-8) var(--space-12);
-        display: grid;
-        gap: var(--space-8);
-      }
-
-      .landing-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--space-4);
-        padding-bottom: var(--space-4);
-        border-bottom: 1px solid var(--border-subtle);
-      }
-
-      .landing-brand {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-4);
-      }
-
-      .landing-brand__mark {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 3.5rem;
-        height: 3.5rem;
-        border: 1px solid var(--border-brand);
-        border-radius: var(--radius-xl);
-        background: linear-gradient(145deg, rgba(245, 158, 11, 0.16), rgba(15, 23, 42, 0.92));
-        box-shadow: var(--shadow-brand);
-        color: var(--brand-primary-soft);
-        font-family: var(--font-family-display);
-        font-size: 1.2rem;
-        font-weight: var(--font-weight-bold);
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-      }
-
-      .landing-nav {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-      }
-
-      .landing-nav a {
-        color: var(--text-secondary);
-      }
-
-      .landing-nav a:hover {
-        color: var(--text-primary);
-      }
-
-      .landing-hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
-        gap: var(--space-6);
-        align-items: stretch;
-      }
-
-      .landing-hero__main,
-      .landing-hero__aside {
-        min-width: 0;
-      }
-
-      .landing-hero__main {
-        display: grid;
-        gap: var(--space-5);
-        padding: var(--space-8);
-      }
-
-      .landing-hero__copy {
-        display: grid;
-        gap: var(--space-4);
-        max-width: 44rem;
-      }
-
-      .landing-hero__eyebrow {
-        color: var(--accent-pension-soft);
-      }
-
-      .landing-hero__actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--space-3);
-      }
-
-      .landing-hero__stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: var(--space-3);
-      }
-
-      .landing-stat {
-        padding: var(--space-4);
-        border: 1px solid var(--border-subtle);
-        background: rgba(255, 255, 255, 0.04);
-      }
-
-      .landing-hero__aside {
-        display: grid;
-        gap: var(--space-5);
-      }
-
-      .landing-proof,
-      .landing-flow {
-        padding: var(--space-5);
-      }
-
-      .landing-feature-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: var(--space-5);
-      }
-
-      .landing-feature {
-        padding: var(--space-5);
-      }
-
-      .landing-feature__icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.5rem;
-        height: 2.5rem;
-        border: 1px solid var(--border-default);
-        border-radius: var(--radius-sm);
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--brand-primary-soft);
-        margin-bottom: var(--space-4);
-      }
-
-      .landing-checklist {
-        display: grid;
-        gap: var(--space-3);
-      }
-
-      .landing-checklist__item {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--space-3);
-        padding: var(--space-3) 0;
-        border-top: 1px solid var(--border-subtle);
-      }
-
-      .landing-checklist__item:first-child {
-        border-top: 0;
-        padding-top: 0;
-      }
-
-      .landing-checklist__dot {
-        width: 0.75rem;
-        height: 0.75rem;
-        border-radius: var(--radius-pill);
-        background: var(--brand-primary);
-        margin-top: 0.35rem;
-        flex-shrink: 0;
-      }
-
-      .landing-footer {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--space-4);
-        padding-top: var(--space-4);
-        border-top: 1px solid var(--border-subtle);
-      }
-
-      .landing-footer__links {
-        display: inline-flex;
-        flex-wrap: wrap;
-        gap: var(--space-3);
-      }
-
-      @media (max-width: 1279px) {
-        .landing-hero {
-          grid-template-columns: minmax(0, 1fr);
-        }
-      }
-
-      @media (max-width: 1023px) {
-        .landing-feature-grid,
-        .landing-hero__stats {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
-      @media (max-width: 767px) {
-        .landing-shell {
-          padding-block: var(--space-6) var(--space-10);
-          gap: var(--space-6);
-        }
-
-        .landing-header,
-        .landing-footer {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .landing-hero__main,
-        .landing-proof,
-        .landing-flow,
-        .landing-feature {
-          padding: var(--space-4);
-        }
-
-        .landing-feature-grid,
-        .landing-hero__stats {
-          grid-template-columns: 1fr;
-        }
-
-        .landing-hero__actions .button {
-          width: 100%;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="./styles/dashboard.refined.css" />
+    <link rel="stylesheet" href="./styles/index.css" />
   </head>
   <body>
-    <div class="app-root">
-      <main class="landing-shell" aria-label="Entrada do Esquilo Invest">
+    <div class="scene">
+      <div class="scene__blur scene__blur--left"></div>
+      <div class="scene__blur scene__blur--right"></div>
+      <div class="scene__blur scene__blur--bottom"></div>
+      <img
+        class="scene__coin"
+        src="https://raw.githubusercontent.com/serealdemanga/esquilo-invest/refs/heads/main/icons/esquilo.png"
+        alt=""
+        aria-hidden="true"
+      />
+      <div class="scene__shape scene__shape--top" aria-hidden="true"></div>
+      <div class="scene__shape scene__shape--mid" aria-hidden="true"></div>
+      <div class="scene__shape scene__shape--bottom" aria-hidden="true"></div>
+
+      <main class="landing-shell">
         <header class="landing-header">
-          <a class="landing-brand" href="./index.html" aria-label="Voltar para a entrada do Esquilo Invest">
-            <span class="landing-brand__mark" aria-hidden="true">EI</span>
-            <span>
-              <span class="type-brand">Esquilo Invest</span>
-              <span class="type-body-sm u-text-tertiary">O tradutor da sua vida financeira aplicada</span>
-            </span>
+          <a class="landing-brand" href="./index.html" aria-label="Esquilo Invest">
+            <img
+              class="landing-brand__logo"
+              src="https://raw.githubusercontent.com/serealdemanga/esquilo-invest/refs/heads/main/icons/esquilo.png"
+              alt="Logo do Esquilo Invest"
+            />
+            <div class="landing-brand__copy">
+              <strong>Esquilo Invest</strong>
+              <span>Sua carteira, sem enrolação</span>
+            </div>
           </a>
 
-          <nav class="landing-nav" aria-label="Navegação inicial">
-            <a class="button button--ghost button--sm" href="#como-funciona">Como funciona</a>
-            <a class="button button--ghost button--sm" href="#pilares">Pilares</a>
-            <a class="button button--secondary button--sm" href="./dashboard.html">Abrir dashboard</a>
+          <nav class="landing-nav" aria-label="Navegação principal">
+            <a class="landing-nav__link" href="#dor">O problema</a>
+            <a class="landing-nav__link" href="#solucao">A solução</a>
+            <a class="landing-nav__link" href="#clareza">Clareza</a>
+            <button class="button button--secondary" type="button" data-open-auth="login">Entrar</button>
           </nav>
         </header>
 
-        <section class="landing-hero">
-          <article class="landing-hero__main card card--panel card--emphasis">
-            <div class="landing-hero__copy">
-              <span class="type-kicker landing-hero__eyebrow">Desktop Web • Cloudflare-ready</span>
-              <h1 class="type-heading-1">Um lugar unico para entender o que voce tem, quanto rendeu e o que vale revisar agora.</h1>
-              <p class="type-body">
-                O Esquilo nao quer parecer home broker, banco ou painel tecnico sem alma.
-                Ele consolida a carteira, traduz o que importa em linguagem normal e aponta a proxima jogada sem empurrar ruído.
-              </p>
-            </div>
-
-            <div class="landing-hero__actions">
-              <a class="button button--primary button--lg" href="./dashboard.html">Entrar no dashboard</a>
-              <a class="button button--secondary button--lg" href="#como-funciona">Ver estrutura da experiencia</a>
-            </div>
-
-            <div class="landing-hero__stats">
-              <article class="landing-stat">
-                <span class="type-label">Consolidar</span>
-                <strong class="type-value-md">Carteira em um lugar</strong>
-                <p class="type-body-sm">Acoes, fundos e previdencia com leitura fechada e coerente.</p>
-              </article>
-              <article class="landing-stat">
-                <span class="type-label">Traduzir</span>
-                <strong class="type-value-md">Sem economes vazio</strong>
-                <p class="type-body-sm">Dado primeiro, traducao logo depois, sem teatro visual.</p>
-              </article>
-              <article class="landing-stat">
-                <span class="type-label">Orientar</span>
-                <strong class="type-value-md">Uma proxima acao clara</strong>
-                <p class="type-body-sm">Prioridade realista baseada na propria carteira.</p>
-              </article>
-            </div>
-          </article>
-
-          <aside class="landing-hero__aside">
-            <article class="landing-proof card card--ia">
-              <span class="type-kicker">Posicionamento</span>
-              <h2 class="type-heading-3">Nao e mais um app de investimento.</h2>
-              <p class="type-body">
-                A proposta aqui e outra: organizar o que esta espalhado, traduzir se faz sentido e orientar a revisao certa em vez de empurrar produto.
-              </p>
-              <div class="u-stack-sm">
-                <span class="badge badge--brand">Clareza acima de decoracao</span>
-                <span class="badge badge--info">Desktop primeiro</span>
-                <span class="badge badge--success">Backend preservado</span>
-              </div>
-            </article>
-
-            <article class="landing-flow card card--panel" id="como-funciona">
-              <span class="type-kicker">Fluxo principal</span>
-              <h2 class="type-heading-3">Da leitura ao proximo movimento</h2>
-              <div class="landing-checklist">
-                <div class="landing-checklist__item">
-                  <span class="landing-checklist__dot" aria-hidden="true"></span>
-                  <div>
-                    <strong class="type-body-strong">Consolidar</strong>
-                    <p class="type-body-sm">Mostrar patrimonio total, macroclasses e blocos principais sem poluir a tela.</p>
-                  </div>
+        <div class="landing-main">
+          <section class="landing-panel">
+            <div class="hero-grid">
+              <div class="hero-copy">
+                <span class="eyebrow">Clareza primeiro</span>
+                <h1>Sabe quanto tem investido <span class="text-highlight">no total, de verdade?</span></h1>
+                <p>
+                  Um lugar único para organizar o que você tem, entender se a sua carteira faz sentido e saber com mais clareza qual é a sua próxima jogada. Sem economês e sem tela bagunçada.
+                </p>
+                <div class="hero-actions">
+                  <button class="button button--primary" type="button" data-open-auth="signup">
+                    Começar a organizar agora <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                  <button class="button button--secondary" type="button" data-open-auth="signup">
+                    Criar conta gratuita
+                  </button>
                 </div>
-                <div class="landing-checklist__item">
-                  <span class="landing-checklist__dot" aria-hidden="true"></span>
-                  <div>
-                    <strong class="type-body-strong">Traduzir</strong>
-                    <p class="type-body-sm">Explicar risco, concentracao e coerencia da carteira em linguagem normal.</p>
-                  </div>
-                </div>
-                <div class="landing-checklist__item">
-                  <span class="landing-checklist__dot" aria-hidden="true"></span>
-                  <div>
-                    <strong class="type-body-strong">Orientar</strong>
-                    <p class="type-body-sm">Sair da analise com uma missao principal, nao com um monte de ruido tecnico.</p>
-                  </div>
+                <div class="hero-badges">
+                  <span class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Privado e seguro</span>
+                  <span class="hero-badge"><i class="fa-solid fa-file-csv"></i> Importação por extrato</span>
+                  <span class="hero-badge"><i class="fa-solid fa-language"></i> Tradução com IA</span>
                 </div>
               </div>
-            </article>
-          </aside>
-        </section>
 
-        <section id="pilares" class="landing-feature-grid">
-          <article class="landing-feature card card--panel">
-            <span class="landing-feature__icon" aria-hidden="true">◌</span>
-            <span class="type-kicker">Pilar 1</span>
-            <h2 class="type-heading-3">Consolidar</h2>
-            <p class="type-body">
-              Juntar o que esta espalhado em diferentes plataformas e transformar isso em uma leitura unica, limpa e utilizavel.
-            </p>
-          </article>
+              <aside class="hero-aside">
+                <article class="hero-card hero-card--highlight">
+                  <div class="hero-card__icon"><i class="fa-solid fa-compass"></i></div>
+                  <h2>O Esquilo não é uma corretora. É o seu tradutor.</h2>
+                  <p>
+                    A proposta aqui não é empurrar produto. É consolidar, traduzir e orientar a sua vida financeira com mais contexto e menos ruído.
+                  </p>
+                </article>
 
-          <article class="landing-feature card card--panel">
-            <span class="landing-feature__icon" aria-hidden="true">✦</span>
-            <span class="type-kicker">Pilar 2</span>
-            <h2 class="type-heading-3">Traduzir</h2>
-            <p class="type-body">
-              Pegar score, distribuicao, performance e alertas e dizer o que isso realmente significa na pratica.
-            </p>
-          </article>
+                <article class="hero-card">
+                  <span class="eyebrow">Como isso aparece</span>
+                  <div class="hero-card__list">
+                    <div class="hero-card__list-item">
+                      <strong>Você entende o todo primeiro</strong>
+                      <span>Patrimônio, resultado e leitura principal logo de cara.</span>
+                    </div>
+                    <div class="hero-card__list-item">
+                      <strong>Depois vê o peso da carteira</strong>
+                      <span>Onde está a concentração e o que precisa de atenção.</span>
+                    </div>
+                    <div class="hero-card__list-item">
+                      <strong>Por fim, sai com rumo</strong>
+                      <span>O que manter, o que revisar e o que vale acompanhar.</span>
+                    </div>
+                  </div>
+                </article>
+              </aside>
+            </div>
+          </section>
 
-          <article class="landing-feature card card--panel">
-            <span class="landing-feature__icon" aria-hidden="true">⚑</span>
-            <span class="type-kicker">Pilar 3</span>
-            <h2 class="type-heading-3">Orientar</h2>
-            <p class="type-body">
-              Priorizar uma proxima revisao clara, sem fingir onisciencia e sem sugerir coisa inviavel para o contexto real.
-            </p>
-          </article>
-        </section>
+          <section class="landing-panel" id="dor">
+            <div class="section-grid">
+              <article class="section-card">
+                <span class="eyebrow">A dor real</span>
+                <h2>O problema não é investir. É a <span class="text-highlight">desorientação.</span></h2>
+                <p>
+                  As plataformas atuais mostram saldo, jogam gráfico na tela e fingem que isso basta. O que normalmente falta é uma visão consolidada que ajude você a entender o que de fato está acontecendo com o seu dinheiro.
+                </p>
+                <div class="pain-list">
+                  <div class="pain-list__item"><i class="fa-solid fa-xmark"></i><span>Dinheiro espalhado em corretoras, bancos e previdência, sem uma visão única.</span></div>
+                  <div class="pain-list__item"><i class="fa-solid fa-xmark"></i><span>Dificuldade de entender a rentabilidade real consolidada da carteira.</span></div>
+                  <div class="pain-list__item"><i class="fa-solid fa-xmark"></i><span>Medo de estar investindo mal e só descobrir tarde demais.</span></div>
+                  <div class="pain-list__item"><i class="fa-solid fa-xmark"></i><span>Recomendações genéricas que ignoram sua realidade e seu momento.</span></div>
+                </div>
+              </article>
 
-        <footer class="landing-footer">
-          <div>
-            <strong class="type-body-strong">Front externo pronto para Cloudflare Pages</strong>
-            <p class="type-body-sm">Entrada institucional e dashboard operacional separados, mas coerentes na mesma linguagem.</p>
-          </div>
+              <aside class="section-card pain-visual">
+                <div class="pain-visual__mock">
+                  <div class="pain-visual__main">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span><i class="fa-solid fa-question"></i></span>
+                  </div>
+                  <h3>Sua carteira hoje pode estar parecendo uma caixa preta.</h3>
+                  <p>
+                    Você sabe que tem dinheiro ali, mas não enxerga com clareza o que está funcionando, o que está pesado demais e o que precisa ser revisto.
+                  </p>
+                </div>
+              </aside>
+            </div>
+          </section>
 
-          <div class="landing-footer__links">
-            <a class="button button--ghost button--sm" href="./dashboard.html">Ir para o dashboard</a>
-          </div>
-        </footer>
+          <section class="landing-panel" id="solucao">
+            <div class="section-grid section-grid--reverse">
+              <aside class="section-card">
+                <span class="eyebrow">O que muda</span>
+                <h2>O Esquilo organiza a confusão e fala em português normal.</h2>
+                <p>
+                  Em vez de despejar dado cru, ele entrega uma leitura prática. Você entende quanto tem, onde está o peso da carteira e qual é o próximo passo mais sensato agora.
+                </p>
+              </aside>
+              <article class="section-card">
+                <span class="eyebrow">Os 3 pilares</span>
+                <h2>Consolidar. Traduzir. Orientar.</h2>
+                <p>
+                  Esse é o núcleo da proposta. Menos tela que impressiona por volume. Mais tela que ajuda de verdade.
+                </p>
+              </article>
+            </div>
+
+            <div class="pillars-grid">
+              <article class="pillar-card">
+                <div class="pillar-card__icon"><i class="fa-solid fa-box-open"></i></div>
+                <h3>1. Consolidar</h3>
+                <p>Reunir ações, fundos e previdência em um lugar só para você finalmente enxergar o total sem abrir várias plataformas ao mesmo tempo.</p>
+              </article>
+              <article class="pillar-card">
+                <div class="pillar-card__icon"><i class="fa-solid fa-language"></i></div>
+                <h3>2. Traduzir</h3>
+                <p>Trocar o texto duro e técnico por uma leitura clara sobre concentração, risco, desempenho e equilíbrio da carteira.</p>
+              </article>
+              <article class="pillar-card">
+                <div class="pillar-card__icon"><i class="fa-solid fa-compass"></i></div>
+                <h3>3. Orientar</h3>
+                <p>Em vez de empilhar recomendações genéricas, entregar uma direção mais objetiva sobre o que merece sua atenção agora.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="landing-panel" id="clareza">
+            <div class="trust-wrap">
+              <article class="trust-card">
+                <span class="eyebrow landing-eyebrow-dark">Clareza</span>
+                <h2>Nós não vendemos produto. Nós entregamos entendimento.</h2>
+                <p>
+                  O foco do Esquilo é te ajudar a compreender melhor a sua própria vida financeira. A interface foi pensada para respirar, fazer sentido e deixar o que importa mais visível do que o ruído.
+                </p>
+                <div class="trust-card__actions">
+                  <button class="button button--dark" type="button" data-open-auth="signup">
+                    Criar minha conta gratuita <i class="fa-solid fa-bolt"></i>
+                  </button>
+                  <button class="button button--light" type="button" data-open-auth="login">
+                    Entrar na minha conta
+                  </button>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
       </main>
     </div>
+
+    <aside class="auth-modal" id="authModal" aria-hidden="true">
+      <div class="auth-modal__card" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+        <div class="auth-modal__header">
+          <div>
+            <span class="eyebrow" id="authModeLabel">Acesso</span>
+            <h2 class="auth-modal__title" id="authModalTitle">Entrar no Esquilo</h2>
+            <p class="auth-modal__text" id="authModalText">
+              Por enquanto não vamos validar nada. Preencha do jeito que quiser e siga para o dashboard.
+            </p>
+          </div>
+          <button class="auth-modal__close" type="button" data-auth-close aria-label="Fechar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="auth-modal__tabs">
+          <button class="auth-tab is-active" type="button" data-auth-mode="login">Entrar</button>
+          <button class="auth-tab" type="button" data-auth-mode="signup">Criar conta</button>
+        </div>
+
+        <form class="auth-form" id="authForm">
+          <div class="field">
+            <label class="field__label" for="authUser">CPF ou e-mail</label>
+            <input class="field__input" type="text" id="authUser" placeholder="000.000.000-00 ou email@exemplo.com" autocomplete="off" />
+            <div class="email-suggestions" id="emailSuggestions"></div>
+          </div>
+
+          <div class="password-box">
+            <label class="field__label">Senha de 6 dígitos</label>
+            <div class="password-display" id="passwordDisplay" aria-label="Senha digitada">
+              <span class="password-dot"></span>
+              <span class="password-dot"></span>
+              <span class="password-dot"></span>
+              <span class="password-dot"></span>
+              <span class="password-dot"></span>
+              <span class="password-dot"></span>
+            </div>
+            <div class="keyboard-grid" id="virtualKeyboard"></div>
+          </div>
+
+          <button class="button button--primary" type="submit" id="authSubmitButton">
+            Entrar no Esquilo <i class="fa-solid fa-lock-open"></i>
+          </button>
+
+          <div class="auth-modal__footer">
+            <button class="auth-link" type="button" data-auth-help="senha">Esqueci minha senha</button>
+            <button class="auth-link" type="button" data-auth-mode="signup">Ainda não tem conta? Criar</button>
+          </div>
+        </form>
+      </div>
+    </aside>
+
+    <aside class="friendly-modal" id="friendlyModal" hidden>
+      <div class="friendly-modal__card" role="dialog" aria-modal="true" aria-labelledby="friendlyModalTitle">
+        <span class="friendly-modal__eyebrow">Esquilo</span>
+        <h2 class="friendly-modal__title" id="friendlyModalTitle">Essa parte ainda vai ser ligada</h2>
+        <p class="friendly-modal__message" id="friendlyModalMessage">
+          A estrutura está pronta, mas essa etapa ainda depende do backend final.
+        </p>
+        <div class="friendly-modal__actions">
+          <button class="button button--secondary" type="button" data-friendly-close>Fechar</button>
+          <button class="button button--primary" type="button" data-friendly-open-auth>Voltar para o acesso</button>
+        </div>
+      </div>
+    </aside>
+
+    <script src="./scripts/index.js"></script>
   </body>
 </html>

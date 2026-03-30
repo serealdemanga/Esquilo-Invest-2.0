@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#efe2ff" />
+    <meta name="theme-color" content="#f7eee9" />
     <meta
       name="description"
       content="Esquilo Invest reúne sua carteira em uma visão mais clara, leve e fácil de entender."
@@ -28,7 +28,7 @@
 
     <link rel="stylesheet" href="./styles/tokens.css" />
     <link rel="stylesheet" href="./styles/base.css" />
-    <link rel="stylesheet" href="./styles/dashboard.css" />
+    <link rel="stylesheet" href="./styles/dashboard.refined.css" />
   </head>
   <body>
     <div class="scene" data-scene>
@@ -146,7 +146,7 @@
                   <span>Atualizado</span>
                   <strong data-role="updated-at">Agora há pouco</strong>
                 </div>
-                <button class="icon-button" type="button" data-action="refresh-dashboard" aria-label="Atualizar">
+                <button class="icon-button" type="button" data-action="refresh-dashboard" aria-label="Atualizar carteira">
                   ↻
                 </button>
                 <button class="button button--primary" type="button" data-action="request-ai-analysis">
@@ -386,6 +386,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="./scripts/app.js"></script>
+    <script type="module" src="./scripts/app.final.js"></script>
   </body>
 </html>

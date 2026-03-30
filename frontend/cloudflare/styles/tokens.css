@@ -1,296 +1,109 @@
 :root {
-  /*
-    Esquilo Invest Design Tokens
-    Base semântica para o front externo em Cloudflare Pages.
-    Objetivo: manter identidade forte, reduzir ruído visual e preparar
-    os próximos arquivos sem depender de valores soltos.
-  */
+  color-scheme: light;
 
-  color-scheme: dark;
+  --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  /* Brand */
-  --brand-primary: #f59e0b;
-  --brand-primary-strong: #d97706;
-  --brand-primary-soft: #fbbf24;
-  --brand-primary-ghost: rgba(245, 158, 11, 0.12);
-  --brand-primary-border: rgba(245, 158, 11, 0.22);
-  --brand-primary-glow: rgba(245, 158, 11, 0.28);
+  --color-white: #ffffff;
+  --color-black: #111217;
 
-  /* Product accents */
-  --accent-ia: #8b5cf6;
-  --accent-ia-soft: #c4b5fd;
-  --accent-ia-ghost: rgba(139, 92, 246, 0.12);
-  --accent-ia-border: rgba(139, 92, 246, 0.22);
+  --color-text-strong: #17181f;
+  --color-text-base: #45495a;
+  --color-text-soft: #8188a0;
+  --color-text-faint: #a7aec2;
+  --color-text-inverse: #ffffff;
 
-  --accent-actions: #34d399;
-  --accent-actions-soft: #86efac;
-  --accent-actions-ghost: rgba(52, 211, 153, 0.12);
-  --accent-actions-border: rgba(52, 211, 153, 0.22);
+  --color-surface-page-start: #f7eee9;
+  --color-surface-page-mid: #f4e9f8;
+  --color-surface-page-end: #ebe5ff;
 
-  --accent-funds: #a855f7;
-  --accent-funds-soft: #d8b4fe;
-  --accent-funds-ghost: rgba(168, 85, 247, 0.12);
-  --accent-funds-border: rgba(168, 85, 247, 0.22);
+  --color-surface-panel: rgba(255, 255, 255, 0.78);
+  --color-surface-panel-strong: rgba(255, 255, 255, 0.92);
+  --color-surface-card: rgba(255, 255, 255, 0.82);
+  --color-surface-card-soft: rgba(255, 255, 255, 0.62);
+  --color-surface-card-muted: rgba(248, 249, 255, 0.92);
+  --color-surface-pill: rgba(67, 136, 255, 0.12);
+  --color-surface-dark: rgba(23, 24, 31, 0.92);
 
-  --accent-pension: #3b82f6;
-  --accent-pension-soft: #93c5fd;
-  --accent-pension-ghost: rgba(59, 130, 246, 0.12);
-  --accent-pension-border: rgba(59, 130, 246, 0.22);
+  --color-line-soft: rgba(86, 98, 136, 0.12);
+  --color-line-mid: rgba(86, 98, 136, 0.2);
+  --color-line-strong: rgba(86, 98, 136, 0.28);
+  --color-line-white: rgba(255, 255, 255, 0.92);
 
-  /* Feedback */
-  --feedback-success: #10b981;
-  --feedback-success-soft: #6ee7b7;
-  --feedback-success-ghost: rgba(16, 185, 129, 0.12);
+  --color-brand-500: #4388ff;
+  --color-brand-600: #2f6ff0;
+  --color-brand-300: #8db7ff;
+  --color-brand-200: #cfe0ff;
+  --color-purple-500: #8a67f8;
+  --color-cyan-400: #66c7f4;
+  --color-green-500: #3bb979;
+  --color-yellow-500: #e5a13f;
+  --color-red-500: #e06e6e;
+  --color-pink-400: #ff8ed3;
 
-  --feedback-warning: #f59e0b;
-  --feedback-warning-soft: #fde68a;
-  --feedback-warning-ghost: rgba(245, 158, 11, 0.12);
+  --gradient-page: linear-gradient(135deg, var(--color-surface-page-start) 0%, var(--color-surface-page-mid) 45%, var(--color-surface-page-end) 100%);
+  --gradient-brand: linear-gradient(135deg, var(--color-brand-500) 0%, var(--color-brand-600) 100%);
+  --gradient-brand-soft: linear-gradient(135deg, rgba(67, 136, 255, 0.1), rgba(138, 103, 248, 0.08));
 
-  --feedback-danger: #ef4444;
-  --feedback-danger-soft: #fca5a5;
-  --feedback-danger-ghost: rgba(239, 68, 68, 0.12);
+  --shadow-scene: 0 30px 80px rgba(92, 78, 150, 0.12);
+  --shadow-panel: 0 18px 60px rgba(81, 74, 133, 0.14);
+  --shadow-card: 0 16px 40px rgba(118, 111, 176, 0.16);
+  --shadow-soft: 0 8px 22px rgba(89, 99, 151, 0.08);
+  --shadow-brand: 0 14px 28px rgba(47, 111, 240, 0.24);
 
-  --feedback-info: #38bdf8;
-  --feedback-info-soft: #7dd3fc;
-  --feedback-info-ghost: rgba(56, 189, 248, 0.12);
+  --blur-panel: blur(20px);
+  --blur-card: blur(18px);
 
-  /* Neutral palette */
-  --color-black: #05070a;
-  --color-slate-975: #05070a;
-  --color-slate-950: #020617;
-  --color-slate-925: #0b1220;
-  --color-slate-900: #0f172a;
-  --color-slate-850: #111827;
-  --color-slate-800: #1e293b;
-  --color-slate-700: #334155;
-  --color-slate-600: #475569;
-  --color-slate-500: #64748b;
-  --color-slate-400: #94a3b8;
-  --color-slate-300: #cbd5e1;
-  --color-slate-200: #e2e8f0;
-  --color-slate-100: #f1f5f9;
-  --color-white: #f8fafc;
-
-  /* Text */
-  --text-primary: var(--color-slate-100);
-  --text-secondary: var(--color-slate-300);
-  --text-tertiary: var(--color-slate-400);
-  --text-muted: var(--color-slate-500);
-  --text-inverse: var(--color-slate-950);
-  --text-brand: var(--brand-primary-soft);
-  --text-link: var(--brand-primary-soft);
-  --text-link-hover: #fcd34d;
-
-  /* Backgrounds */
-  --bg-app: var(--color-slate-975);
-  --bg-canvas: var(--color-slate-950);
-  --bg-elevated: var(--color-slate-925);
-  --bg-overlay: rgba(2, 6, 23, 0.82);
-  --bg-overlay-strong: rgba(2, 6, 23, 0.92);
-
-  /* Surfaces */
-  --surface-1: linear-gradient(180deg, rgba(11, 18, 32, 0.96), rgba(8, 15, 28, 0.92));
-  --surface-2: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(11, 18, 32, 0.9));
-  --surface-3: rgba(255, 255, 255, 0.03);
-  --surface-4: rgba(255, 255, 255, 0.05);
-  --surface-glass: rgba(15, 23, 42, 0.78);
-  --surface-glass-strong: rgba(15, 23, 42, 0.88);
-  --surface-highlight: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(15, 23, 42, 0.92));
-  --surface-danger: linear-gradient(180deg, rgba(127, 29, 29, 0.2), rgba(15, 23, 42, 0.94));
-  --surface-success: linear-gradient(180deg, rgba(6, 78, 59, 0.18), rgba(15, 23, 42, 0.94));
-  --surface-ia: linear-gradient(180deg, rgba(76, 29, 149, 0.18), rgba(15, 23, 42, 0.94));
-
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --border-brand: var(--brand-primary-border);
-  --border-danger: rgba(239, 68, 68, 0.22);
-  --border-success: rgba(16, 185, 129, 0.22);
-  --border-info: rgba(56, 189, 248, 0.22);
-  --border-ia: var(--accent-ia-border);
-
-  /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
-  --shadow-sm: 0 6px 16px rgba(2, 6, 23, 0.16);
-  --shadow-md: 0 14px 28px rgba(2, 6, 23, 0.2);
-  --shadow-lg: 0 22px 42px rgba(2, 6, 23, 0.24);
-  --shadow-xl: 0 28px 56px rgba(2, 6, 23, 0.3);
-  --shadow-brand: 0 18px 32px rgba(245, 158, 11, 0.12);
-  --shadow-ia: 0 20px 36px rgba(76, 29, 149, 0.18);
-  --shadow-focus: 0 0 0 4px rgba(245, 158, 11, 0.18);
-
-  /* Typography */
-  --font-family-display: "Orbitron", "Inter", "Segoe UI", sans-serif;
-  --font-family-body: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-
-  --font-size-2xs: 0.6875rem;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-md: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.375rem;
-  --font-size-5xl: 3rem;
-
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-
-  --line-height-tight: 1.1;
-  --line-height-snug: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.65;
-
-  --letter-spacing-tight: -0.03em;
-  --letter-spacing-normal: 0;
-  --letter-spacing-wide: 0.08em;
-  --letter-spacing-wider: 0.14em;
-  --letter-spacing-display: 0.18em;
-
-  /* Semantic type roles */
-  --type-brand-size: clamp(1.4rem, 1.2rem + 0.8vw, 2rem);
-  --type-kicker-size: 0.6875rem;
-  --type-heading-1-size: clamp(2.1rem, 1.7rem + 1.2vw, 3.1rem);
-  --type-heading-2-size: clamp(1.4rem, 1.2rem + 0.65vw, 1.9rem);
-  --type-heading-3-size: 1.125rem;
-  --type-body-size: 0.9375rem;
-  --type-body-sm-size: 0.8125rem;
-  --type-label-size: 0.75rem;
-  --type-value-xl-size: clamp(2rem, 1.65rem + 1vw, 2.9rem);
-  --type-value-lg-size: 1.65rem;
-  --type-value-md-size: 1rem;
-  --type-value-sm-size: 0.8125rem;
-
-  /* Spacing */
-  --space-0: 0;
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-7: 1.75rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-14: 3.5rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-
-  /* Radius */
-  --radius-none: 0;
-  --radius-xs: 0.25rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
+  --radius-2xs: 8px;
+  --radius-xs: 12px;
+  --radius-sm: 16px;
+  --radius-md: 18px;
+  --radius-lg: 22px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-3xl: 34px;
   --radius-pill: 999px;
 
-  /* Layout */
-  --container-width: 76rem;
-  --container-padding-inline: clamp(1rem, 0.8rem + 0.8vw, 2rem);
-  --header-height: 4.5rem;
-  --sidebar-width: 22rem;
-  --hero-min-height: 20rem;
-  --card-min-height: 14rem;
-  --table-row-height: 3.75rem;
-  --control-height-sm: 2rem;
-  --control-height-md: 2.5rem;
-  --control-height-lg: 3rem;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
 
-  /* Motion */
-  --duration-fast: 140ms;
-  --duration-base: 220ms;
-  --duration-slow: 320ms;
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --text-xs: 0.74rem;
+  --text-sm: 0.82rem;
+  --text-md: 0.92rem;
+  --text-base: 1rem;
+  --text-lg: 1.05rem;
+  --text-xl: 1.34rem;
+  --text-2xl: 1.8rem;
+  --text-3xl: 2.4rem;
+  --text-4xl: 3rem;
 
-  /* Blur */
-  --blur-sm: 8px;
-  --blur-md: 12px;
-  --blur-lg: 16px;
+  --leading-tight: 1.05;
+  --leading-snug: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
 
-  /* Z-index */
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  --sidebar-width: 248px;
+  --scene-max-width: 1360px;
+  --scene-padding: 40px;
+
+  --transition-fast: 180ms ease;
+  --transition-mid: 260ms ease;
+
   --z-base: 1;
-  --z-sticky: 20;
-  --z-dropdown: 40;
-  --z-overlay: 60;
-  --z-modal: 80;
-  --z-toast: 100;
-
-  /* Data visualization */
-  --chart-actions: var(--accent-actions);
-  --chart-funds: var(--accent-funds);
-  --chart-pension: var(--accent-pension);
-  --chart-warning: var(--feedback-warning);
-  --chart-grid: rgba(255, 255, 255, 0.08);
-  --chart-axis: rgba(148, 163, 184, 0.8);
-
-  /* Component semantics */
-  --panel-background: var(--surface-1);
-  --panel-background-emphasis: var(--surface-highlight);
-  --panel-border: var(--border-default);
-  --panel-border-emphasis: var(--border-brand);
-  --panel-shadow: var(--shadow-md);
-
-  --card-background: var(--surface-2);
-  --card-background-subtle: var(--surface-3);
-  --card-border: var(--border-default);
-  --card-shadow: var(--shadow-sm);
-
-  --input-background: rgba(15, 23, 42, 0.92);
-  --input-background-hover: rgba(15, 23, 42, 0.98);
-  --input-border: var(--border-default);
-  --input-border-focus: var(--border-brand);
-  --input-text: var(--text-primary);
-  --input-placeholder: var(--text-muted);
-
-  --button-primary-background: var(--brand-primary);
-  --button-primary-background-hover: var(--brand-primary-soft);
-  --button-primary-text: var(--text-inverse);
-  --button-primary-shadow: var(--shadow-brand);
-
-  --button-secondary-background: rgba(255, 255, 255, 0.05);
-  --button-secondary-background-hover: rgba(255, 255, 255, 0.08);
-  --button-secondary-text: var(--text-primary);
-  --button-secondary-border: var(--border-default);
-
-  --button-ghost-background: transparent;
-  --button-ghost-background-hover: rgba(255, 255, 255, 0.05);
-  --button-ghost-text: var(--text-secondary);
-
-  --badge-neutral-background: rgba(148, 163, 184, 0.12);
-  --badge-neutral-text: var(--text-secondary);
-  --badge-success-background: var(--feedback-success-ghost);
-  --badge-success-text: var(--feedback-success-soft);
-  --badge-warning-background: var(--feedback-warning-ghost);
-  --badge-warning-text: var(--feedback-warning-soft);
-  --badge-danger-background: var(--feedback-danger-ghost);
-  --badge-danger-text: var(--feedback-danger-soft);
-  --badge-info-background: var(--feedback-info-ghost);
-  --badge-info-text: var(--feedback-info-soft);
-
-  --focus-ring: 0 0 0 1px rgba(245, 158, 11, 0.36), var(--shadow-focus);
-
-  /* Backward-friendly aliases for incremental migration */
-  --primary: var(--brand-primary);
-  --bg-dark: var(--bg-app);
-  --card-bg: var(--surface-glass);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --duration-fast: 0ms;
-    --duration-base: 0ms;
-    --duration-slow: 0ms;
-    --blur-sm: 0px;
-    --blur-md: 0px;
-    --blur-lg: 0px;
-  }
+  --z-floating: 2;
+  --z-toast: 12;
 }
