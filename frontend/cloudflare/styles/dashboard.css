@@ -1,391 +1,197 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7eee9" />
-    <meta
-      name="description"
-      content="Esquilo Invest reúne sua carteira em uma visão mais clara, leve e fácil de entender."
-    />
+       /* =========================================================
+           ⬇️ COPIAR ISSO PARA: frontend/cloudflare/styles/dashboard.css ⬇️
+           ========================================================= */
+           
+        :root {
+            --bg-app: #F9FAFB;
+            --bg-surface: #FFFFFF;
+            --brand-orange: #FF7300;
+            --brand-orange-hover: #E66800;
+            --brand-dark: #0F172A;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-light: #E5E7EB;
+            --success: #10B981;
+            --danger: #EF4444;
+            --sidebar-width: 240px; /* Reduzido o tamanho padrão */
+            --sidebar-collapsed-width: 84px; /* Novo token pro menu recolhido */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-    <meta
-      name="esquilo-api-base-url"
-      content="https://script.google.com/macros/s/AKfycbya0mKpePyZV79S3ta0hJf0fhhwWfeUFwfopMOsZRSuqT7EF8LiTz6dV2suOuJNWve-/exec"
-    />
-    <meta name="esquilo-api-token" content="esquilo-invest-mobile-debug-2026" />
-    <meta name="esquilo-api-timeout-ms" content="20000" />
-    <meta name="esquilo-use-legacy-appsscript" content="false" />
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <title>Esquilo Invest | Sua carteira em uma leitura só</title>
+        body {
+            background-color: var(--bg-app); 
+            color: var(--text-main);
+            /* Fonte primária com fallbacks nativos para não ficar estranha */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex; min-height: 100vh; overflow-x: hidden;
+        }
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+        /* Fonte secundária para títulos */
+        h1, h2, h3, h4, h5, h6 { 
+            font-family: 'Poppins', 'Inter', -apple-system, sans-serif; 
+            color: var(--brand-dark); 
+            letter-spacing: -0.01em;
+        }
+        
+        a { text-decoration: none; color: inherit; }
 
-    <link rel="stylesheet" href="./styles/tokens.css" />
-    <link rel="stylesheet" href="./styles/base.css" />
-    <link rel="stylesheet" href="./styles/dashboard.refined.css" />
-  </head>
-  <body>
-    <div class="scene" data-scene>
-      <div class="scene__blur scene__blur--left"></div>
-      <div class="scene__blur scene__blur--right"></div>
-      <div class="scene__blur scene__blur--bottom"></div>
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            width: var(--sidebar-width); background: var(--bg-surface);
+            border-right: 1px solid var(--border-light);
+            display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 50;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden;
+        }
 
-      <img
-        class="scene__coin"
-        src="https://raw.githubusercontent.com/serealdemanga/esquilo-invest/refs/heads/main/icons/esquilo.png"
-        alt=""
-        aria-hidden="true"
-      />
-      <div class="scene__shape scene__shape--top" aria-hidden="true"></div>
-      <div class="scene__shape scene__shape--mid" aria-hidden="true"></div>
-      <div class="scene__shape scene__shape--bottom" aria-hidden="true"></div>
+        /* Classes do Menu Retrátil */
+        .sidebar.collapsed { width: var(--sidebar-collapsed-width); }
+        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 0; }
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .user-info { display: none; opacity: 0; }
+        .sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; }
+        .sidebar.collapsed .user-profile { justify-content: center; }
 
-      <aside class="floating-card floating-card--distribution" aria-hidden="true">
-        <div class="floating-card__header">
-          <span class="floating-card__eyebrow">Distribuição</span>
-          <span class="floating-card__ghost"></span>
-        </div>
-        <div class="mini-donut">
-          <div class="mini-donut__ring"></div>
-        </div>
-        <div class="mini-legend">
-          <span class="mini-legend__item"><i></i>Ações</span>
-          <span class="mini-legend__item"><i></i>Fundos</span>
-          <span class="mini-legend__item"><i></i>Previdência</span>
-        </div>
-      </aside>
+        .sidebar-header {
+            height: 72px; display: flex; align-items: center; padding: 0 24px;
+            border-bottom: 1px solid var(--border-light);
+            font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 18px; gap: 12px;
+            color: var(--brand-dark); white-space: nowrap;
+        }
+        .sidebar-header img { height: 28px; min-width: 28px; }
 
-      <aside class="floating-card floating-card--summary" aria-hidden="true">
-        <div class="floating-card__header">
-          <span class="floating-card__eyebrow">Resumo</span>
-          <span class="floating-card__ghost"></span>
-        </div>
-        <div class="mini-stat">
-          <strong>Score 80</strong>
-          <span>Carteira boa, mas com um ponto para revisar</span>
-        </div>
-        <div class="mini-line-chart">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </aside>
+        .nav-links { flex: 1; padding: 24px 16px; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: all 0.2s;
+            white-space: nowrap; overflow: hidden;
+        }
 
-      <main class="workspace">
-        <div class="workspace__shell">
-          <aside class="sidebar" aria-label="Navegação principal">
-            <a class="brand" href="./index.html" aria-label="Voltar para o início do Esquilo Invest">
-              <img
-                class="brand__logo"
-                src="https://raw.githubusercontent.com/serealdemanga/esquilo-invest/refs/heads/main/icons/esquilo.png"
-                alt="Logo do Esquilo Invest"
-              />
-              <div class="brand__copy">
-                <strong>Esquilo Invest</strong>
-                <span>Sua carteira, sem enrolação</span>
-              </div>
-            </a>
+        .sidebar-header {
+            height: 72px; display: flex; align-items: center; padding: 0 24px;
+            border-bottom: 1px solid var(--border-light);
+            font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 18px; gap: 12px;
+            color: var(--brand-dark);
+        }
+        .sidebar-header img { height: 28px; }
 
-            <nav class="sidebar__nav">
-              <button class="nav-pill is-active" type="button" data-nav-target="overview">
-                <span class="nav-pill__icon">◉</span>
-                <span>Visão geral</span>
-              </button>
-              <button class="nav-pill" type="button" data-nav-target="actions">
-                <span class="nav-pill__icon">↗</span>
-                <span>Ações</span>
-              </button>
-              <button class="nav-pill" type="button" data-nav-target="funds">
-                <span class="nav-pill__icon">◌</span>
-                <span>Fundos</span>
-              </button>
-              <button class="nav-pill" type="button" data-nav-target="pension">
-                <span class="nav-pill__icon">◎</span>
-                <span>Previdência</span>
-              </button>
-              <button class="nav-pill" type="button" data-nav-target="insights">
-                <span class="nav-pill__icon">✦</span>
-                <span>Leituras</span>
-              </button>
-            </nav>
+        .nav-links { flex: 1; padding: 24px 16px; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 8px; font-weight: 500; color: var(--text-muted); transition: all 0.2s;
+        }
+        .nav-item:hover { background: var(--bg-app); color: var(--brand-dark); }
+        .nav-item.active { background: rgba(255, 115, 0, 0.1); color: var(--brand-orange); }
+        .nav-item i { font-size: 18px; width: 20px; text-align: center; }
 
-            <section class="sidebar__focus card-soft">
-              <span class="sidebar__label">Hoje vale olhar</span>
-              <strong class="sidebar__focus-title" data-bind="focus-title">Carregando...</strong>
-              <p class="sidebar__focus-text" data-bind="focus-text">Buscando o principal ponto da carteira.</p>
-            </section>
+        .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border-light); }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand-dark); color: #FFF; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: 600; font-size: 14px; color: var(--brand-dark); }
+        .user-plan { font-size: 12px; color: var(--text-muted); }
 
-            <footer class="sidebar__footer">
-              <button class="button button--secondary" type="button" data-action="toggle-ghost-mode">
-                Ocultar valores
-              </button>
-            </footer>
-          </aside>
+        /* ==================== MAIN CONTENT ==================== */
+        .main-wrapper { 
+            flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; 
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body.sidebar-collapsed .main-wrapper { margin-left: var(--sidebar-collapsed-width); }
+        
+        /* TOPBAR */
+        .topbar {
+            height: 72px; background: var(--bg-surface); border-bottom: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 32px;
+            position: sticky; top: 0; z-index: 40;
+        }
+        .page-title { font-size: 20px; font-weight: 600; }
+        .topbar-actions { display: flex; gap: 16px; align-items: center; }
+        
+        /* BOTÕES & ESTADOS (Fallback) */
+        .btn-icon { background: none; border: 1px solid var(--border-light); width: 40px; height: 40px; border-radius: 8px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-icon:hover:not(:disabled) { border-color: var(--text-main); color: var(--text-main); }
+        
+        .btn-sync { background: var(--brand-dark); color: #FFF; border: none; padding: 0 16px; height: 40px; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-sync:hover:not(:disabled) { opacity: 0.9; box-shadow: var(--shadow-sm); }
+        
+        /* Fallbacks de botões (Disabled & Loading) */
+        button:disabled { opacity: 0.6; cursor: not-allowed !important; }
+        .btn-loading { pointer-events: none; position: relative; color: transparent !important; }
+        .btn-loading::after {
+            content: ""; position: absolute; width: 16px; height: 16px;
+            top: 0; left: 0; right: 0; bottom: 0; margin: auto;
+            border: 2px solid transparent; border-top-color: #ffffff;
+            border-radius: 50%; animation: button-spin 1s ease infinite;
+        }
+        @keyframes button-spin { from { transform: rotate(0turn); } to { transform: rotate(1turn); } }
 
-          <section class="content" aria-label="Conteúdo principal do dashboard">
-            <header class="topbar">
-              <div class="topbar__intro">
-                <span class="eyebrow">Bom te ver</span>
-                <h1 class="topbar__title">Sua carteira em uma leitura só.</h1>
-                <p class="topbar__subtitle" data-bind="hero-subtitle">
-                  Veja quanto você tem, como está sua carteira e o que merece atenção agora.
-                </p>
-              </div>
+        /* CONTENT GRID */
+        .content { padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 32px; }
+        
+        .dashboard-grid-top { display: grid; grid-template-columns: 1fr 2fr; gap: 32px; align-items: stretch; }
+        
+        /* CARDS (Ajustados para alinhar altura) */
+        .card { 
+            background: var(--bg-surface); 
+            border: 1px solid var(--border-light); 
+            border-radius: 12px; 
+            padding: 24px; 
+            box-shadow: var(--shadow-sm); 
+            display: flex; 
+            flex-direction: column;
+            height: 100%; /* Faz o card esticar e alinhar com os outros do grid */
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 16px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+        .card-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        
+        /* Balance Card */
+        .balance-amount { font-size: 36px; font-weight: 700; color: var(--brand-dark); font-family: 'Poppins', sans-serif; line-height: 1.2; margin-bottom: 8px; }
+        .balance-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 50px; font-size: 13px; font-weight: 600; }
+        .badge-up { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .badge-down { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .badge-loading { background: var(--border-light); color: var(--text-muted); } /* Status de fallback */
+        
+        /* AI Translator Card (O Diferencial) */
+        .ai-card { border: 1px solid rgba(255, 115, 0, 0.3); background: linear-gradient(180deg, #FFFFFF 0%, #FFFaf5 100%); position: relative; overflow: hidden; }
+        .ai-icon-bg { position: absolute; right: -20px; top: -20px; font-size: 120px; color: rgba(255, 115, 0, 0.05); }
+        .ai-message { font-size: 18px; font-weight: 500; color: var(--brand-dark); line-height: 1.5; margin-bottom: 20px; flex: 1; }
+        .ai-action-btn { background: var(--brand-orange); color: #FFF; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; align-self: flex-start; }
+        .ai-action-btn:hover:not(:disabled) { background: var(--brand-orange-hover); }
 
-              <div class="topbar__actions">
-                <div class="pill-info">
-                  <span>Atualizado</span>
-                  <strong data-role="updated-at">Agora há pouco</strong>
-                </div>
-                <button class="icon-button" type="button" data-action="refresh-dashboard" aria-label="Atualizar carteira">
-                  ↻
-                </button>
-                <button class="button button--primary" type="button" data-action="request-ai-analysis">
-                  Ver leitura da IA
-                </button>
-              </div>
-            </header>
+        /* Bottom Grid */
+        .dashboard-grid-bottom { display: grid; grid-template-columns: 1fr 2fr; gap: 32px; align-items: stretch; }
+        
+        /* Gráfico Alocação */
+        .chart-container { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; align-items: center; flex: 1; }
+        
+        /* Tabela de Ativos */
+        .table-responsive { overflow-x: auto; flex: 1; }
+        .assets-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .assets-table th { padding: 12px 16px; border-bottom: 1px solid var(--border-light); font-weight: 600; color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .assets-table td { padding: 16px; border-bottom: 1px solid var(--border-light); font-size: 15px; color: var(--brand-dark); font-weight: 500; }
+        .assets-table tr:last-child td { border-bottom: none; }
+        .asset-icon { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; margin-right: 12px; font-size: 14px; }
+        .icon-rf { background: #EEF2FF; color: #4F46E5; }
+        .icon-rv { background: #FEF3C7; color: #D97706; }
+        .icon-fii { background: #ECFDF5; color: #059669; }
 
-            <section class="hero-grid" id="overview">
-              <article class="hero-card hero-card--main">
-                <div class="hero-card__header">
-                  <div>
-                    <span class="eyebrow">Patrimônio atual</span>
-                    <strong class="hero-card__value hide-value" data-bind="total-value">R$ 0,00</strong>
-                  </div>
-                  <span class="status-chip" data-bind="status-chip">Carregando</span>
-                </div>
-                <p class="hero-card__text" data-bind="hero-message">
-                  Estamos trazendo a leitura mais recente da sua carteira.
-                </p>
-                <div class="hero-card__footer">
-                  <div class="hero-card__metric">
-                    <span>Resultado</span>
-                    <strong data-bind="total-performance">0,0%</strong>
-                  </div>
-                  <div class="hero-card__metric">
-                    <span>Perfil</span>
-                    <strong data-bind="profile-label">—</strong>
-                  </div>
-                  <div class="hero-card__metric">
-                    <span>Score</span>
-                    <strong data-bind="score-label">—</strong>
-                  </div>
-                </div>
-              </article>
-
-              <article class="hero-card hero-card--side">
-                <span class="eyebrow">Próximo passo</span>
-                <strong class="hero-card__side-title" data-bind="primary-action-title">Sem urgência por enquanto</strong>
-                <p class="hero-card__side-text" data-bind="primary-action-reason">
-                  Assim que os dados entrarem, você vê aqui o principal movimento sugerido.
-                </p>
-                <button class="button button--secondary" type="button" data-action="scroll-next-step">
-                  Ver detalhes
-                </button>
-              </article>
-            </section>
-
-            <section class="metrics-row" aria-label="Indicadores principais">
-              <article class="metric-box">
-                <span class="metric-box__label">Total investido</span>
-                <strong class="metric-box__value hide-value" data-bind="invested-value">R$ 0,00</strong>
-                <span class="metric-box__support">O que já entrou na carteira</span>
-              </article>
-              <article class="metric-box">
-                <span class="metric-box__label">Ações</span>
-                <strong class="metric-box__value hide-value" data-bind="actions-total">R$ 0,00</strong>
-                <span class="metric-box__support" data-bind="actions-support">Sem leitura ainda</span>
-              </article>
-              <article class="metric-box">
-                <span class="metric-box__label">Fundos</span>
-                <strong class="metric-box__value hide-value" data-bind="funds-total">R$ 0,00</strong>
-                <span class="metric-box__support" data-bind="funds-support">Sem leitura ainda</span>
-              </article>
-              <article class="metric-box">
-                <span class="metric-box__label">Previdência</span>
-                <strong class="metric-box__value hide-value" data-bind="pension-total">R$ 0,00</strong>
-                <span class="metric-box__support" data-bind="pension-support">Sem leitura ainda</span>
-              </article>
-            </section>
-
-            <section class="dashboard-grid">
-              <article class="panel panel--chart panel--wide">
-                <div class="panel__head">
-                  <div>
-                    <span class="eyebrow">Evolução</span>
-                    <h2>Como sua carteira está andando</h2>
-                  </div>
-                  <div class="segmented-control" role="tablist" aria-label="Recorte do gráfico principal">
-                    <button class="segmented-control__item is-active" type="button" data-period="week">7 dias</button>
-                    <button class="segmented-control__item" type="button" data-period="month">30 dias</button>
-                    <button class="segmented-control__item" type="button" data-period="year">12 meses</button>
-                  </div>
-                </div>
-                <div class="chart-panel">
-                  <canvas id="performanceChart" aria-label="Gráfico principal da carteira"></canvas>
-                </div>
-              </article>
-
-              <article class="panel panel--compact">
-                <div class="panel__head">
-                  <div>
-                    <span class="eyebrow">Distribuição</span>
-                    <h2>Onde está o peso da carteira</h2>
-                  </div>
-                </div>
-                <div class="distribution-card">
-                  <canvas id="allocationChart" aria-label="Gráfico de distribuição"></canvas>
-                  <div class="distribution-card__legend" data-bind="distribution-legend"></div>
-                </div>
-              </article>
-
-              <article class="panel panel--stack" id="insights">
-                <div class="panel__head">
-                  <div>
-                    <span class="eyebrow">Leitura principal</span>
-                    <h2>O que merece sua atenção</h2>
-                  </div>
-                </div>
-                <div class="insight-card insight-card--primary">
-                  <strong data-bind="insight-title">Carregando leitura</strong>
-                  <p data-bind="insight-text">Buscando a mensagem principal da sua carteira.</p>
-                </div>
-                <div class="insight-card-list" data-bind="insight-list"></div>
-              </article>
-
-              <article class="panel panel--stack" id="next-step">
-                <div class="panel__head">
-                  <div>
-                    <span class="eyebrow">Próxima decisão</span>
-                    <h2>O que fazer agora</h2>
-                  </div>
-                </div>
-                <div class="next-step-card">
-                  <strong data-bind="next-step-title">Sem recomendação carregada</strong>
-                  <p data-bind="next-step-text">A principal sugestão aparece aqui assim que os dados entram.</p>
-                  <div class="next-step-card__tags" data-bind="next-step-tags"></div>
-                </div>
-              </article>
-            </section>
-
-            <section class="section-tabs">
-              <button class="section-tab is-active" type="button" data-section="actions">Ações</button>
-              <button class="section-tab" type="button" data-section="funds">Fundos</button>
-              <button class="section-tab" type="button" data-section="pension">Previdência</button>
-            </section>
-
-            <section class="section-panel is-active" id="actions">
-              <div class="panel panel--table">
-                <div class="panel__head panel__head--space">
-                  <div>
-                    <span class="eyebrow">Ações</span>
-                    <h2>Seus ativos de bolsa</h2>
-                  </div>
-                  <div class="table-tools">
-                    <input class="search-input" type="search" placeholder="Buscar ativo" data-filter="table-search" />
-                    <button class="button button--secondary" type="button" data-action="refresh-actions">Atualizar</button>
-                  </div>
-                </div>
-                <div class="table-shell">
-                  <table class="data-table">
-                    <thead>
-                      <tr>
-                        <th>Ativo</th>
-                        <th>Instituição</th>
-                        <th>Leitura</th>
-                        <th>Valor atual</th>
-                        <th>Resultado</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody data-bind="actions-table">
-                      <tr>
-                        <td colspan="6">Carregando ações...</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </section>
-
-            <section class="section-panel" id="funds">
-              <div class="panel panel--table">
-                <div class="panel__head">
-                  <div>
-                    <span class="eyebrow">Fundos</span>
-                    <h2>Seus fundos em leitura simples</h2>
-                  </div>
-                </div>
-                <div class="table-shell">
-                  <table class="data-table">
-                    <thead>
-                      <tr>
-                        <th>Nome</th>
-                        <th>Instituição</th>
-                        <th>Valor atual</th>
-                        <th>Resultado</th>
-                        <th>Leitura</th>
-                      </tr>
-                    </thead>
-                    <tbody data-bind="funds-table">
-                      <tr>
-                        <td colspan="5">Carregando fundos...</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </section>
-
-            <section class="section-panel" id="pension">
-              <div class="panel panel--table">
-                <div class="panel__head">
-                  <div>
-                    <span class="eyebrow">Previdência</span>
-                    <h2>Seus planos em uma visão clara</h2>
-                  </div>
-                </div>
-                <div class="table-shell">
-                  <table class="data-table">
-                    <thead>
-                      <tr>
-                        <th>Plano</th>
-                        <th>Instituição</th>
-                        <th>Valor atual</th>
-                        <th>Resultado</th>
-                        <th>Leitura</th>
-                      </tr>
-                    </thead>
-                    <tbody data-bind="pension-table">
-                      <tr>
-                        <td colspan="5">Carregando previdência...</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </section>
-          </section>
-        </div>
-      </main>
-
-      <aside class="toast" data-role="toast" hidden>
-        <strong data-role="toast-title">Esquilo</strong>
-        <span data-role="toast-message"></span>
-      </aside>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="./scripts/app.final.js"></script>
-  </body>
-</html>
+        /* RESPONSIVO */
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 24px; color: var(--brand-dark); cursor: pointer; }
+        @media (max-width: 1024px) {
+            .dashboard-grid-top, .dashboard-grid-bottom { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-md); }
+            .main-wrapper { margin-left: 0; }
+            .mobile-menu-btn { display: block; }
+            .topbar { padding: 0 20px; }
+            .content { padding: 20px; }
+        }
+        /* ==================== FIM DO CSS ==================== */
